@@ -1,0 +1,19 @@
+{% load static %}
+<header class="navbar">
+
+    <h2>{{ page_title|default:"Tableau de Bord" }}</h2>
+
+    <div class="search-box">
+        <input type="text" placeholder="Search...">
+    </div>
+
+    <div class="nav-actions">
+        <span class="icon"></span>
+        <span class="icon"></span>
+
+        <div class="profile">
+            <img src="{% static 'images/profile_img_1.png' %}" alt="profil_pic">
+            <span>{{ request.session.prenom }} {{ request.session.nom }}</span>
+        </div>
+    </div>
+</header>

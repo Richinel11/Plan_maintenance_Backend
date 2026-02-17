@@ -1,0 +1,14 @@
+.plann_card {
+    background: var(--bg-card);
+    padding: 24px;
+    border-radius: 20px;
+    width: 1100px;
+
+
+}
+
+.table-responsive {
+    /* ; */
+}
+
+#plan-table {}

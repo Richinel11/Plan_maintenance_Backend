@@ -1,0 +1,99 @@
+{% load static %}
+<aside class="sidebar">
+   <div class="logo">
+      <img src="{% static 'images/eneo_new_logo.png' %}" alt="logo_img">
+      <span>P.M.S.E</span>
+   </div>
+
+   <nav>
+      <a href="{% url 'user:dashboard' %}"
+         class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+         <span class="material-symbols-outlined">dashboard</span> Accueil
+      </a>
+
+      {% comment %} "{% url 'user:planning' %}" {% endcomment %}
+      <a href="{% url 'planning:planning' %}"
+         class="{% if request.resolver_match.url_name == 'planning' %}active{% endif %}">
+         <span class="material-symbols-outlined">planner_review</span> Planning
+      </a>
+
+      {% comment %} "{% url 'user:calendar' %}" {% endcomment %}
+      <a href="{% url 'planning:calendar' %}"
+         class="{% if request.resolver_match.url_name == 'calendar' %}active{% endif %}">
+         <span class="material-symbols-outlined">calendar_month</span> Vue Calendrier
+      </a>
+
+      <a href="{% url 'user:users' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">
+         <span class="material-symbols-outlined">groups</span> Utilisateurs
+      </a>
+
+      <!-- Reseau Menu -->
+      <div class="menu-item">
+         <a class="dropdown-btn">
+            <div class="menu-label">
+               <span class="material-symbols-outlined">electric_bolt</span>
+               <span>Reseau</span>
+            </div>
+            <span class="material-symbols-outlined arrow">expand_more</span>
+         </a>
+         <div class="submenu">
+
+            <a href="{% url 'referentiel:troncons' %}"
+               class="{% if request.resolver_match.url_name == 'troncons' %}active{% endif %}">
+               Tronçon
+            </a>
+
+            {% comment %} href="{% url 'user:ouvrage' %}" {% endcomment %}
+            {% comment %} <a href="#" class="{% if request.resolver_match.url_name == 'ouvrage' %}active{% endif %}">
+               Ouvrage
+            </a> {% endcomment %}
+
+            {% comment %} href="{% url 'user:depart' %}" {% endcomment %}
+            <a href="{% url 'referentiel:depart' %}"
+               class="{% if request.resolver_match.url_name == 'depart' %}active{% endif %}">
+               Depart
+            </a>
+
+            {% comment %} href="{% url 'user:poste' %}" {% endcomment %}
+            <a href="{% url 'referentiel:poste' %}"
+               class="{% if request.resolver_match.url_name == 'poste' %}active{% endif %}">
+               Poste
+            </a>
+
+            {% comment %} href="{% url 'user:localisation' %}" {% endcomment %}
+            {% comment %} <a href="#"
+               class="{% if request.resolver_match.url_name == 'localisation' %}active{% endif %}">
+               Localisation
+            </a> {% endcomment %}
+
+            {% comment %} "{% url 'user:ref_reseau' %}" {% endcomment %}
+            <a href="{% url 'referentiel:ref_reseau' %}"
+               class="{% if request.resolver_match.url_name == 'ref_reseau' %}active{% endif %}">
+               Ref Reseau
+            </a>
+         </div>
+      </div>
+
+      {% comment %} "{% url 'user:notifications' %}" {% endcomment %}
+      <a href="#" class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+         <span class="material-symbols-outlined">notifications</span> Notification
+      </a>
+
+
+      <!-- Logout Button -->
+      <a href="{% url 'user:logout' %}" class="logout-btn">
+         Déconnexion <span class="material-symbols-outlined">logout</span>
+      </a>
+   </nav>
+
+</aside>
+
+
+<script>
+   document.querySelectorAll('.dropdown-btn').forEach(button => {
+      button.addEventListener('click', () => {
+         const menuItem = button.parentElement;
+         menuItem.classList.toggle('open');
+      });
+   });
+</script>

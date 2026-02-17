@@ -1,0 +1,117 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<div >
+
+    <div class="btn-table-container">
+        <button id="openUserModalBtn">
+          <span class="material-symbols-outlined">line_start_circle</span>Ajouter un Départ
+        </button>
+    </div>
+
+    <h3>Liste des Départs</h3>
+
+    <div class="card" >
+
+        <table id="depart-table" class="display">
+        <thead>
+            <tr>
+                <th>Nom des Départs</th>
+                <th>Date D'ajout</th>
+                <th>Statut</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+{% comment %} Modal to confirm user activate or deactivate {% endcomment %}
+<div id="confirmModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3 id="confirmModalTitle">Confirmation</h3>
+        <p id="confirmModalMessage">Voulez-vous continuer ?</p>
+
+        <div class="confirm-buttons">
+            <button id="confirmYes" class="btn-confirm">Confirmer</button>
+            <button id="confirmNo" class="btn-cancel">Annuler</button>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable
+        let table = $('#depart-table').DataTable({
+            ajax: "{% url 'referentiel:depart' %}",
+            ordering: true,
+            paging: true,
+            searching: true,
+            order: [[1, "desc"]],
+            columns: [
+                { data: "nom" },
+                { data: "date_creation" },
+                { data: "statut" },
+                { data: "actions" }
+            ]
+        });
+
+    let pendingToggleBtn = null;
+    $('#depart-table').on('click', '.btn-toggle-status', function () {
+        const btn = $(this);
+        const isActif = btn.data('actif');
+        pendingToggleBtn = btn;
+
+        const actionText = (isActif === true || isActif === "true") ? "désactiver" : "activer";
+        $('#confirmModalTitle').text('Confirmation');
+        $('#confirmModalMessage').text(`Voulez-vous vraiment ${actionText} ce départ ?`);
+        $('#confirmModal').fadeIn();
+    });
+
+    $('#confirmYes').on('click', function () {
+        $('#confirmModal').fadeOut();
+        toggleUser(pendingToggleBtn);
+        pendingToggleBtn = null;
+    });
+
+    $('#confirmNo').on('click', function () {
+        pendingToggleBtn = null;
+        $('#confirmModal').fadeOut();
+    });
+
+    function toggleUser(btn) {
+        const departId = btn.data('id');
+        const row = table.row(btn.closest('tr'));
+        $.ajax({
+            url:`/referentiel/depart/${departId}/toggle-status/`,
+            type: "POST",
+            headers: { "X-CSRFToken": "{{ csrf_token }}" },
+            success: function (res) {
+                const rowData = row.data();
+                rowData.statut = res.statut_html;
+                rowData.actions = res.actions_html;
+                row.data(rowData).invalidate().draw(false);
+                // Optional: animate status button
+                $(row.node()).addClass('row-updated');
+                setTimeout(() => { $(row.node()).removeClass('row-updated'); }, 2000);
+            }
+        });
+    }
+
+
+
+
+
+    });
+
+    
+</script>
+
+{% endblock %}

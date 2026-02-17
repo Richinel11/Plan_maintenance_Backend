@@ -1,0 +1,242 @@
+{% load static %}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<div class="btn-table-container">
+    <button id="openUserModalBtn">
+        <span class="material-symbols-outlined">person_add</span> Ajouter utilisateur
+    </button>
+</div>
+
+<h3>Liste des utilisateurs</h3>
+
+{% comment %} Display user in table {% endcomment %}
+<table id="users-table" class="display">
+    <thead>
+        <tr>
+            <th>Utilisateur</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Statut</th>
+            <th>Date de Création</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+{% comment %} Pop up modal to add new user {% endcomment %}
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <span class="material-symbols-outlined close">cancel</span>
+
+        <h3 id="userModalTitle">Ajouter un utilisateur</h3>
+
+        <form id="addUserForm">
+            {% csrf_token %}
+
+            <input name="nom" placeholder="Nom" required>
+            <input name="prenom" placeholder="Prénom" required>
+            <input name="username" placeholder="Nom d'utilisateur" required>
+            <input name="email" placeholder="Email">
+
+            <select name="role" required>
+                <option value="">-- Rôle --</option>
+                {% for role in roles %}
+                    <option value="{{ role.id }}">{{ role.nom }}</option>
+                {% endfor %}
+            </select>
+
+            <div class="btn-container"> 
+               <button type="submit" id="submit-button" class ="btn-submit">Enregistrer</button> 
+                <div class="loader-section" id="loader-section" style="display:none;">
+                    <span class="loader" id="loader"></span>
+                </div>  
+            </div> 
+            {% comment %} <button type="submit">Enregistrer</button> {% endcomment %}
+        </form>
+    </div>
+</div>
+
+
+
+{% comment %} Modal to confirm user activate or deactivate {% endcomment %}
+<div id="confirmModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3 id="confirmModalTitle">Confirmation</h3>
+        <p id="confirmModalMessage">Voulez-vous continuer ?</p>
+
+        <div class="confirm-buttons">
+            <button id="confirmYes" class="btn-confirm">Confirmer</button>
+            <button id="confirmNo" class="btn-cancel">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    // Initialize DataTable
+    let table = $('#users-table').DataTable({
+        ajax: "{% url 'user:users' %}",
+        ordering: true,
+        paging: true,
+        searching: true,
+        order: [[4, "desc"]],
+        columns: [
+            { data: "utilisateur" },
+            { data: "email" },
+            { data: "role" },
+            { data: "statut" },
+            { data: "date_creation" },
+            { data: "actions" }
+        ]
+    });
+
+    // Open modal for new user
+    $('#openUserModalBtn').on('click', function () {
+        $('#userModal').fadeIn();
+        $('#addUserForm')[0].reset();
+        $('#addUserForm').removeData('editing-user-id');
+        $('#userModalTitle').text('Ajouter un utilisateur');
+    });
+
+    // Close modal
+    $('.close').on('click', function () {
+        $('#userModal').fadeOut();
+        $('#addUserForm')[0].reset();
+        $('#addUserForm').removeData('editing-user-id');
+    });
+
+    // Handle form submit (create & update)
+    $('#addUserForm').on('submit', function(e){
+      e.preventDefault();
+        const form = $(this);
+        const submitButton = $('#submit-button');
+        const loaderSection = $('#loader-section');
+
+        submitButton.prop('disabled', true).hide();
+        loaderSection.show();
+
+        const userId = form.data('editing-user-id');
+        let url = "{% url 'user:user-create' %}";
+        if(userId) {
+            url = `/users/${userId}/update/`;
+        }
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: form.serialize(),
+            headers: { "X-CSRFToken": "{{ csrf_token }}" },
+            success: function(res){
+                if(userId){
+                    // Update only the cells of the row to preserve avatar / styling
+                    const rowNode = $(`button[data-id='${userId}']`).closest('tr');
+                    $(rowNode).find('td:eq(0)').html(res.utilisateur); // user name / avatar cell
+                    $(rowNode).find('td:eq(1)').html(res.email);
+                    $(rowNode).find('td:eq(2)').html(res.role);
+                    $(rowNode).find('td:eq(3)').html(res.statut_html);
+                    $(rowNode).find('td:eq(4)').html(res.date_creation);
+                    $(rowNode).find('td:eq(5)').html(res.actions_html);
+
+                    // Highlight updated row
+                    $(rowNode).addClass('row-updated');
+                    setTimeout(() => { $(rowNode).removeClass('row-updated'); }, 2000);
+
+                } else {
+                    // Reload table for new user (preserves styling)
+                    table.ajax.reload(null, false);
+                }
+
+                // Reset form & close modal
+                form[0].reset();
+                form.removeData('editing-user-id');
+                $('#userModal').fadeOut();
+            },
+            error: function(err){
+                alert(err.responseJSON?.error || 'Erreur lors de l\'enregistrement');
+            },
+            complete: function(){
+                submitButton.prop('disabled', false).show();
+                loaderSection.hide();
+            }
+        });
+    });
+
+    // Handle user status toggle
+    let pendingToggleBtn = null;
+    $('#users-table').on('click', '.btn-toggle-status', function () {
+        const btn = $(this);
+        const isActif = btn.data('actif');
+        pendingToggleBtn = btn;
+
+        const actionText = (isActif === true || isActif === "true") ? "désactiver" : "activer";
+        $('#confirmModalTitle').text('Confirmation');
+        $('#confirmModalMessage').text(`Voulez-vous vraiment ${actionText} cet utilisateur ?`);
+        $('#confirmModal').fadeIn();
+    });
+
+    $('#confirmYes').on('click', function () {
+        $('#confirmModal').fadeOut();
+        toggleUser(pendingToggleBtn);
+        pendingToggleBtn = null;
+    });
+
+    $('#confirmNo').on('click', function () {
+        pendingToggleBtn = null;
+        $('#confirmModal').fadeOut();
+    });
+
+    function toggleUser(btn) {
+        const userId = btn.data('id');
+        const row = table.row(btn.closest('tr'));
+        $.ajax({
+            url: `/users/${userId}/toggle-status/`,
+            type: "POST",
+            headers: { "X-CSRFToken": "{{ csrf_token }}" },
+            success: function (res) {
+                const rowData = row.data();
+                rowData.statut = res.statut_html;
+                rowData.actions = res.actions_html;
+                row.data(rowData).invalidate().draw(false);
+
+                // Optional: animate status button
+                $(row.node()).addClass('row-updated');
+                setTimeout(() => { $(row.node()).removeClass('row-updated'); }, 2000);
+            }
+        });
+    }
+
+    // Handle edit button click
+    $('#users-table').on('click', '.btn-edit', function () {
+        const btn = $(this);
+        const userId = btn.data('id');
+        $.ajax({
+            url: `/users/${userId}/get-info/`,
+            type: "GET",
+            success: function (res) {
+                if(res.error){
+                    alert(res.error);
+                    return;
+                }
+
+                const form = $('#addUserForm');
+                form.find('input[name="nom"]').val(res.nom);
+                form.find('input[name="prenom"]').val(res.prenom);
+                form.find('input[name="username"]').val(res.username);
+                form.find('input[name="email"]').val(res.email);
+                form.find('select[name="role"]').val(res.role);
+
+                // Store user ID for updating
+                form.data('editing-user-id', res.id);
+                $('#userModalTitle').text('Modifier un utilisateur');
+
+                $('#userModal').fadeIn();
+            }
+        });
+    });
+});
+</script>
