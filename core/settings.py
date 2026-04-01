@@ -39,14 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Installed Apps
-    'user',
-    'planning',
-    'pilotage',
-    'referentiel',
-    'exploitation',
+    'user.apps.UserConfig',
+    'planning.apps.PlanningConfig',
+    'pilotage.apps.PilotageConfig',
+    'referentiel.apps.ReferentielConfig',
+    'exploitation.apps.ExploitationConfig',
 
     # Third party lib
-
+    'rest_framework'
 
     
 ]
@@ -60,6 +60,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaderS.middleware.CorsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS=[
+    "http://localhost:5174"
 ]
 
 ROOT_URLCONF = 'core.urls'

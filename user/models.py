@@ -30,6 +30,7 @@ class Role(models.Model):
         return self.nom
 
 # Model For User
+
 class Utilisateur(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     username = models.CharField(max_length=150, unique=True)
