@@ -19,16 +19,6 @@ class EntiteMetier(models.Model):
         return f"{self.nom} ({self.get_type_display()})"
 
 
-class Role(models.Model):
-    id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    nom = models.CharField(max_length=50, unique=True)
-    code_role = models.CharField(max_length=50, unique=True, blank=True, null=True)
-    description = models.TextField(blank=True)
-    date_creation = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-
-    def __str__(self):
-        return self.nom
-
 # Model For User
 
 class Utilisateur(models.Model):
@@ -43,15 +33,14 @@ class Utilisateur(models.Model):
     password = models.CharField(max_length=128, blank=True)
     first_connection = models.BooleanField(default=True)
 
-    entite_metier = models.ForeignKey(
-        EntiteMetier, on_delete=models.PROTECT, related_name="utilisateurs"
-    )
+    entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, related_name="utilisateurs")
 
-    role = models.ForeignKey(
-        Role, on_delete=models.PROTECT, related_name="utilisateurs"
-    )
+    role = models.ForeignKey("security.Role", on_delete=models.PROTECT, related_name="utilisateurs")
 
     date_creation = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+     # REQUIRED_FIELDS pour compatibilité Django
+    REQUIRED_FIELDS = ['nom', 'prenom', 'email']
 
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith("pbkdf2_"):

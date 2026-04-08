@@ -25,7 +25,7 @@ class PlanningTravaux(models.Model):
         ('VALIDE', 'Validé'),
         ('EN_COURS', 'En cours'),
         ('TERMINE', 'Terminé'),
-        ('REPORTE', 'Reporté'),
+        ('REPORTE', 'Reporté')
     ]
     
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)

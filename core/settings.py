@@ -39,19 +39,23 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Installed Apps
+    "corsheaders",
     'user.apps.UserConfig',
     'planning.apps.PlanningConfig',
     'pilotage.apps.PilotageConfig',
     'referentiel.apps.ReferentielConfig',
     'exploitation.apps.ExploitationConfig',
+    'security.apps.SecurityConfig',
 
     # Third party lib
-    'rest_framework'
+    'rest_framework',
+    
 
     
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,7 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaderS.middleware.CorsMiddleware',
+    
 ]
 
 CORS_ALLOWED_ORIGINS=[
@@ -116,6 +120,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+LOGIN_URL = '/users/login/'
+LOGIN_REDIRECT_URL = '/admin/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

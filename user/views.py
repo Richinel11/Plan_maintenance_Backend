@@ -6,8 +6,9 @@ from rest_framework import status
 from django.contrib.auth.hashers import check_password, make_password
 from django.shortcuts import get_object_or_404
 
-from .models import Utilisateur, Role, EntiteMetier
-from .serializers import UtilisateurSerializer, RoleSerializer, EntiteMetierSerializer
+from .models import Utilisateur, EntiteMetier
+from security.models import Role
+from .serializers import UtilisateurSerializer,  EntiteMetierSerializer
 
 
 class UtilisateurViewSet(ModelViewSet):
@@ -70,9 +71,6 @@ class UtilisateurViewSet(ModelViewSet):
         return Response({"message": "Mot de passe mis à jour"})
 
 
-class RoleViewSet(ModelViewSet):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
 
 
 class EntiteMetierViewSet(ModelViewSet):
