@@ -2,10 +2,11 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from user.models import Utilisateur
 from .models import Role, Permission, UserRole, RolePermission
-from .serializers import RoleSerializer, PermissionSerializer, UserRoleSerializer, RolePermissionSerializer
+from .serializers import AssignPermissionSerializer, AssignRoleSerializer, RoleSerializer, PermissionSerializer
 from .permission import HasPermission
 from .services import (
     assign_role_to_user,
@@ -19,6 +20,16 @@ from .services import (
 from django.contrib.auth import get_user_model
 
 
+
+
+@extend_schema_view(
+    list=extend_schema(tags=['Security'], description='Lister tous les rôles'),
+    retrieve=extend_schema(tags=['Security'], description='Détail d’un rôle'),
+    create=extend_schema(tags=['Security'], description='Créer un rôle'),
+    update=extend_schema(tags=['Security'], description='Mettre à jour un rôle'),
+    destroy=extend_schema(tags=['Security'], description='Supprimer un rôle'),
+)
+
 #  ROLE CRUD
 
 class RoleViewSet(viewsets.ModelViewSet):
@@ -26,9 +37,17 @@ class RoleViewSet(viewsets.ModelViewSet):
     serializer_class = RoleSerializer
     permission_classes = [IsAuthenticated, HasPermission]
     required_permissions = ["manage_roles"]
+    
+    
+@extend_schema_view(
+    list=extend_schema(tags=['Security'], description='Lister toutes les permissions'),
+    retrieve=extend_schema(tags=['Security'], description='Détail d’une permission'),
+    create=extend_schema(tags=['Security'], description='Créer une permission'),
+    update=extend_schema(tags=['Security'], description='Mettre à jour une permission'),
+    destroy=extend_schema(tags=['Security'], description='Supprimer une permission'),
+)
 
 # PERMISSION CRUD
-
 
 class PermissionViewSet(viewsets.ModelViewSet):
     queryset = Permission.objects.all()
@@ -36,6 +55,13 @@ class PermissionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, HasPermission]
     required_permissions = ["manage_permissions"]
 
+
+
+@extend_schema(
+    tags=['Security'],
+    request=AssignRoleSerializer,
+    responses={"200": {"message": "Rôle assigné avec succès"}}
+)
 
 #  Assigner un role a un utilisateur
 
@@ -62,6 +88,12 @@ class AssignRoleToUserView(APIView):
 
 #  retirer un role a un utilisateur
 
+@extend_schema(
+    tags=['Security'],
+    request=AssignRoleSerializer,
+    responses={"200": {"message": "Rôle retiré avec succès"}}
+)
+
 class RemoveRoleFromUserView(APIView):
     permission_classes = [IsAuthenticated, HasPermission]
     required_permissions = ["assign_role"]
@@ -85,6 +117,12 @@ class RemoveRoleFromUserView(APIView):
 
 #  Assigner un role a une permission
 
+@extend_schema(
+    tags=['Security'],
+    request=AssignPermissionSerializer,
+    responses={"200": {"message": "Permission retirée du rôle"}}
+)
+
 class AssignPermissionToRoleView(APIView):
     permission_classes = [IsAuthenticated, HasPermission]
     required_permissions = ["assign_permission"]
@@ -104,6 +142,11 @@ class AssignPermissionToRoleView(APIView):
         return Response({"message": "Permission assignée au rôle"})
 
 
+@extend_schema(
+    tags=['Security'],
+    request=AssignPermissionSerializer,
+    responses={"200": {"message": "Permission retirée du rôle"}}
+)
 # retirer une permission d'un role
 
 class RemovePermissionFromRoleView(APIView):
@@ -125,6 +168,12 @@ class RemovePermissionFromRoleView(APIView):
         return Response({"message": "Permission retirée du rôle"})
 
 
+@extend_schema(
+    tags=['Security'],
+    responses=RoleSerializer(many=True),
+    description="Lister les rôles d’un utilisateur"
+)
+
 # afficher ler roles d'un utilisateur
 
 class UserRolesView(APIView):
@@ -143,6 +192,12 @@ class UserRolesView(APIView):
         return Response(serializer.data)
 
 
+
+@extend_schema(
+    tags=['Security'],
+    responses=PermissionSerializer(many=True),
+    description="Lister les permissions d’un rôle"
+)
 #  voir les permissions par roles
 
 class RolePermissionsView(APIView):

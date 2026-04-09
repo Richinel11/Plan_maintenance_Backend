@@ -2,42 +2,39 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from drf_spectacular.utils import extend_schema, extend_schema_view
+
 
 from django.contrib.auth.hashers import check_password, make_password
 from django.shortcuts import get_object_or_404
 
 from .models import Utilisateur, EntiteMetier
 from security.models import Role
-from .serializers import UtilisateurSerializer,  EntiteMetierSerializer
+from .serializers import  SetPasswordSerializer, UtilisateurSerializer,  EntiteMetierSerializer
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenSerializer
+
+class CustomTokenView(TokenObtainPairView):
+    serializer_class = CustomTokenSerializer
+    
+    
+@extend_schema_view(
+    list=extend_schema(tags=['User'], description="Lister les utilisateurs"),
+    retrieve=extend_schema(tags=['User'], description="Détail d’un utilisateur"),
+    create=extend_schema(tags=['User'], description="Créer un utilisateur"),
+    update=extend_schema(tags=['User'], description="Mettre à jour un utilisateur"),
+    destroy=extend_schema(tags=['User'], description="Supprimer un utilisateur"),
+
+    # actions custom
+
+    toggle_status=extend_schema(tags=['User'], description="Activer / désactiver un utilisateur", responses={"200": {"actif": True}}),
+    set_password=extend_schema(tags=['User'], request=SetPasswordSerializer, description="Changer le mot de passe"),
+)
 
 class UtilisateurViewSet(ModelViewSet):
     queryset = Utilisateur.objects.select_related("role", "entite_metier").all()
     serializer_class = UtilisateurSerializer
-    
-    #login api
-    @action(detail=False, methods=['post'])
-    def login(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-
-        if not username or not password:
-            return Response({"error": "Champs requis"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = Utilisateur.objects.get(username=username, actif=True)
-        except Utilisateur.DoesNotExist:
-            return Response({"error": "Utilisateur non trouvé"}, status=404)
-
-        if not check_password(password, user.password):
-            return Response({"error": "Mot de passe incorrect"}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({
-            "message": "Connexion réussie",
-            "user": UtilisateurSerializer(user).data
-        })
-        
- 
     
     # changer de statut
     @action(detail=True, methods=['post'])
@@ -72,6 +69,13 @@ class UtilisateurViewSet(ModelViewSet):
 
 
 
+@extend_schema_view(
+    list=extend_schema(tags=['User'], description="Lister les entités métier"),
+    retrieve=extend_schema(tags=['User'], description="Détail d’une entité métier"),
+    create=extend_schema(tags=['User'], description="Créer une entité métier"),
+    update=extend_schema(tags=['User'], description="Mettre à jour une entité métier"),
+    destroy=extend_schema(tags=['User'], description="Supprimer une entité métier"),
+)
 
 class EntiteMetierViewSet(ModelViewSet):
     queryset = EntiteMetier.objects.all()

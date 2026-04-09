@@ -1,5 +1,6 @@
 #plnaning/views.py
 from rest_framework import viewsets, status
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
@@ -8,6 +9,14 @@ from .serializers import PlanningTravauxSerializer, TypeActiviteSerializer
 
 
 
+
+@extend_schema_view(
+    list=extend_schema(tags=['TypeActivite'], description='Lister tous les types d’activités'),
+    retrieve=extend_schema(tags=['TypeActivite'], description='Récupérer un type d’activité'),
+    create=extend_schema(tags=['TypeActivite'], description='Créer un type d’activité'),
+    update=extend_schema(tags=['TypeActivite'], description='Mettre à jour un type d’activité'),
+    destroy=extend_schema(tags=['TypeActivite'], description='Supprimer un type d’activité'),
+)
 
 class TypeActiviteViewSet(viewsets.ViewSet):
 
@@ -58,6 +67,26 @@ class TypeActiviteViewSet(viewsets.ViewSet):
         type_activite = get_object_or_404(TypeActivite, id=pk)
         type_activite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+    
+    
+@extend_schema_view(
+    list=extend_schema(tags=['Planning'], description='Lister tous les travaux planifiés'),
+    retrieve=extend_schema(tags=['Planning'], description='Détail d’un travail planifié'),
+    create=extend_schema(tags=['Planning'], description='Créer un travail planifié'),
+    update=extend_schema(tags=['Planning'], description='Mettre à jour un travail planifié'),
+    destroy=extend_schema(tags=['Planning'], description='Supprimer un travail planifié'),
+
+    # Actions custom
+    reporter=extend_schema(tags=['Planning'], description='Reporter la date de fin et changer le statut en "REPORTE"'),
+    changer_statut=extend_schema(tags=['Planning'], description='Changer le statut du travail (BROUILLON, SOUMIS, VALIDE, EN_COURS, TERMINE)'),
+    soumettre=extend_schema(tags=['Planning'], description='Soumettre un travail pour validation'),
+    valider=extend_schema(tags=['Planning'], description='Valider un travail soumis (Responsable)'),
+    demarrer=extend_schema(tags=['Planning'], description='Démarrer un travail validé'),
+    terminer=extend_schema(tags=['Planning'], description='Terminer un travail en cours'),
+    conflits=extend_schema(tags=['Planning'], description='Lister les travaux en conflit')
+)
     
 class PlanningTravauxViewSet(viewsets.ViewSet):
     
