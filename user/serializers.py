@@ -30,7 +30,7 @@ class CustomTokenSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
 
-        token["id"] = user.id
+        token["id"] = str(user.id)
 
         # supprimer user_id si présent
         

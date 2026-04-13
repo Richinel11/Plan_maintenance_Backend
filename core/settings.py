@@ -112,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "user.Utilisateur"
 
 REST_FRAMEWORK = {
     
