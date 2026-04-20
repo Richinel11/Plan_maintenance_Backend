@@ -5,10 +5,10 @@ from .models import Utilisateur,EntiteMetier
 # Register your models here.
 @admin.register(Utilisateur)
 class AdminUser(admin.ModelAdmin):
-    list_display = ('id','username','nom','prenom','email','actif')
-    list_filter = ('actif',)
+    list_display = ('id','username','first_name','last_name','email','is_active')
+    list_filter = ('is_active',)
 
 @admin.register(EntiteMetier)
 class AdminEntiteMetier(admin.ModelAdmin):
-    list_display = ('id','nom','type',)
-    list_filter = ('date_creation',)
+    list_display = ('id','name','type',)
+    list_filter = ('created_at',)

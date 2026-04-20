@@ -16,9 +16,9 @@ class Role(models.Model):
     
 class Permission(models.Model):
     id = models.UUIDField(_('id'), primary_key=True, default=uuid.uuid4, editable=False)
-    nom = models.CharField(max_length=100) # element affiché pour l'utilisateur
-    code = models.CharField(max_length=100, unique=True)  # element pour le backend
-    module = models.CharField(max_length=100)  # planning, security, etc
+    nom = models.CharField(max_length=100) 
+    code = models.CharField(max_length=100, unique=True)  
+    module = models.CharField(max_length=100)  
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

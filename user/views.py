@@ -1,73 +1,190 @@
+from django.utils import timezone
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from drf_spectacular.utils import extend_schema, extend_schema_view
-
-
-from django.contrib.auth.hashers import check_password, make_password
-from django.shortcuts import get_object_or_404
-
+from .models import Utilisateur
 from .models import Utilisateur, EntiteMetier
-from security.models import Role
-from .serializers import  SetPasswordSerializer, UtilisateurSerializer,  EntiteMetierSerializer
+from security.models import Role, UserRole
+from .serializers import  SetPasswordSerializer, UtilisateurSerializer,  EntiteMetierSerializer, UtilisateurUpdateSerializer
+from .serializers import LoginSerializer
 
-from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import CustomTokenSerializer
-
-class CustomTokenView(TokenObtainPairView):
-    serializer_class = CustomTokenSerializer
-    
-    
 @extend_schema_view(
     list=extend_schema(tags=['User'], description="Lister les utilisateurs"),
     retrieve=extend_schema(tags=['User'], description="Détail d’un utilisateur"),
     create=extend_schema(tags=['User'], description="Créer un utilisateur"),
     update=extend_schema(tags=['User'], description="Mettre à jour un utilisateur"),
     destroy=extend_schema(tags=['User'], description="Supprimer un utilisateur"),
-
     # actions custom
-
     toggle_status=extend_schema(tags=['User'], description="Activer / désactiver un utilisateur", responses={"200": {"actif": True}}),
     set_password=extend_schema(tags=['User'], request=SetPasswordSerializer, description="Changer le mot de passe"),
 )
 
-class UtilisateurViewSet(ModelViewSet):
-    queryset = Utilisateur.objects.select_related("role", "entite_metier").all()
-    serializer_class = UtilisateurSerializer
-    
-    # changer de statut
-    @action(detail=True, methods=['post'])
-    def toggle_status(self, request, pk=None):
-        user = self.get_object()
 
-        user.actif = not user.actif
+@api_view(['POST'])
+def create_user(request):
+    
+    try: 
+        role = Role.objects.get(code_role = request.data['code_role'])
+        user = Utilisateur.objects.create(
+            username = request.data['username'],
+            first_name = request.data['first_name'],
+            last_name = request.data['last_name'],
+            email = request.data['email'],
+            password = request.data['password'],
+            first_connection = True,
+            is_ldap = request.data['is_ldap']
+        )
+        UserRole.objects.create(
+            user = user,
+            role = role
+        )
+        
+        return Response({"message" :"User ok"}, status=status.HTTP_201_CREATED)
+    
+    except Role.DoesNotExist: 
+        return Response({'Error':'Role non existant'}, status=status.HTTP_400_BAD_REQUEST)
+
+# list all user
+
+@api_view(['GET'])
+def get_users(request):
+    # permission_classes = [IsAuthenticated]  
+    # authentication_classes = [] 
+    users = Utilisateur.objects.all()
+    serializer = UtilisateurSerializer(users, many = True)
+    if serializer.is_valid:   
+        return Response(serializer.data) 
+    
+# get update & delete  user
+@api_view(['GET','PUT', 'PATCH'])
+
+def get_update_user(request, user_id):
+    try:
+        user = Utilisateur.objects.get(id =user_id)
+    except Utilisateur.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET'  :
+        serializer = UtilisateurSerializer(user, many= False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    if request.method == 'PUT':
+        serializer = UtilisateurUpdateSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.method == 'PATCH':
+    
+        serializer = UtilisateurUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Update role si fourni
+    #if request.data.get('code_role'):
+    #    role = Role.objects.get(code_rol=request.data.get('code_role'))
+    #   user_role = UserRole.objects.filter(user=user).first()
+
+    #    if user_role:
+    #       user_role.role = role
+    #        user_role.save()
+    #    else:
+    #        UserRole.objects.create(user=user, role=role)
+
+    return Response({"message": "User updated"}, status=status.HTTP_200_OK)
+
+    
+# delete user
+@api_view(['DELETE'])    
+def delete_user(request, user_id):
+    try:    
+        user = Utilisateur.objects.get(id=user_id)
+        user.is_deleted = True
+        user.is_active = False
+        user.deleted_at = timezone.now()
+        user.save()
+        return Response({"message": "User deleted"}, status=status.HTTP_204_NO_CONTENT)
+
+    except Utilisateur.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    
+    
+#restauration d'un utilisateur
+@api_view(['PATCH'])
+def restore_user(request, user_id):
+    try:
+        user = Utilisateur.objects.get(id=user_id)
+          
+        if not user.is_deleted:
+            return Response({'error': 'Cet utilisateur n\'est pas supprimé'},status=status.HTTP_400_BAD_REQUEST) 
+
+        user.is_deleted = False
+        user.deleted_at = None
         user.save()
 
+        return Response({'message': 'Utilisateur restauré avec succès'},status=status.HTTP_200_OK)
+
+    except Utilisateur.DoesNotExist:
+        return Response({'error': 'Utilisateur non trouvé'},status=status.HTTP_404_NOT_FOUND)
+
+    #login api
+class LoginAPIView(APIView):
+    """
+    API endpoint pour l'authentification des utilisateurs
+    Supporte l'authentification locale et LDAP
+    """
+    permission_classes = []  # Pas d'authentification requise pour le login
+    authentication_classes = []  # Pas d'authentification requise pour le login
+    
+    def post(self, request):
+        # Validation des données d'entrée
+        serializer = LoginSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            data =  serializer.validated_data
+            return Response({
+                'access' : data['access'],
+                'refresh' : data['refresh']
+            }, status=status.HTTP_200_OK)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class LogoutAPIView(APIView):
+    """Déconnexion de l'utilisateur"""
+    
+    def post(self, request):
+        # Vider la session
+        request.session.flush()
+        return Response({'success': True,'message': 'Déconnexion réussie'}, status=status.HTTP_200_OK)
+
+
+
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        
+        # Ajouter les infos supplémentaires
         return Response({
-            "id": str(user.id),
-            "actif": user.actif
+            'token': token.key,
+            'user_id': user.pk,
+            'username': user.username,
+            'role': user.role.nom if hasattr(user, 'role') else None
         })
         
-
         
-      # changer de password
-    @action(detail=True, methods=['post'])
-    def set_password(self, request, pk=None):
-        user = self.get_object()
-
-        password = request.data.get("password")
-
-        if not password:
-            return Response({"error": "Mot de passe requis"}, status=status.HTTP_400_BAD_REQUEST)
-
-        user.password = make_password(password)
-        user.first_connection = False
-        user.save()
-
-        return Response({"message": "Mot de passe mis à jour"})
-
-
 
 @extend_schema_view(
     list=extend_schema(tags=['User'], description="Lister les entités métier"),

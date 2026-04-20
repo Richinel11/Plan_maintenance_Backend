@@ -1,7 +1,14 @@
+from venv import logger
+
 from rest_framework import serializers
-from .models import Utilisateur, EntiteMetier
 from security.serializers import RoleSerializer
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .models import Utilisateur, EntiteMetier
+from django.contrib.auth.hashers import make_password, check_password
+from utils import LDAP_connect 
+from rest_framework_simplejwt.tokens import RefreshToken
+import logging
+
+Logger = logging.getLogger(__name__)
 
 class EntiteMetierSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,31 +17,81 @@ class EntiteMetierSerializer(serializers.ModelSerializer):
 
 
 class UtilisateurSerializer(serializers.ModelSerializer):
-    role = RoleSerializer(read_only=True)
-    entite_metier = EntiteMetierSerializer(read_only=True)
+    # role = RoleSerializer(read_only=True)
 
     class Meta:
         model = Utilisateur
-        fields = '__all__'
+        fields = ['id','username', 'first_name', 'last_name', 'email',  'is_active', 'is_ldap']
 
+class UtilisateurUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Utilisateur
+        fields = [
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'first_connection',
+            'is_ldap',
+        ]
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(min_length=8, write_only=True)
+
+    def validate(self, attrs):
+        username = attrs['username']
+        password = attrs['password']
+
+        if not username.isalnum():
+            raise serializers.ValidationError("Username doit être alphanumérique")
+
+        try:
+            user = Utilisateur.objects.get(username=username)
+        except Utilisateur.DoesNotExist:
+            raise serializers.ValidationError("Identifiants invalides")
+        if user.is_active == False:
+            raise serializers.ValidationError("account blocked")
+        if user.is_deleted == True:
+            raise serializers.ValidationError("user does not exist")
+
+        if user.is_ldap:
+            try:
+                LDAP_connect.ldap_login(username, password)
+                logger.info("LDAP Auth OK pour %s", username)
+            except Exception as e:
+                logger.warning("Échec LDAP pour %s : %s", username, str(e))
+                raise serializers.ValidationError("Identifiants invalides")
+        else:
+            if not check_password(password, user.password):
+                raise serializers.ValidationError("Identifiants invalides")
+
+        refresh = RefreshToken()
+        refresh['user_id'] = str(user.id)
+        
+        access = refresh.access_token
+        access['user_id'] = str(user.id)
+        
+        return {
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+        }
+
+class LoginResponseSerializer(serializers.Serializer):
+    user_id = serializers.CharField()
+    username = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    role = serializers.CharField()
+    ldap_dn = serializers.CharField(allow_blank=True)
+    ldap_groups = serializers.ListField(child=serializers.CharField())
+    first_password_change_required = serializers.BooleanField(default=False)    
+   
+    
 class SetPasswordSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 
 class ToggleStatusSerializer(serializers.Serializer):
-    pass  # pas de body
+    pass  
         
-class CustomTokenSerializer(TokenObtainPairSerializer):
-    
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-
-        token["id"] = str(user.id)
-
-        # supprimer user_id si présent
-        
-        if "user_id" in token:
-            del token["user_id"]
-
-        return token

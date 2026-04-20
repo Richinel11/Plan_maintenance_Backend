@@ -1,8 +1,10 @@
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated 
 from drf_spectacular.utils import extend_schema, extend_schema_view
+
+
 
 from user.models import Utilisateur
 from .models import Role, Permission, UserRole, RolePermission
@@ -18,8 +20,7 @@ from .services import (
 )
 
 from django.contrib.auth import get_user_model
-
-
+from rest_framework.decorators import api_view,permission_classes
 
 
 @extend_schema_view(
@@ -30,13 +31,48 @@ from django.contrib.auth import get_user_model
     destroy=extend_schema(tags=['Security'], description='Supprimer un rôle'),
 )
 
-#  ROLE CRUD
+# Function based rule
+@api_view(['POST'])
+def create_role (request):
+    if request.method == 'POST' :
+        Role.objects.create(
+            nom = request.data["nom_role"],
+            code_role = request.data["code_role"],
+            description = request.data["description"]
+        )
+        return Response({'message': 'Role Created'}, status=status.HTTP_201_CREATED)
+    return Response({'Error': 'Method not Allowed'}, status=status.HTTP_400_BAD_REQUEST)
 
-class RoleViewSet(viewsets.ModelViewSet):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-    permission_classes = [IsAuthenticated, HasPermission]
-    required_permissions = ["manage_roles"]
+@api_view(['GET'])
+def get_role(request):
+    role = Role.objects.all()
+    serializer = RoleSerializer(role, many = True)
+    if serializer.is_valid :
+        return Response(serializer.data)
+
+@api_view(['GET','PUT', "DELETE"])
+def get_update_role(request, code_role):
+    try:
+        role = Role.objects.get(code_role = code_role )   
+        
+        if request.method == 'GET' :
+            serializer = RoleSerializer(role, many = False)
+            return Response(serializer.data) 
+        if request.method == 'PUT':
+            role.code_role = request.data['code_role']
+            role.nom = request.data['nom']
+            role.description = request.data['description']
+            
+            role.save()
+            return Response({"message":"Role Updated"}, status=status.HTTP_200_OK) 
+        
+        # if request.method == 'DELETE':
+        #     role.is_actif =False
+        #     role.save()
+        #     return Response({"message":"Role Deleted"}, status=status.HTTP_200_OK) 
+    except Exception as e :
+        return Response({"Error" : "Role not found"}, status=status.HTTP_400_BAD_REQUEST)
+        
     
     
 @extend_schema_view(
@@ -84,7 +120,6 @@ class AssignRoleToUserView(APIView):
             return Response({"error": "Rôle introuvable"}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"message": "Rôle assigné avec succès"})
-
 
 #  retirer un role a un utilisateur
 

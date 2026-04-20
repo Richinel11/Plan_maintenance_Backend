@@ -8,11 +8,12 @@ from exploitation.models import DemandeRetrait, NoteArret
 User = get_user_model()
 
 class PilotageTravail(models.Model):
-    # Identification
+    # Identification du travail
+    
     titre = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
-    # Responsables
+    # Responsables du travail
     responsable = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="travaux_pilotage")
     entite = models.ForeignKey(EntiteMetier, on_delete=models.SET_NULL, null=True, related_name="travaux_pilotage")
 
@@ -20,7 +21,7 @@ class PilotageTravail(models.Model):
     reference_reseau = models.ForeignKey(ReferenceReseau, on_delete=models.SET_NULL, null=True, blank=True)
     type_activite = models.ForeignKey(TypeActivite, on_delete=models.SET_NULL, null=True, blank=True)
 
-    # Planning
+    # Planning 
     date_debut = models.DateTimeField(null=True, blank=True)
     date_fin = models.DateTimeField(null=True, blank=True)
     statut = models.CharField(max_length=50, choices=[
@@ -32,6 +33,7 @@ class PilotageTravail(models.Model):
         ("REPORTE", "Reporté"),
         ("ANNULE", "Annulé")
     ], default="BROUILLON")
+    
     travail_en_alignement = models.BooleanField(default=False)
 
     # Workflow
@@ -47,3 +49,8 @@ class PilotageTravail(models.Model):
 
     def __str__(self):
         return self.titre
+    
+class Transition (models.Model):
+    from_state = models.CharField(max_length=10)
+    to_state = models.CharField(max_length=10)
+    

@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from datetime import timedelta
 
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_spectacular',
+
     
 
     
@@ -86,6 +86,18 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'db_maintenance',
+#         'USER': 'root',
+#         'PASSWORD': '',
+#         'HOST': '127.0.0.1', 
+#         'PORT': '3306',       
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -112,7 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = "user.Utilisateur"
+
 
 REST_FRAMEWORK = {
     
@@ -124,13 +136,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny', 
     ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',  # Génèrer le schéma automatiquement
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', 
 }
 
 
 SIMPLE_JWT = {
     
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "USER_ID_FIELD": "id",       # champs de l'utilisateur dans la DB
     "USER_ID_CLAIM": "id",       # champs utilisé dans le token
@@ -139,8 +151,6 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True, # pour eviter la reutilisation d'un ancien refresh Token
 }
 
-LOGIN_URL = '/users/login/'
-LOGIN_REDIRECT_URL = '/admin/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
