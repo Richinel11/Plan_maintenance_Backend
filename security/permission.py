@@ -6,8 +6,7 @@ class HasPermission(BasePermission):
     def has_permission(self, request, view):
         
         user = request.user
-        
-         #verifier si l'utilisateur est connecté
+        #verifier si l'utilisateur est connecté
          
         if not user or not user.is_authenticated:
             return False

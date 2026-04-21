@@ -13,7 +13,7 @@ def user_has_permission(user, permission_code):
     if not user or not user.is_authenticated:
         return False
 
-    # Super admin → accès total
+    # Super admin accès total
     if user.is_superuser:
         return True
 

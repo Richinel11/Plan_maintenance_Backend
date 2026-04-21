@@ -1,7 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    PermissionViewSet,
     AssignRoleToUserView,
     RemoveRoleFromUserView,
     AssignPermissionToRoleView,
@@ -9,24 +8,20 @@ from .views import (
     UserRolesView,
     RolePermissionsView,
     
-    create_role,get_role
+    create_role, get_role, get_update_role, create_permission, get_permission, get_update_permission
     )
-
-
-# ROUTER POUR LES VIEWSETS
-# r indique que c'est une rawstring. ne traite pas les / comme des caractères spéciaux. 
-router = DefaultRouter()
-router.register(r'permissions', PermissionViewSet, basename='permission')
-
 
 # URLS POUR LES API VIEWS
 
 urlpatterns = [
-    path('', include(router.urls)),  # inclut toutes les routes(router) CRUD Role & Permission
     
     path('roles/all-roles', get_role, name="get-all-role"),
     path('roles/create-role', create_role, name="create-new-role"),
-    
+    path('roles/update-role', get_update_role, name="update-role"),
+    path('permissions/all-permission', get_permission, name="get-all-permission"),
+    path('permissions/create-permission', create_permission, name="create-new-permission"),
+    path('permissions/update-permission', get_update_permission, name="update-permission"),
+
     # Assign / Remove Role to User
     path('user/assign-role', AssignRoleToUserView.as_view(), name='assign-role'),
     path('user/remove-role', RemoveRoleFromUserView.as_view(), name='remove-role'),
@@ -36,7 +31,7 @@ urlpatterns = [
     path('roles/remove-permission', RemovePermissionFromRoleView.as_view(), name='remove-permission'),
 
     # Get roles of a user
-    path('user/<str:user_id>/roles', UserRolesView.as_view(), name='user-roles'),
+    path('user/<uuid:user_id>/roles', UserRolesView.as_view(), name='user-roles'),
 
     # Get permissions of a role
     path('roles/<str:role_code>/permissions', RolePermissionsView.as_view(), name='role-permissions'),

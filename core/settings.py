@@ -5,6 +5,9 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 import os
 
+
+AUTH_USER_MODEL = 'user.Utilisateur'
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -40,8 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_spectacular',
+    'rest_framework_simplejwt.token_blacklist',
 
-    
 
     
 ]
@@ -133,22 +136,32 @@ REST_FRAMEWORK = {
         
     ],
     
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny', 
-    ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', 
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.AllowAny', 
+    # ],
+    # 'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', 
 }
 
 
 SIMPLE_JWT = {
     
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    
     "USER_ID_FIELD": "id",       # champs de l'utilisateur dans la DB
-    "USER_ID_CLAIM": "id",       # champs utilisé dans le token
+    "USER_ID_CLAIM": "user_id",       # champs utilisé dans le token
+    
+    "AUTH_TOKEN_CLASSES" : ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM" : "token_type",
+    
+    "AUTH_HEADER_TYPES" : ("Bearer"),
+    
 
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True, # pour eviter la reutilisation d'un ancien refresh Token
+    
+    "SIGNING_KEY" : SECRET_KEY,
+    "ALGORITHM" : "HS256"
 }
 
 
