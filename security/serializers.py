@@ -1,19 +1,25 @@
-from rest_framework import serializers
-
+from rest_framework import serializers 
 from .models import Permission, Role, RolePermission, UserRole, WorkflowPermission
 
 
-class RoleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model= Role 
-        fields= ["id", "nom", "code_role", "description", "date_creation"]
-        
 
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model= Permission  
-        fields=["id", "nom", "code", "description", "created_at"]
+        fields=["nom", "code", "description"]
         
+class RoleSerializer(serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Role
+        fields = ["nom", "code_role",  "date_creation", "permissions"]
+
+    def get_permissions(self, obj):
+        # Utilisation du related_name 'role_permissions' défini dans le modèle
+        role_permissions = obj.role_permissions.all().select_related('permission')
+        permissions = [rp.permission for rp in role_permissions]
+        return PermissionSerializer(permissions, many=True).data
         
 class RolePermissionSerializer(serializers.ModelSerializer):
     class Meta:

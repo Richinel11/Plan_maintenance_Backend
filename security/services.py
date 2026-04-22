@@ -4,33 +4,33 @@ from rest_framework.response import Response
 from .models import Role, Permission, UserRole, RolePermission
 
 
-# Fonctions concernant les PERMISSIONS des utilisateurs
+# services.py
 
 def user_has_permission(user, permission_code):
-    
-   # Vérifie si un utilisateur possède une permission donnée via ses rôles
-
+    # Vérifie si un utilisateur possède une permission donnée via son rôle
     if not user or not user.is_authenticated:
         return False
 
-    # Super admin accès total
+    # Super admin : accès total
     if user.is_superuser:
         return True
 
-    return Permission.objects.filter(rolepermission__role__userrole__user=user, code=permission_code).exists()
+    return Permission.objects.filter(
+        rolepermission__role__userrole__user=user,
+        code=permission_code
+    ).exists()
 
-    #Vérifie si l'utilisateur possède TOUTES les permissions
+
 def user_has_all_permissions(user, permission_codes: list):
-
-    
+    # Vérifie si l'utilisateur possède TOUTES les permissions
     for code in permission_codes:
         if not user_has_permission(user, code):
             return False
     return True
 
-   # Vérifie si l'utilisateur possède AU MOINS une permission
-def user_has_any_permission(user, permission_codes: list):
 
+def user_has_any_permission(user, permission_codes: list):
+    # Vérifie si l'utilisateur possède AU MOINS une permission
     for code in permission_codes:
         if user_has_permission(user, code):
             return True
@@ -91,9 +91,7 @@ def remove_permission_from_role(role_code, permission_code):
 
 #Retourne toutes les permissions d’un rôle
 def get_role_permissions(role_code):
-    return Permission.objects.filter(
-        rolepermission__role__code_role=role_code
-    )
+    return Permission.objects.filter( rolepermission__role__code_role=role_code)
     
 #Retourne toutes les permissions d’un utilisateur 
 def get_user_permissions_optimized(user):

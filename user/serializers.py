@@ -1,6 +1,7 @@
 from venv import logger
 
 from rest_framework import serializers
+from security.models import UserRole
 from security.serializers import RoleSerializer
 from .models import Utilisateur, EntiteMetier
 from django.contrib.auth.hashers import make_password, check_password
@@ -17,12 +18,18 @@ class EntiteMetierSerializer(serializers.ModelSerializer):
 
 
 class UtilisateurSerializer(serializers.ModelSerializer):
-    # role = RoleSerializer(read_only=True)
+    roles = serializers.SerializerMethodField()
 
     class Meta:
         model = Utilisateur
-        fields = ['id','username', 'first_name', 'last_name', 'email',  'is_active', 'is_ldap']
+        fields = ['id','username', 'first_name', 'last_name', 'email',  'is_active', 'is_ldap', 'roles']
 
+    def get_roles(self, obj):
+        # Récupère les roles de l'utilisateur via UserRole
+        user_roles = UserRole.objects.filter(user=obj).select_related('role')
+        roles = [ur.role for ur in user_roles]
+        return RoleSerializer(roles, many=True).data
+    
 class UtilisateurUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Utilisateur

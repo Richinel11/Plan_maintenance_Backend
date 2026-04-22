@@ -6,7 +6,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from user.models import Utilisateur
 from .models import Role, Permission, UserRole, RolePermission
 from .serializers import AssignPermissionSerializer, AssignRoleSerializer, RoleSerializer, PermissionSerializer
-from .permission import HasPermission
+from .permission import HasPermission , HasPermissionFactory
 from .services import (
     assign_role_to_user,
     remove_role_from_user,
@@ -15,7 +15,7 @@ from .services import (
     get_user_roles,
     get_role_permissions
 )
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 
 
 @extend_schema_view(
@@ -26,8 +26,9 @@ from rest_framework.decorators import api_view
     destroy=extend_schema(tags=['Security'], description='Supprimer un rôle'),
 )
 
-# Function based rule
+# create role
 @api_view(['POST'])
+@permission_classes([IsAuthenticated, HasPermissionFactory('MANAGE_ROLES')])
 def create_role (request):
     if request.method == 'POST' :
         Role.objects.create(
@@ -38,14 +39,18 @@ def create_role (request):
         return Response({'message': 'Role Created'}, status=status.HTTP_201_CREATED)
     return Response({'Error': 'Method not Allowed'}, status=status.HTTP_400_BAD_REQUEST)
 
+#list roles
 @api_view(['GET'])
+@permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_ROLES')])
 def get_role(request):
     role = Role.objects.all()
     serializer = RoleSerializer(role, many = True)
     if serializer.is_valid :
         return Response(serializer.data)
-
+    
+#update role
 @api_view(['GET','PUT', "DELETE"])
+@permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_ROLES')])
 def get_update_role(request, code_role):
     try:
         role = Role.objects.get(code_role = code_role )   
@@ -71,15 +76,18 @@ def get_update_role(request, code_role):
 
 # PERMISSION CRUD
 
+#list permissions
 @api_view(['GET'])
+@permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_PERMISSIONS')])
 def get_permission(request):
     permisssion = Permission.objects.all()
     serializer = PermissionSerializer(permisssion, many = True)
     if serializer.is_valid :
         return Response(serializer.data)
 
-
+#create permission
 @api_view(['POST'])
+@permission_classes([IsAuthenticated, HasPermissionFactory('MANAGE_PERMISSIONS')])
 def create_permission(request):
     if request.method == 'POST' :
         Permission.objects.create(
@@ -90,7 +98,9 @@ def create_permission(request):
         return Response({'message': 'Permission Created'}, status=status.HTTP_201_CREATED)
     return Response({'Error': 'Method not Allowed'}, status=status.HTTP_400_BAD_REQUEST)
 
+#update permissions
 @api_view(['GET','PUT'])
+@permission_classes([IsAuthenticated, HasPermissionFactory('MANAGE_PERMISSIONS')])
 def get_update_permission(request, code_permission):
     try:
         permisison = Permission.objects.get(code = code_permission )   
@@ -112,10 +122,9 @@ def get_update_permission(request, code_permission):
         
 
 #  Assigner un role a un utilisateur
-
 class AssignRoleToUserView(APIView):
     permission_classes = [IsAuthenticated, HasPermission]
-    required_permissions = ["assign_role"]
+    required_permissions = ["MANAGE_ROLES"]
 
     def post(self, request):
         user_id = request.data.get("user_id")
@@ -135,10 +144,9 @@ class AssignRoleToUserView(APIView):
 
 
 #  retirer un role a un utilisateur
-
 class RemoveRoleFromUserView(APIView):
     permission_classes = [IsAuthenticated, HasPermission]
-    required_permissions = ["assign_role"]
+    required_permissions = ["MANAGE_ROLES"]
 
     def post(self, request):
         user_id = request.data.get("user_id")
@@ -157,10 +165,9 @@ class RemoveRoleFromUserView(APIView):
         return Response({"message": "Rôle retiré avec succès"})
 
 #  Assigner un role a une permission
-
 class AssignPermissionToRoleView(APIView):
     permission_classes = [IsAuthenticated, HasPermission]
-    required_permissions = ["assign_permission"]
+    required_permissions = ["MANAGE_PERMISSIONS"]
 
     def post(self, request):
         role_code = request.data.get("role_code")
@@ -177,10 +184,9 @@ class AssignPermissionToRoleView(APIView):
         return Response({"message": "Permission assignée au rôle"})
 
 # retirer une permission d'un role
-
 class RemovePermissionFromRoleView(APIView):
     permission_classes = [IsAuthenticated, HasPermission]
-    required_permissions = ["assign_permission"]
+    required_permissions = ["MANAGE_PERMISSIONS"]
 
     def post(self, request):
         role_code = request.data.get("role_code")
@@ -198,10 +204,9 @@ class RemovePermissionFromRoleView(APIView):
 
 
 # afficher ler roles d'un utilisateur
-
 class UserRolesView(APIView):
     permission_classes = [IsAuthenticated, HasPermission]
-    required_permissions = ["view_roles"]
+    required_permissions = ["MANAGE_PERMISSIONS"]
 
     def get(self, request, user_id):
         try:
@@ -214,13 +219,10 @@ class UserRolesView(APIView):
 
         return Response(serializer.data)
 
-
-
-
 #  voir les permissions par roles
 class RolePermissionsView(APIView):
     permission_classes = [IsAuthenticated, HasPermission]
-    required_permissions = ["view_permissions"]
+    required_permissions = ["MANAGE_PERMISSIONS"]
 
     def get(self, request, role_code):
         permissions = get_role_permissions(role_code)
@@ -228,55 +230,4 @@ class RolePermissionsView(APIView):
 
         return Response(serializer.data)
         
-# @extend_schema_view(
-#     list=extend_schema(tags=['Security'], description='Lister toutes les permissions'),
-#     retrieve=extend_schema(tags=['Security'], description='Détail d’une permission'),
-#     create=extend_schema(tags=['Security'], description='Créer une permission'),
-#     update=extend_schema(tags=['Security'], description='Mettre à jour une permission'),
-#     destroy=extend_schema(tags=['Security'], description='Supprimer une permission'),
-# )
-
-
-
-# @extend_schema(
-#     tags=['Security'],
-#     responses=PermissionSerializer(many=True),
-#     description="Lister les permissions d’un rôle"
-# )
-
-
-
-# @extend_schema(
-#     tags=['Security'],
-#     responses=RoleSerializer(many=True),
-#     description="Lister les rôles d’un utilisateur"
-# )
-
-
-
-# @extend_schema(
-#     tags=['Security'],
-#     request=AssignPermissionSerializer,
-#     responses={"200": {"message": "Permission retirée du rôle"}}
-# )
-
-#@extend_schema(
-#     tags=['Security'],
-#     request=AssignPermissionSerializer,
-#     responses={"200": {"message": "Permission retirée du rôle"}}
-# )
-
-
-#@extend_schema(
-#     tags=['Security'],
-#     request=AssignRoleSerializer,
-#     responses={"200": {"message": "Rôle retiré avec succès"}}
-# )
-
-
-
-# @extend_schema(
-#     tags=['Security'],
-#     request=AssignRoleSerializer,
-#     responses={"200": {"message": "Rôle assigné avec succès"}}
-# )
+        

@@ -18,7 +18,7 @@ class Permission(models.Model):
     id = models.UUIDField(_('id'), primary_key=True, default=uuid.uuid4, editable=False)
     nom = models.CharField(max_length=100) 
     code = models.CharField(max_length=100, unique=True)  
-    module = models.CharField(max_length=100)  
+    module = models.CharField(max_length=100, blank=True)  
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -1,10 +1,11 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from .models import Utilisateur,EntiteMetier
 
 
 # Register your models here.
 @admin.register(Utilisateur)
-class AdminUser(admin.ModelAdmin):
+class UtilisateurAdmin(UserAdmin):
     list_display = ('id','username','first_name','last_name','email','is_active')
     list_filter = ('is_active',)
 

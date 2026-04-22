@@ -8,15 +8,14 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from .models import Utilisateur
 from .models import Utilisateur, EntiteMetier
 from security.models import Role, UserRole
+from security.permission import HasPermissionFactory
 from .serializers import  SetPasswordSerializer, UtilisateurSerializer,  EntiteMetierSerializer, UtilisateurUpdateSerializer
 from .serializers import LoginSerializer
 from django.contrib.auth import authenticate
 from utils import LDAP_connect 
 import uuid 
-
 from rest_framework_simplejwt.tokens import RefreshToken
 
 @extend_schema_view(
@@ -34,11 +33,16 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated, HasPermissionFactory('MANAGE_USERS')])
 def create_user(request):
     
-    try: 
-        role = Role.objects.get(code_role = request.data['code_role'])
-        user = Utilisateur.objects.create(
+    try:
+        try: 
+            role = Role.objects.get(code_role = request.data['code_role'])
+        except Role.DoesNotExist: 
+            return Response({'Error':'Role non existant'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = Utilisateur.objects.create_user(
             username = request.data['username'],
             first_name = request.data['first_name'],
             last_name = request.data['last_name'],
@@ -54,12 +58,13 @@ def create_user(request):
         
         return Response({"message" :"User ok"}, status=status.HTTP_201_CREATED)
     
-    except Role.DoesNotExist: 
-        return Response({'Error':'Role non existant'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e: 
+        return Response({'Error':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # list all user
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')])
 def get_users(request):
     # if not request.user.is_authenticated:
     #     return Response(
@@ -68,24 +73,16 @@ def get_users(request):
 
     users = Utilisateur.objects.filter(is_deleted = False)
     serializer = UtilisateurSerializer(users, many = True)
-    if serializer.is_valid():
+    if serializer.is_valid:
         return Response(serializer.data) 
-    
-# get update & delete  user
-@api_view(['GET','PUT', 'PATCH'])
-@permission_classes([IsAuthenticated])
-def get_user_id(request, user_id):
-    print(f"user id: {user_id}")
-    return Response({"Respose ok"})
 
-
+#find & update user
 
 @api_view(['GET','PUT', 'PATCH'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')])
 def get_update_user(request, user_id):
     try:
-        # print(f'{user_id}')
-       
+        
         user = Utilisateur.objects.get(id =user_id)
     except Utilisateur.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -125,7 +122,8 @@ def get_update_user(request, user_id):
 
     
 # delete user
-@api_view(['DELETE'])    
+@api_view(['DELETE'])   
+@permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')]) 
 def delete_user(request, user_id):
     try:    
         user = Utilisateur.objects.get(id=user_id)
@@ -142,6 +140,7 @@ def delete_user(request, user_id):
     
 #restauration d'un utilisateur
 @api_view(['PATCH'])
+@permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')])
 def restore_user(request, user_id):
     try:
         user = Utilisateur.objects.get(id=user_id)
@@ -174,20 +173,20 @@ class LoginAPIView(APIView):
             user = Utilisateur.objects.get(username=username)
             
         except Utilisateur.DoesNotExist:
-            print("step 1")
+            
             return Response({"error":"user does not exist"}, status=status.HTTP_400_BAD_REQUEST)
         
         if user.is_active == False:
-            print("step 2")
+            
             return Response({"error":"account blocked"}, status=status.HTTP_400_BAD_REQUEST)
           
         if user.is_deleted == True:
-            print("step 3")
+            
             return Response({"error":"user does not exist"}, status=status.HTTP_400_BAD_REQUEST)
            
         if user.is_ldap :
             try:
-                print("step 4")
+                
                 LDAP_connect.ldap_login(username, password)
                 # logger.info("LDAP Auth OK pour %s", username)
             except Exception as e:
@@ -196,12 +195,12 @@ class LoginAPIView(APIView):
                 
         else:
             auth = authenticate(username=username , password=password)
-            print("step 5")
+            
             if auth is None :
                 return Response({"error":"Invalid username and password"}, status=status.HTTP_400_BAD_REQUEST)
-            print("step 6")     
+                 
         refresh = RefreshToken.for_user(user)
-        print("step 7")
+        
 
         return Response ({
             "user_id" : str(user.id),
@@ -247,16 +246,6 @@ class LogoutAPIView(APIView):
 #             'role': user.role.nom if hasattr(user, 'role') else None
 #         })
         
-        
-
-@extend_schema_view(
-    list=extend_schema(tags=['User'], description="Lister les entités métier"),
-    retrieve=extend_schema(tags=['User'], description="Détail d’une entité métier"),
-    create=extend_schema(tags=['User'], description="Créer une entité métier"),
-    update=extend_schema(tags=['User'], description="Mettre à jour une entité métier"),
-    destroy=extend_schema(tags=['User'], description="Supprimer une entité métier"),
-)
-
 class EntiteMetierViewSet(ModelViewSet):
     queryset = EntiteMetier.objects.all()
     serializer_class = EntiteMetierSerializer

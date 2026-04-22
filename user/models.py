@@ -57,15 +57,15 @@ class Utilisateur(AbstractUser):
     
     objects = UtilisateurManager()
 
+
+    def __str__(self):
+        return self.username
+    
     # def save(self, *args, **kwargs):
     #     if self.password and not self.password.startswith("pbkdf2_"):
     #         self.password = make_password(self.password)
     #     super().save(*args, **kwargs)
 
-
-    def __str__(self):
-        return self.username
-    
     # objects = SoftDeleteManager()
     # all_objects = models.Manager()
 

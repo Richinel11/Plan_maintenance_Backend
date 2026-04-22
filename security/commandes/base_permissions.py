@@ -8,6 +8,7 @@ class Command(BaseCommand):
 
         # créer toutes les permissions
         permissions = [
+            #permissions accordées aux roles
             {'code': 'CREATE_WORK',    'description': 'Créer un travail de maintenance'},
             {'code': 'UPDATE_WORK',    'description': 'Modifier un travail existant'},
             {'code': 'DELETE_WORK',    'description': 'Supprimer un travail'},
@@ -29,6 +30,8 @@ class Command(BaseCommand):
             {'code': 'VIEW_KPI',          'description': 'Consulter les indicateurs KPI'},
             {'code': 'VIEW_HISTOTY',   'description': 'Consulter l\'historique complet'},
             {'code': 'VIEW_AUDIT',        'description': 'Accès lecture seule pour audit'},
+            
+            #permissions accordées à un utilisateur (admin)
             {'code':'CREATE_USER',      'description':'créer les utilisateurs'},
             {'code':'VIEW_USER',    'description':'voir tous les utilisateurs'},
             {'code': 'UPDATE_USER',     'description':'modifier un utilisateur'},

@@ -40,7 +40,7 @@ class Command(BaseCommand):
         {
             'nom': 'Administrateur',
             'code_role': 'ADMIN',
-            'description': 'a tous les droits permissions dans l\'aplication'
+            'description': 'a tous les droits permissions dans l\'application'
         },
     ] 
 
