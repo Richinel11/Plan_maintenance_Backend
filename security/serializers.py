@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from .models import Permission, Role, RolePermission, UserRole, WorkflowPermission
+from .models import Permission, Role, RolePermission, UserRole
 
 
 
@@ -29,13 +29,6 @@ class RolePermissionSerializer(serializers.ModelSerializer):
 class UserRoleSerializer(serializers.ModelSerializer):
     class Meta:
         model= UserRole 
-        fields='__all__'
-        
-
-        
-class WorkflowPermissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model= WorkflowPermission 
         fields='__all__'
         
 class AssignRoleSerializer(serializers.Serializer):

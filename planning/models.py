@@ -2,9 +2,11 @@ from django.db import models
 
 # Create your models here.
 from django.db import models
+from pilotage.models import Workflow, WorkflowStep
 from user.models import Utilisateur
 from referentiel.models import ReferenceReseau
 from django.utils.translation import gettext as _
+#from pilotage.models import Workflow, WorkflowStep
 import uuid
 
 
@@ -15,7 +17,8 @@ class TypeActivite(models.Model):
 
     def __str__(self):
         return self.libelle
-
+    class Meta:
+        ordering = ['date_creation']
 
 class PlanningTravaux(models.Model):
 
@@ -56,9 +59,15 @@ class PlanningTravaux(models.Model):
     modifie_par = models.ForeignKey(
         Utilisateur, on_delete=models.PROTECT, related_name="travaux_modifies"
     )
+    
+    workflow = models.ForeignKey(Workflow, on_delete=models.SET_NULL, null=True, related_name="plannings")
+    current_step = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL, null=True, related_name="current_plannings")
 
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.titre
+    
+    class Meta:
+        ordering = ['date_creation']

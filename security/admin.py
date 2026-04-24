@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Role, Permission, RolePermission, UserRole, WorkflowPermission
+from .models import Role, Permission, RolePermission, UserRole
 # Register your models here.
 
 
@@ -23,7 +23,3 @@ class RolePermissionAdmin(admin.ModelAdmin):
 class UserRoleAdmin(admin.ModelAdmin):
     list_display = ("user", "role")
 
-
-@admin.register(WorkflowPermission)
-class WorkflowPermissionAdmin(admin.ModelAdmin):
-    list_display = ("permission", "step")

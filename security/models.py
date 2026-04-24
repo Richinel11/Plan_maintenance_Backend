@@ -49,6 +49,3 @@ class UserRole (models.Model):
         return f"{self.user} - {self.role}"
 
 
-class WorkflowPermission(models.Model):
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
-    step = models.CharField(max_length=50) #savoir à quel niveau du workflow on se trouve
