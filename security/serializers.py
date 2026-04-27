@@ -31,6 +31,14 @@ class UserRoleSerializer(serializers.ModelSerializer):
         model= UserRole 
         fields='__all__'
         
+#modifier le role assigné à un utilisateur
+class UpdateUserRoleSerializer(serializers.ModelSerializer):
+    role = serializers.SlugRelatedField( queryset=Role.objects.all(),slug_field='code_role')
+    class Meta:
+        model = UserRole
+        fields = ['role']
+       
+        
 class AssignRoleSerializer(serializers.Serializer):
     user_id = serializers.UUIDField()
     role_code = serializers.CharField()

@@ -76,7 +76,20 @@ def get_users(request):
     if serializer.is_valid:
         return Response(serializer.data) 
 
-#find & update user
+# find user
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def find_user(request, user_id):
+    try :
+        user = Utilisateur.objects.get(id=user_id)
+    except Utilisateur.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serialzer =UtilisateurSerializer(user, many=False)
+    return Response(serialzer.data, status=status.HTTP_200_OK)
+
+# update user
 
 @api_view(['GET','PUT', 'PATCH'])
 @permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')])
@@ -86,11 +99,6 @@ def get_update_user(request, user_id):
         user = Utilisateur.objects.get(id =user_id)
     except Utilisateur.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'GET':
-        print('get user by id')
-        serializer = UtilisateurSerializer(user, many= False)
-        return Response(serializer.data, status=status.HTTP_200_OK)
     
     if request.method == 'PUT':
         serializer = UtilisateurUpdateSerializer(user, data=request.data)

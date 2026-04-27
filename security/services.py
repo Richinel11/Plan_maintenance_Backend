@@ -63,13 +63,8 @@ def assign_permission_to_role(role_code, permission_code):
     try:
         role = Role.objects.get(code_role=role_code)
         permission = Permission.objects.get(code=permission_code)
-
-        RolePermission.objects.get_or_create(
-            role=role,
-            permission=permission
-        )
+        RolePermission.objects.get_or_create( role=role, permission=permission)
         return True
-
     except (Role.DoesNotExist, Permission.DoesNotExist):
         return False
 
@@ -78,14 +73,8 @@ def remove_permission_from_role(role_code, permission_code):
     try:
         role = Role.objects.get(code_role=role_code)
         permission = Permission.objects.get(code=permission_code)
-
-        RolePermission.objects.filter(
-            role=role,
-            permission=permission
-        ).delete()
-
+        RolePermission.objects.filter(role=role, permission=permission).delete()
         return True
-
     except (Role.DoesNotExist, Permission.DoesNotExist):
         return False
 

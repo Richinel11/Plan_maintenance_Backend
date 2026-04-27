@@ -40,10 +40,7 @@ def workflow_detail(request, workflow_id):
     try:
         workflow = Workflow.objects.get(id=workflow_id)
     except Workflow.DoesNotExist:
-        return Response(
-            {"error": "Workflow introuvable"},
-            status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "Workflow introuvable"},status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = WorkflowSerializer(workflow)

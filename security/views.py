@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from user.models import Utilisateur
 from .models import Role, Permission, UserRole, RolePermission
-from .serializers import AssignPermissionSerializer, AssignRoleSerializer, RoleSerializer, PermissionSerializer
+from .serializers import  RoleSerializer, PermissionSerializer, UpdateUserRoleSerializer
 from .permission import HasPermission , HasPermissionFactory
 from .services import (
     assign_role_to_user,
@@ -142,6 +142,34 @@ class AssignRoleToUserView(APIView):
 
         return Response({"message": "Rôle assigné avec succès"})
 
+
+#modifier le role d'un utilisateur
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated, HasPermissionFactory('MANAGE_ROLES')])
+def update_user_role(request, user_id):
+    #Récupérer l'utilisateur
+    
+    try:
+        user = Utilisateur.objects.get(id=user_id)
+    except Utilisateur.DoesNotExist:
+        return Response({"error": "Utilisateur introuvable"},status=status.HTTP_404_NOT_FOUND)
+
+    # Récupère le UserRole existant
+    user_role = UserRole.objects.filter(user=user).first()
+
+    if not user_role:
+        return Response( {"error": "Aucun rôle assigné à cet utilisateur"},status=status.HTTP_404_NOT_FOUND)
+
+    serializer = UpdateUserRoleSerializer(user_role, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response( 
+            {
+                "message": "Rôle mis à jour avec succès",
+                "user": user.username,
+                "role": user_role.role.code_role
+            },status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #  retirer un role a un utilisateur
 class RemoveRoleFromUserView(APIView):

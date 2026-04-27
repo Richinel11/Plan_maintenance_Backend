@@ -2,10 +2,9 @@ from django.db import models
 from django.utils.translation import gettext as _
 import uuid
 
-
 # Create your models here.
 
-
+#type de travail effectuer
 class Ouvrage(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     nom = models.CharField(max_length=150)
@@ -25,7 +24,7 @@ class Poste(models.Model):
     def __str__(self):
         return self.nom
 
-
+# lieu de depart
 class Depart(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     nom = models.CharField(max_length=150)
@@ -34,7 +33,7 @@ class Depart(models.Model):
     def __str__(self):
         return self.nom
 
-
+#troncon sur lequel s'effectuent les travaux
 class Troncon(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     nom = models.CharField(max_length=150)
@@ -68,3 +67,4 @@ class ReferenceReseau(models.Model):
     actif = models.BooleanField(default=False)
     def __str__(self):
         return self.code_reference
+ 
