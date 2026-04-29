@@ -1,5 +1,5 @@
 # Image Python stable (important)
-FROM python:3.12
+FROM python:3.12-slim
 
 # Empêche les fichiers .pyc et optimise les logs
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -28,5 +28,5 @@ RUN pip install --default-timeout=200 --no-cache-dir -r requirements.txt\
 # Copier tout le projet
 COPY . .
 
-# Commande par défaut (dev)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Commande par défaut (prod)
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]

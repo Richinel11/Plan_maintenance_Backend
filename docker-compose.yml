@@ -1,4 +1,4 @@
-
+version: '3.8'
 
 services:
   db:
@@ -6,33 +6,43 @@ services:
     container_name: mysql_db
     restart: always
     environment:
-      MYSQL_DATABASE: mydb
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DJANGO_DATABASE_NAME}
+      MYSQL_USER: ${DJANGO_DATABASE_USER}
+      MYSQL_PASSWORD: ${DJANGO_DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DJANGO_DATABASE_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   web:
     build: .
     container_name: django_api
-    command: python manage.py runserver 0.0.0.0:8000
+    restart: always
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3"
     volumes:
       - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     dns:
       - 8.8.8.8
       - 8.8.4.4
-    environment:
-      DB_HOST: db
-      DB_NAME: mydb
-      DB_USER: user
-      DB_PASSWORD: password
 
 volumes:
   db_data:
+  static_volume:
+  media_volume:
