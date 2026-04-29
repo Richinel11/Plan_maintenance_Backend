@@ -311,13 +311,13 @@ def planning_current_step(request, planning_id):
     except PlanningTravaux.DoesNotExist:
         return Response({"error": "Planning introuvable"},status=status.HTTP_404_NOT_FOUND)
 
-    return Response({
-        "planning_id": str(planning.id),
-        "titre": planning.titre,
-        "workflow": planning.workflow.name if planning.workflow else None,
-        "current_step": {
-            "code": planning.current_step.code if planning.current_step else None,
-            "name": planning.current_step.name if planning.current_step else None,
-            "number": planning.current_step.number if planning.current_step else None,
-        }
-    }, status=status.HTTP_200_OK)
+    # return Response({
+    #     "planning_id": str(planning.id),
+    #     "titre": planning.titre,
+    #     "workflow": planning.workflow.name if planning.workflow else None,
+    #     "current_step": {
+    #         "code": planning.current_step.code if planning.current_step else None,
+    #         "name": planning.current_step.name if planning.current_step else None,
+    #         "number": planning.current_step.number if planning.current_step else None,
+    #     }
+    # }, status=status.HTTP_200_OK)

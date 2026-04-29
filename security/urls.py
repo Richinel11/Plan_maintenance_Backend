@@ -17,10 +17,10 @@ from .views import (
 urlpatterns = [
     path('roles/all-roles', get_role, name="get-all-role"),
     path('roles/create-role', create_role, name="create-new-role"),
-    path('roles/update-role', get_update_role, name="update-role"),
+    path('roles/update-role/code_role', get_update_role, name="update-role"),
     path('permissions/all-permission', get_permission, name="get-all-permission"),
     path('permissions/create-permission', create_permission, name="create-new-permission"),
-    path('permissions/update-permission', get_update_permission, name="update-permission"),
+    path('permissions/update-permission/code_permission', get_update_permission, name="update-permission"),
 
     # Assign / Remove Role to User
     path('user/assign-role', AssignRoleToUserView.as_view(), name='assign-role'),

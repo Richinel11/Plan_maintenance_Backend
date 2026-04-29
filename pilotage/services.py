@@ -73,7 +73,7 @@ def execute_transition(planning: PlanningTravaux, transition: WorkflowTransition
 
     #  Mettre à jour le current_step du planning
     planning.current_step = transition.to_step
-    planning.save(update_fields=['current_step', 'updated_at'])
+    planning.save(update_fields=['current_step'])
 
     #  Enregistrer dans WorkflowHistory
     WorkflowHistory.objects.create(
@@ -97,11 +97,11 @@ def execute_transition(planning: PlanningTravaux, transition: WorkflowTransition
 
     return {
         "success": True,
-        "from_step": old_step,
-        "to_step": transition.to_step
+        "from_step": str(old_step.code) if old_step else None,
+        "from_step_name": str(old_step.name) if old_step else None,
+        "to_step": str(transition.to_step.code) if transition.to_step else None,
+        "to_step_name": str(transition.to_step.name) if transition.to_step else None,
     }
-
-
 # REFUSER UNE TRANSITION
 
 def reject_transition(planning: PlanningTravaux, transition: WorkflowTransition, user, motif: str = "") -> dict:
@@ -143,14 +143,14 @@ def reject_transition(planning: PlanningTravaux, transition: WorkflowTransition,
         comment=motif
     )
 
-    return {
-        "success": False,
-        "status": "REJECTED",
-        "from_step": old_step,
-        "to_step": planning.current_step,
-        "motif": motif
-    }
 
+    return {
+    "success": False,
+    "status": "REJECTED",
+    "from_step": str(old_step.code) if old_step else None,
+    "to_step": str(planning.current_step.code) if planning.current_step else None,
+    "motif": motif
+}
 
 
 #  RÉCUPÉRER L'HISTORIQUE D'UN PLANNING

@@ -1,14 +1,18 @@
 from django.contrib import admin
-from .models import PlanningTravaux, TypeActivite
+from .models import PlanningTravaux, TypeActivite, ChargeConsignation
 
-# Register your models here.
 @admin.register(PlanningTravaux)
 class AdminPlanningTraveaux(admin.ModelAdmin):
-    list_display = ('id','titre','reference','type_activite','titre','statut_travaux','date_creation',)
-    list_filter  = ('date_creation','type_activite')
-
+    list_display = ['reference', 'segment', 'type_travaux', 'statut_travaux', 'date_creation']
+    list_filter = ['segment', 'type_travaux', 'statut_travaux']
+    search_fields = ['reference']
 
 
 @admin.register(TypeActivite)
 class AdminTypeActivite(admin.ModelAdmin):
-    list_display = ('id','libelle','date_creation')
+    list_display = ['libelle', 'date_creation']
+
+
+@admin.register(ChargeConsignation)
+class AdminChargeConsignation(admin.ModelAdmin):
+    list_display = ['nom', 'prenom', 'matricule']

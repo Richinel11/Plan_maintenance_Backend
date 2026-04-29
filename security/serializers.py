@@ -13,7 +13,7 @@ class RoleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Role
-        fields = ["nom", "code_role",  "date_creation", "permissions"]
+        fields = ["nom", "code_role","description", "date_creation", "permissions"]
 
     def get_permissions(self, obj):
         # Utilisation du related_name 'role_permissions' défini dans le modèle

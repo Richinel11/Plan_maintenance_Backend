@@ -19,6 +19,12 @@ class WorkflowSerializer(serializers.ModelSerializer):
         model = Workflow
         fields = ['id', 'name', 'code', 'description', 'is_active', 'steps', 'created_at']
 
+#pour l'affichage du workflow dans le plannig
+ 
+class WorkflowShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Workflow
+        fields = ['id', 'name', 'code']
 
 
 #  WORKFLOW TRANSITION SERIALIZER

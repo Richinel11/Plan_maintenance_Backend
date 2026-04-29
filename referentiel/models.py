@@ -53,6 +53,13 @@ class Localisation(models.Model):
     def __str__(self):
         return f"{self.adresse} - {self.ville}"
 
+class Centrale(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    nom = models.CharField(max_length=150)
+    capacite_mw = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    actif = models.BooleanField(default=True)
+    def __str__(self):
+        return self.nom
 
 class ReferenceReseau(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)

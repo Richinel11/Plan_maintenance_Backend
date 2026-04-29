@@ -91,7 +91,7 @@ def find_user(request, user_id):
 
 # update user
 
-@api_view(['GET','PUT', 'PATCH'])
+@api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')])
 def get_update_user(request, user_id):
     try:
