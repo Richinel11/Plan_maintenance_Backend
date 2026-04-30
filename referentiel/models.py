@@ -69,7 +69,7 @@ class ReferenceReseau(models.Model):
     poste = models.ForeignKey(Poste, on_delete=models.PROTECT, null=True, blank=True)
     depart = models.ForeignKey(Depart, on_delete=models.PROTECT, null=True, blank=True)
     troncon = models.ForeignKey(Troncon, on_delete=models.PROTECT, null=True, blank=True)
-    localisation = models.ForeignKey(Localisation, on_delete=models.CASCADE)
+    localisation = models.ForeignKey(Localisation, on_delete=models.CASCADE, null=True, blank=True)
     date_creation = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     actif = models.BooleanField(default=False)
     def __str__(self):

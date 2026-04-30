@@ -15,7 +15,7 @@ urlpatterns = [
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('user.urls'), name= 'user' ),
-    path('', include('exploitation.urls'), name= 'exploitation' ),
+    path('exploitation/', include('exploitation.urls'), name= 'exploitation' ),
     path('', include('pilotage.urls'), name= 'pilotage' ),
     path('', include('planning.urls'), name= 'planning' ),
     path('', include('referentiel.urls'), name= 'referentiel' ),

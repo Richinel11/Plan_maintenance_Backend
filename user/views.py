@@ -18,19 +18,6 @@ from utils import LDAP_connect
 import uuid 
 from rest_framework_simplejwt.tokens import RefreshToken
 
-@extend_schema_view(
-    list=extend_schema(tags=['User'], description="Lister les utilisateurs"),
-    retrieve=extend_schema(tags=['User'], description="Détail d’un utilisateur"),
-    create=extend_schema(tags=['User'], description="Créer un utilisateur"),
-    update=extend_schema(tags=['User'], description="Mettre à jour un utilisateur"),
-    destroy=extend_schema(tags=['User'], description="Supprimer un utilisateur"),
-    # actions custom
-    toggle_status=extend_schema(tags=['User'], description="Activer / désactiver un utilisateur", responses={"200": {"actif": True}}),
-    set_password=extend_schema(tags=['User'], request=SetPasswordSerializer, description="Changer le mot de passe"),
-)
-
-
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, HasPermissionFactory('MANAGE_USERS')])
@@ -165,6 +152,34 @@ def restore_user(request, user_id):
     except Utilisateur.DoesNotExist:
         return Response({'error': 'Utilisateur non trouvé'},status=status.HTTP_404_NOT_FOUND)
 
+
+# changer de password
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+
+def change_password(request):
+    user = request.user   
+    new_password = request.data.get('new_password') 
+    
+    if not new_password:
+        return Response({"error": "mot de passe requis"},status=status.HTTP_400_BAD_REQUEST)
+    
+    #controle sur la longueur du password
+    if len(new_password) < 8:
+        return Response({"error": "mot de passe trop court.Au moins 8 caractères"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user.set_password(new_password)
+    
+    if hasattr(user, "first_connection"):
+        user.first_connection = False
+        
+    user.save()
+    
+    return Response({"message": "Mot de passe mis à jour avec succès"}, status=status.HTTP_200_OK)
+
+
+
     #login api
 class LoginAPIView(APIView):
     """
@@ -215,19 +230,6 @@ class LoginAPIView(APIView):
             "access" :  str(refresh.access_token),
             "refresh" :  str(refresh)
         })
-        
-    # def post(self, request):
-    #     # Validation des données d'entrée
-    #     serializer = LoginSerializer(data=request.data)
-        
-    #     if serializer.is_valid():
-    #         data =  serializer.validated_data
-    #         return Response({
-    #             'access' : data['access'],
-    #             'refresh' : data['refresh']
-    #         }, status=status.HTTP_200_OK)
-            
-    #   return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class LogoutAPIView(APIView):
     """Déconnexion de l'utilisateur"""
@@ -238,21 +240,6 @@ class LogoutAPIView(APIView):
         return Response({'success': True,'message': 'Déconnexion réussie'}, status=status.HTTP_200_OK)
 
 
-
-# class CustomAuthToken(ObtainAuthToken):
-#     def post(self, request, *args, **kwargs):
-#         serializer = self.serializer_class(data=request.data, context={'request': request})
-#         serializer.is_valid(raise_exception=True)
-#         user = serializer.validated_data['user']
-#         token, created = Token.objects.get_or_create(user=user)
-        
-#         # Ajouter les infos supplémentaires
-#         return Response({
-#             'token': token.key,
-#             'user_id': user.pk,
-#             'username': user.username,
-#             'role': user.role.nom if hasattr(user, 'role') else None
-#         })
         
 class EntiteMetierViewSet(ModelViewSet):
     queryset = EntiteMetier.objects.all()

@@ -18,14 +18,6 @@ from .services import (
 from rest_framework.decorators import api_view, permission_classes
 
 
-@extend_schema_view(
-    list=extend_schema(tags=['Security'], description='Lister tous les rôles'),
-    retrieve=extend_schema(tags=['Security'], description='Détail d’un rôle'),
-    create=extend_schema(tags=['Security'], description='Créer un rôle'),
-    update=extend_schema(tags=['Security'], description='Mettre à jour un rôle'),
-    destroy=extend_schema(tags=['Security'], description='Supprimer un rôle'),
-)
-
 # create role
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, HasPermissionFactory('MANAGE_ROLES')])
