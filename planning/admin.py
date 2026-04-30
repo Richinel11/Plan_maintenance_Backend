@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PlanningTravaux, TypeActivite, ChargeConsignation
+from .models import PlanningTravaux, TypeActivite
 
 @admin.register(PlanningTravaux)
 class AdminPlanningTraveaux(admin.ModelAdmin):
@@ -11,8 +11,3 @@ class AdminPlanningTraveaux(admin.ModelAdmin):
 @admin.register(TypeActivite)
 class AdminTypeActivite(admin.ModelAdmin):
     list_display = ['libelle', 'date_creation']
-
-
-@admin.register(ChargeConsignation)
-class AdminChargeConsignation(admin.ModelAdmin):
-    list_display = ['nom', 'prenom', 'matricule']

@@ -28,7 +28,6 @@ class PosteSerializer(serializers.ModelSerializer):
         model = Poste
         fields = '__all__'
         
-        
 
 class ReferenceReseauSerializer(serializers.ModelSerializer):
 

@@ -19,18 +19,18 @@ class TypeActivite(models.Model):
         ordering = ['date_creation']
         
         
-class ChargeConsignation(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    nom = models.CharField(max_length=150)
-    prenom = models.CharField(max_length=150)
-    matricule = models.CharField(max_length=50, unique=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+# class ChargeConsignation(models.Model):
+#     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+#     nom = models.CharField(max_length=150)
+#     prenom = models.CharField(max_length=150)
+#     matricule = models.CharField(max_length=50, unique=True, blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.nom} {self.prenom}"
+#     def __str__(self):
+#         return f"{self.nom} {self.prenom}"
 
-    class Meta:
-        ordering = ['created_at']
+#     class Meta:
+#         ordering = ['created_at']
 
 
 class PlanningTravaux(models.Model):
@@ -80,7 +80,7 @@ class PlanningTravaux(models.Model):
     moyens_mis_en_oeuvre = models.TextField(blank=True)
 
     #  Charges de consignation (DISTRIBUTION + TRANSPORT) 
-    charge_consignation = models.ForeignKey(ChargeConsignation, on_delete=models.SET_NULL, null=True, blank=True)
+    charge_consignation = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, blank=True)
 
     #  Programmation Temporelle 
     heure_debut_planifie = models.DateTimeField(null=True, blank=True)
@@ -111,8 +111,8 @@ class PlanningTravaux(models.Model):
     current_step = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL,null=True, blank=True)
 
     #  Audit 
-    cree_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name="travaux_crees")
-    modifie_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name="travaux_modifies")
+    cree_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name="plannings_crees")
+    modifie_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name="plannings_modifies")
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 

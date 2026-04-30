@@ -4,10 +4,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from drf_spectacular.utils import extend_schema, extend_schema_view
 from security.permission import HasPermission
-from .models import PlanningTravaux, TypeActivite, ChargeConsignation
-from .serializers import PlanningTravauxSerializer, TypeActiviteSerializer, ChargeConsignationSerializer
+from .models import PlanningTravaux, TypeActivite
+from .serializers import PlanningTravauxSerializer, TypeActiviteSerializer
 
 class TypeActiviteViewSet(ModelViewSet):
     """ViewSet CRUD pour TypeActivite."""
@@ -15,13 +14,6 @@ class TypeActiviteViewSet(ModelViewSet):
     queryset = TypeActivite.objects.all().order_by('libelle')
     serializer_class = TypeActiviteSerializer
     permission_classes = [IsAuthenticated]
-    
-class ChargeConsignationViewSet(ModelViewSet):
-    """ViewSet CRUD pour ChargeConsignation."""
-    
-    queryset = ChargeConsignation.objects.all().order_by('-created_at')
-    serializer_class = ChargeConsignationSerializer 
-    permission_classes = [IsAuthenticated]   
     
 class PlanningTravauxViewSet(ModelViewSet):
     """ViewSet CRUD + actions custom pour PlanningTravaux."""
@@ -34,6 +26,17 @@ class PlanningTravauxViewSet(ModelViewSet):
     )
     serializer_class = PlanningTravauxSerializer
     permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(cree_par=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(modifie_par=self.request.user)
+        
+    # def perform_destroy(self, instance):
+    #     instance.deleted_by = self.request.user
+    #     instance.deleted_at = timezone.now()
+    #     instance.save()
 
     def update(self, request, *args, **kwargs):
         kwargs['partial'] = True  # force le partial sur tous les updates

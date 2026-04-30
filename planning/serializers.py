@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PlanningTravaux, TypeActivite, ChargeConsignation
+from .models import PlanningTravaux, TypeActivite
 from user.models import Utilisateur, EntiteMetier
 from referentiel.models import Centrale, Ouvrage, Troncon, Depart, Poste 
 from referentiel.serializers import OuvrageSerializer, DepartSerializer, TronconSerializer, PosteSerializer
@@ -22,17 +22,10 @@ class CentraleSerializer(serializers.ModelSerializer):
         model = Centrale
         fields = ['id', 'nom', 'type', 'capacite_mw']
 
-
-class ChargeConsignationSerializer(serializers.Serializer):
-    class Meta :
-        model = ChargeConsignation
-        fields = ['id','nom', 'prenom', 'matricule']
-
-
 class EntiteMetierShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = EntiteMetier
-        fields = ['id', 'nom']
+        fields = ['id', 'name']
 
 
 
@@ -47,7 +40,7 @@ class PlanningTravauxSerializer(serializers.ModelSerializer):
     poste = PosteSerializer(read_only=True)
     depart = DepartSerializer(read_only=True)
     troncon = TronconSerializer(read_only=True)
-    charge_consignation = ChargeConsignationSerializer(read_only=True)
+    charge_consignation = UtilisateurShortSerializer(read_only=True)
     centrale_thermique_sollicitee = CentraleSerializer(read_only=True)
     workflow = WorkflowShortSerializer(read_only=True)
     current_step = WorkflowStepSerializer(read_only=True)
@@ -55,31 +48,38 @@ class PlanningTravauxSerializer(serializers.ModelSerializer):
     # ── WRITE ──
     type_travaux_id = serializers.PrimaryKeyRelatedField(queryset=TypeActivite.objects.all(), source='type_travaux',write_only=True, allow_null=True, required=False)
     cree_par_id = serializers.PrimaryKeyRelatedField(queryset=Utilisateur.objects.all(), source='cree_par',write_only=True)
-    modifie_par_id = serializers.PrimaryKeyRelatedField(queryset=Utilisateur.objects.all(), source='modifie_par',write_only=True)
     unite_demanderesse_id = serializers.PrimaryKeyRelatedField(
         queryset=EntiteMetier.objects.all(), source='unite_demanderesse',
         write_only=True, allow_null=True, required=False)
+    
     ouvrage_id = serializers.PrimaryKeyRelatedField(
         queryset=Ouvrage.objects.all(), source='ouvrage',
         write_only=True, allow_null=True, required=False)
+    
     poste_id = serializers.PrimaryKeyRelatedField(
         queryset=Poste.objects.all(), source='poste',
         write_only=True, allow_null=True, required=False)
+    
     depart_id = serializers.PrimaryKeyRelatedField(
         queryset=Depart.objects.all(), source='depart',
-        write_only=True, allow_null=True, required=False)   
+        write_only=True, allow_null=True, required=False)
+       
     troncon_id = serializers.PrimaryKeyRelatedField(
         queryset=Troncon.objects.all(), source='troncon',
         write_only=True, allow_null=True, required=False)
+    
     charge_consignation_id = serializers.PrimaryKeyRelatedField(
-        queryset=ChargeConsignation.objects.all(), source='charge_consignation',
-        write_only=True, allow_null=True, required=False)
+        queryset=Utilisateur.objects.filter(user_roles__role__code_role="CHARGE_CONSIGNATION").distinct(),
+        source='charge_consignation',write_only=True, allow_null=True, required=False)
+
     centrale_thermique_sollicitee_id = serializers.PrimaryKeyRelatedField(
         queryset=Centrale.objects.all(), source='centrale_thermique_sollicitee',
         write_only=True, allow_null=True, required=False)
+    
     workflow_id = serializers.PrimaryKeyRelatedField(
         queryset=Workflow.objects.all(), source='workflow',
         write_only=True, allow_null=True, required=False)
+    
     current_step_id = serializers.PrimaryKeyRelatedField(
         queryset=WorkflowStep.objects.all(), source='current_step',
         write_only=True, allow_null=True, required=False)
