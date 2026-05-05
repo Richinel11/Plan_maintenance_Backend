@@ -46,8 +46,14 @@ class PlanningTravauxSerializer(serializers.ModelSerializer):
     current_step = WorkflowStepSerializer(read_only=True)
 
     # ── WRITE ──
-    type_travaux_id = serializers.PrimaryKeyRelatedField(queryset=TypeActivite.objects.all(), source='type_travaux',write_only=True, allow_null=True, required=False)
-    cree_par_id = serializers.PrimaryKeyRelatedField(queryset=Utilisateur.objects.all(), source='cree_par',write_only=True)
+    type_travaux_id = serializers.PrimaryKeyRelatedField(
+        queryset=TypeActivite.objects.all(),
+        source='type_travaux',write_only=True, allow_null=True, required=False
+    )
+    cree_par_id = serializers.PrimaryKeyRelatedField(
+        queryset=Utilisateur.objects.all(),
+        source='cree_par',write_only=True
+    )
     unite_demanderesse_id = serializers.PrimaryKeyRelatedField(
         queryset=EntiteMetier.objects.all(), source='unite_demanderesse',
         write_only=True, allow_null=True, required=False)

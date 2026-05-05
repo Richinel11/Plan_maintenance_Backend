@@ -52,7 +52,9 @@ class ReferenceReseauSerializer(serializers.ModelSerializer):
         queryset=Troncon.objects.all(), source='troncon',
         write_only=True, allow_null=True, required=False
     )
-    localisation_id = serializers.PrimaryKeyRelatedField(queryset=Localisation.objects.all(), source='localisation', write_only=True)
+    localisation_id = serializers.PrimaryKeyRelatedField(
+        queryset=Localisation.objects.all(),
+        source='localisation', write_only=True, allow_null =True, required =False)
 
     class Meta:
         model = ReferenceReseau

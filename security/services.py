@@ -81,16 +81,3 @@ def remove_permission_from_role(role_code, permission_code):
 #Retourne toutes les permissions d’un rôle
 def get_role_permissions(role_code):
     return Permission.objects.filter( rolepermission__role__code_role=role_code)
-    
-#Retourne toutes les permissions d’un utilisateur 
-def get_user_permissions_optimized(user):
-    roles = Role.objects.filter(userrole__user=user).prefetch_related(
-        Prefetch(
-            'role_permissions',queryset=RolePermission.objects.select_related(
-                'permission')))
-    
-    permissions = []
-    for role in roles:
-        for rp in role.nom.all():
-            permissions.append(rp.permission.code)
-    return list(set(permissions))

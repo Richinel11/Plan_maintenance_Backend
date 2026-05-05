@@ -122,7 +122,7 @@ class LocalisationViewset(viewsets.ViewSet):
     
     def retrieve(self, request, pk=None):
         Loc = get_object_or_404(Localisation, id=pk)
-        serializer = OuvrageSerializer(Loc)
+        serializer = LocalisationSerializer(Loc)
         return Response(serializer.data)
     
     def create(self, request):
@@ -156,7 +156,7 @@ class PosteViewSet(viewsets.ViewSet):
     
     def retrieve(self, request, pk=None):
         poste = get_object_or_404(Localisation, id=pk)
-        serializer = OuvrageSerializer(poste)
+        serializer = PosteSerializer(poste)
         return Response(serializer.data)
     
     def create(self, request): 

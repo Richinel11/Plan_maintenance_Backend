@@ -37,7 +37,7 @@ class PlanningTravauxViewSet(ModelViewSet):
     #     instance.deleted_by = self.request.user
     #     instance.deleted_at = timezone.now()
     #     instance.save()
-
+ 
     def update(self, request, *args, **kwargs):
         kwargs['partial'] = True  # force le partial sur tous les updates
         return super().update(request, *args, **kwargs)
