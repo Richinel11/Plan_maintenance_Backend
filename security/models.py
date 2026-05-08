@@ -15,10 +15,16 @@ class Role(models.Model):
     
     
 class Permission(models.Model):
+    
+    MODULES_CHOICES = [
+        ('PLAN', 'Planning'),
+        ('DDR', 'DDR'),
+        ('NAPT', 'NAPT'),
+    ]
     id = models.UUIDField(_('id'), primary_key=True, default=uuid.uuid4, editable=False)
     nom = models.CharField(max_length=100) 
     code = models.CharField(max_length=100, unique=True)  
-    module = models.CharField(max_length=100, blank=True)  
+    module = models.CharField(max_length=20, choices = MODULES_CHOICES)  
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

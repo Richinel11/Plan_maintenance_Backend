@@ -2,7 +2,6 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated 
-from drf_spectacular.utils import extend_schema, extend_schema_view
 from user.models import Utilisateur
 from .models import Role, Permission, UserRole, RolePermission
 from .serializers import  RoleSerializer, PermissionSerializer, UpdateUserRoleSerializer
@@ -28,8 +27,14 @@ def create_role (request):
             code_role = request.data["code_role"],
             description = request.data["description"]
         )
-        return Response({'message': 'Role Created'}, status=status.HTTP_201_CREATED)
-    return Response({'Error': 'Method not Allowed'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            "message-en": "role Created",
+            "message": 'role Crée'
+        },status=status.HTTP_201_CREATED)
+    return Response({
+        "error-en": 'Only Method POST is Allowed',
+        "error-fr": "seule la méthode POST est autorisée"
+    },status=status.HTTP_400_BAD_REQUEST)
 
 #list roles
 @api_view(['GET'])
@@ -41,7 +46,7 @@ def get_role(request):
         return Response(serializer.data)
     
 #update role
-@api_view(['GET','PUT', "DELETE"])
+@api_view(['GET','PUT'])
 @permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_ROLES')])
 def get_update_role(request, code_role):
     try:
@@ -57,15 +62,35 @@ def get_update_role(request, code_role):
             role.description = request.data['description']
             
             role.save()
-            return Response({"message":"Role Updated"}, status=status.HTTP_200_OK) 
-        
-        # if request.method == 'DELETE':
-        #     role.is_actif =False
-        #     role.save()
-        #     return Response({"message":"Role Deleted"}, status=status.HTTP_200_OK) 
+            return Response({"error-en":"Role Updated",
+                             "error-fr":"Role mis à jour"},
+                            status=status.HTTP_200_OK) 
+     
     except Exception as e :
-        return Response({"Error" : "Role not found"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error-en" : "Role not found",
+                         "error-fr":"Role introuvable"},
+                        status=status.HTTP_400_BAD_REQUEST)
+    
+    
+#supprimer un role
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated, HasPermissionFactory('DELETE_ROLES')])
+
+def delete_role(request, pk):
+    try:
+        
+        role = Role.objects.get(pk=pk)
+    except Role.DoesNotExist:
+        return Response (
+            {'error-fr': 'le role n\'existe pas',
+             'error-en':'role does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        
+    role.delete()
+    
+    return Response({'message-fr':'role supprimer',
+                     'message-en': 'role deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    
 # PERMISSION CRUD
 
 #list permissions
@@ -107,10 +132,36 @@ def get_update_permission(request, code_permission):
             permisison.description = request.data['description']
             
             permisison.save()
-            return Response({"message":"Permission Updated"}, status=status.HTTP_200_OK) 
+            return Response({"error-en":"Permission Updated",
+                             'error-fr':"permission mise-à-jour"},
+                            status=status.HTTP_200_OK) 
         
     except Exception as e :
-        return Response({"Error" : "permission not found"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error-en" : "permission not found",
+                         "error-fr":"permission introuvable"},
+                        status=status.HTTP_400_BAD_REQUEST)
+    
+    
+#supprimer une permission
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated, HasPermissionFactory('DELETE_PERMISSIONS')])
+
+def delete_permission(request, pk):
+    try:
+        
+        permission = Permission.objects.get(pk=pk)
+    except Permission.DoesNotExist:
+        return Response (
+            {'error-fr': 'le permission n\'existe pas',
+             'error-en':'permission does not exist'},
+            status=status.HTTP_404_NOT_FOUND)
+        
+    permission.delete()
+    
+    return Response({'message-fr':'permission supprimer',
+                     'message-en': 'permission deleted successfully'},
+                    status=status.HTTP_204_NO_CONTENT)
         
 
 #  Assigner un role a un utilisateur
@@ -125,14 +176,19 @@ class AssignRoleToUserView(APIView):
         try:
             user = Utilisateur.objects.get(id=user_id)
         except Utilisateur.DoesNotExist:
-            return Response({"error": "Utilisateur introuvable"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error-fr": "Utilisateur introuvable",
+                             "error-en":"user not found"},
+                            status=status.HTTP_404_NOT_FOUND)
 
         success = assign_role_to_user(user, role_code)
 
         if not success:
-            return Response({"error": "Rôle introuvable"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error-fr": "Rôle introuvable",
+                             "error-en": "Role not found"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"message": "Rôle assigné avec succès"})
+        return Response({"error-fr": "Rôle assigné avec succès",
+                         "error-en":"Role assigned successfully"})
 
 
 #modifier le role d'un utilisateur
@@ -144,20 +200,24 @@ def update_user_role(request, user_id):
     try:
         user = Utilisateur.objects.get(id=user_id)
     except Utilisateur.DoesNotExist:
-        return Response({"error": "Utilisateur introuvable"},status=status.HTTP_404_NOT_FOUND)
+        return Response({"error-fr": "Utilisateur introuvable",
+                         "error-en":"User not found"},status=status.HTTP_404_NOT_FOUND)
 
     # Récupère le UserRole existant
     user_role = UserRole.objects.filter(user=user).first()
 
     if not user_role:
-        return Response( {"error": "Aucun rôle assigné à cet utilisateur"},status=status.HTTP_404_NOT_FOUND)
+        return Response( {"error-fr": "Aucun rôle assigné à cet utilisateur",
+                          "error-en":"User don't have any Role"},
+                        status=status.HTTP_404_NOT_FOUND)
 
     serializer = UpdateUserRoleSerializer(user_role, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response( 
             {
-                "message": "Rôle mis à jour avec succès",
+                "error-fr": "Rôle mis à jour avec succès",
+                "error-en": "Role updated successfully",
                 "user": user.username,
                 "role": user_role.role.code_role
             },status=status.HTTP_200_OK)
@@ -175,14 +235,18 @@ class RemoveRoleFromUserView(APIView):
         try:
             user = Utilisateur.objects.get(id=user_id)
         except Utilisateur.DoesNotExist:
-            return Response({"error": "Utilisateur introuvable"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error-fr": "Utilisateur introuvable",
+                             "error-en": "user not found"},
+                            status=status.HTTP_404_NOT_FOUND)
 
         success = remove_role_from_user(user, role_code)
 
         if not success:
-            return Response({"error": "Rôle introuvable"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error-fr": "Rôle introuvable",
+                             "error-en":"Role not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"message": "Rôle retiré avec succès"})
+        return Response({"error-fr": "Rôle retiré avec succès",
+                         "error-en":"Role removed"}, status=status.HTTP_200_OK)
 
 #  Assigner un role a une permission
 class AssignPermissionToRoleView(APIView):

@@ -19,10 +19,11 @@ class EntiteMetierSerializer(serializers.ModelSerializer):
 
 class UtilisateurSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
+    entite_metier = EntiteMetierSerializer(many =True, read_only =True)
 
     class Meta:
         model = Utilisateur
-        fields = ['id','username', 'first_name', 'last_name', 'email',  'is_active', 'is_ldap', 'roles']
+        fields = ['id','username', 'first_name', 'last_name', 'email',  'is_active', 'is_ldap', 'roles', 'entite_metier',]
 
     def get_roles(self, obj):
         # Récupère les roles de l'utilisateur via UserRole

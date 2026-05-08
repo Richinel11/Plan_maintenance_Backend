@@ -1,21 +1,22 @@
 from django.utils import timezone
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action, api_view,permission_classes
-from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from drf_spectacular.utils import extend_schema, extend_schema_view
 from .models import Utilisateur, EntiteMetier
 from security.models import Role, UserRole
 from security.permission import HasPermissionFactory
-from .serializers import  SetPasswordSerializer, UtilisateurSerializer,  EntiteMetierSerializer, UtilisateurUpdateSerializer
-from .serializers import LoginSerializer
+from .serializers import(
+    SetPasswordSerializer,
+    UtilisateurSerializer,
+    EntiteMetierSerializer,
+    UtilisateurUpdateSerializer,
+    LoginSerializer,
+)
 from django.contrib.auth import authenticate
 from utils import LDAP_connect 
-import uuid 
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -27,7 +28,10 @@ def create_user(request):
         try: 
             role = Role.objects.get(code_role = request.data['code_role'])
         except Role.DoesNotExist: 
-            return Response({'Error':'Role non existant'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error-fr':'Role non existant',
+                'error-en': 'this Role do not exist'},
+                            status=status.HTTP_400_BAD_REQUEST)
         
         user = Utilisateur.objects.create_user(
             username = request.data['username'],
@@ -43,10 +47,13 @@ def create_user(request):
             role = role
         )
         
-        return Response({"message" :"User ok"}, status=status.HTTP_201_CREATED)
+        return Response({
+            "error-en" :"User created",
+            "error-fr":'Utilisateur crée'},
+                        status=status.HTTP_201_CREATED)
     
     except Exception as e: 
-        return Response({'Error':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # list all user
 
@@ -71,7 +78,10 @@ def find_user(request, user_id):
     try :
         user = Utilisateur.objects.get(id=user_id)
     except Utilisateur.DoesNotExist:
-        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({
+            'error-en': 'User does not exist',
+            'error-fr': 'l\'utilisateur n\'exsite pas'},
+                        status=status.HTTP_404_NOT_FOUND)
     
     serialzer =UtilisateurSerializer(user, many=False)
     return Response(serialzer.data, status=status.HTTP_200_OK)
@@ -85,7 +95,9 @@ def get_update_user(request, user_id):
         
         user = Utilisateur.objects.get(id =user_id)
     except Utilisateur.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error-en': 'User not found',
+                         'error-fr':'l\'utilisateur n\'existe pas'},
+                        status=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'PUT':
         serializer = UtilisateurUpdateSerializer(user, data=request.data)
@@ -113,10 +125,12 @@ def get_update_user(request, user_id):
        else:
            UserRole.objects.create(user=user, role=role)
 
-    return Response({"message": "User updated"}, status=status.HTTP_200_OK)
+    return Response({"error-en": "User updated",
+                     'error-fr': 'Utilisateur mis à jour'},
+                    status=status.HTTP_200_OK)
 
     
-# delete user
+# delete user (soft delete)
 @api_view(['DELETE'])   
 @permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')]) 
 def delete_user(request, user_id):
@@ -126,10 +140,15 @@ def delete_user(request, user_id):
         user.is_active = False
         user.deleted_at = timezone.now()
         user.save()
-        return Response({"message": "User deleted"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({
+            "error-en": "User deleted",
+            "error-fr": "utilisateur supprimé"},
+                        status=status.HTTP_204_NO_CONTENT)
 
     except Utilisateur.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error-en': 'User not found',
+                         'error-fr': 'l\'utilisateur n\'existe pas'},
+                        status=status.HTTP_404_NOT_FOUND)
     
     
     
@@ -141,16 +160,22 @@ def restore_user(request, user_id):
         user = Utilisateur.objects.get(id=user_id)
           
         if not user.is_deleted:
-            return Response({'error': 'Cet utilisateur n\'est pas supprimé'},status=status.HTTP_400_BAD_REQUEST) 
+            return Response({'error-fr': 'Cet utilisateur n\'est pas supprimé',
+                             'error-en':'User not deleted'},
+                            status=status.HTTP_400_BAD_REQUEST) 
 
         user.is_deleted = False
         user.deleted_at = None
         user.save()
 
-        return Response({'message': 'Utilisateur restauré avec succès'},status=status.HTTP_200_OK)
+        return Response({'error-fr': 'Utilisateur restauré avec succès',
+                         'error-en':'User restaured successfully'},
+                        status=status.HTTP_200_OK)
 
     except Utilisateur.DoesNotExist:
-        return Response({'error': 'Utilisateur non trouvé'},status=status.HTTP_404_NOT_FOUND)
+        return Response({'error-fr': 'Utilisateur non trouvé',
+                         'error-en':'User not found'},
+                        status=status.HTTP_404_NOT_FOUND)
 
 
 # changer de password
@@ -163,11 +188,15 @@ def change_password(request):
     new_password = request.data.get('new_password') 
     
     if not new_password:
-        return Response({"error": "mot de passe requis"},status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error-fr": "mot de passe requis",
+                         'error-en': 'password required'},
+                        status=status.HTTP_400_BAD_REQUEST)
     
     #controle sur la longueur du password
     if len(new_password) < 8:
-        return Response({"error": "mot de passe trop court.Au moins 8 caractères"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error-fr": "mot de passe trop court.Au moins 8 caractères",
+                         'error-en': 'short password! at least 8 characters'},
+                        status=status.HTTP_400_BAD_REQUEST)
     
     user.set_password(new_password)
     
@@ -176,7 +205,9 @@ def change_password(request):
         
     user.save()
     
-    return Response({"message": "Mot de passe mis à jour avec succès"}, status=status.HTTP_200_OK)
+    return Response({"error-fr": "Mot de passe mis à jour avec succès!",
+                     'error-en': 'password Updated!'},
+                    status=status.HTTP_200_OK)
 
 
 
@@ -192,51 +223,97 @@ class LoginAPIView(APIView):
     def post(self, request) :
         username = request.data["username"]
         password = request.data["password"]
+
+        if not username or not password:
+            return Response(
+                {'error-en':'username et password requis',
+                 'error-fr':'non d\'utilisateur et mot de passe requis'},
+                status=status.HTTP_400_BAD_REQUEST)
+            
+        # Vérifier l'existence de l'utilisateur dans notre BD
         try: 
             user = Utilisateur.objects.get(username=username)
             
         except Utilisateur.DoesNotExist:
             
-            return Response({"error":"user does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error-en":"user does not exist",
+                 'error-fr': 'l\'utilisateur n\'existe pas'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Vérifications de l'état du compte
         
         if user.is_active == False:
             
-            return Response({"error":"account blocked"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error-en":"account blocked",
+                 'error-fr': 'compte blocké'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
           
         if user.is_deleted == True:
             
-            return Response({"error":"user does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-           
+            return Response(
+                {"error-en":"user does not exist",
+                 'error-fr': 'l\'utilisateur n\'existe pas'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        #Authentification : LDAP ou locale 
+          
         if user.is_ldap :
+            # L'utilisateur est dans l'Active Directory -> on délègue l'auth à LDAP_connect
             try:
                 
                 LDAP_connect.ldap_login(username, password)
-                # logger.info("LDAP Auth OK pour %s", username)
+                #logger.info("LDAP Authentificationc  OK pour %s", username)
             except Exception as e:
                 # logger.warning("Échec LDAP pour %s : %s", username, str(e))
-                return Response({"error":"Invalid username and password"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error-en":"Invalid username and password",
+                                 "error-fr":"mot-de-passe ou nom d\'utilisateur invalide"},
+                                status=status.HTTP_400_BAD_REQUEST)
                 
         else:
+            # Authentification Django standard (password hashé en BD)
             auth = authenticate(username=username , password=password)
             
             if auth is None :
-                return Response({"error":"Invalid username and password"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error-en":"Invalid username and password",
+                                 "error-fr":"mot-de-passe ou nom d\'utilisateur invalide"},
+                                status=status.HTTP_400_BAD_REQUEST)
                  
+         # Mise à jour de la dernière connexion 
+        user.last_connection_at = timezone.now()
+        user.save(update_fields=['last_connection_at']) 
+                
+        # Génération des tokens JWT         
         refresh = RefreshToken.for_user(user)
+    
+        #Sérialisation des informations utilisateur (depuis notre BD)
+        user_data = UtilisateurSerializer(user).data
         
-
         return Response ({
             "user_id" : str(user.id),
             "access" :  str(refresh.access_token),
-            "refresh" :  str(refresh)
-        })
+            "user": user_data,
+            "refresh" :  str(refresh),
+            "first_connection" : user.first_connection,
+        }, status=status.HTTP_200_OK)
     
 class LogoutAPIView(APIView):
-    """Déconnexion de l'utilisateur"""
+    """Déconnexion de l'utilisateur : blacklist du refresh token"""
+    permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        # Vider la session
-        request.session.flush()
+        try:
+            refresh_token = request.data.get('refresh')
+            if refresh_token:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+        except Exception :
+            pass # token déjà expiré ou invalide, on laisse passer
+        #request.session.flush()
         return Response({'success': True,'message': 'Déconnexion réussie'}, status=status.HTTP_200_OK)
 
 

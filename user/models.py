@@ -17,7 +17,7 @@ class SoftDeleteManager(models.Manager):
 
 class EntiteMetier(models.Model):
     TYPE_CHOICES = [
-        ('PROD', 'Production'),
+        ('PROD', 'Planning'),
         ('TRANS', 'Transport'),
         ('DIST', 'Distribution'),
     ]
