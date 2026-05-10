@@ -77,10 +77,10 @@ def get_update_role(request, code_role):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated, HasPermissionFactory('DELETE_ROLES')])
 
-def delete_role(request, pk):
+def delete_role(request, code_role):
     try:
         
-        role = Role.objects.get(pk=pk)
+        role = Role.objects.get(code_role=code_role)
     except Role.DoesNotExist:
         return Response (
             {'error-fr': 'le role n\'existe pas',
@@ -147,10 +147,10 @@ def get_update_permission(request, code_permission):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated, HasPermissionFactory('DELETE_PERMISSIONS')])
 
-def delete_permission(request, pk):
+def delete_permission(request, code_permission):
     try:
         
-        permission = Permission.objects.get(pk=pk)
+        permission = Permission.objects.get(code=code_permission)
     except Permission.DoesNotExist:
         return Response (
             {'error-fr': 'le permission n\'existe pas',

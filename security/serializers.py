@@ -6,7 +6,7 @@ from .models import Permission, Role, RolePermission, UserRole
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model= Permission  
-        fields=["nom", "code", "description"]
+        fields=["nom", "code", "description","module"]
         
 class RoleSerializer(serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField()

@@ -23,7 +23,7 @@ class UtilisateurSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Utilisateur
-        fields = ['id','username', 'first_name', 'last_name', 'email',  'is_active', 'is_ldap', 'roles', 'entite_metier',]
+        fields = ['id','username', 'first_name', 'last_name', 'email',  'is_active', 'is_ldap', 'roles', 'entite_metier','first_connection']
 
     def get_roles(self, obj):
         # Récupère les roles de l'utilisateur via UserRole

@@ -136,14 +136,13 @@ def get_update_user(request, user_id):
 def delete_user(request, user_id):
     try:    
         user = Utilisateur.objects.get(id=user_id)
-        user.is_deleted = True
         user.is_active = False
-        user.deleted_at = timezone.now()
+        user.is_deleted = False
         user.save()
         return Response({
-            "error-en": "User deleted",
-            "error-fr": "utilisateur supprimé"},
-                        status=status.HTTP_204_NO_CONTENT)
+            "error-en": "User desactivated successfully",
+            "error-fr": "utilisateur désactiver avec succes"},
+                        status=status.HTTP_200_OK)
 
     except Utilisateur.DoesNotExist:
         return Response({'error-en': 'User not found',
@@ -159,17 +158,17 @@ def restore_user(request, user_id):
     try:
         user = Utilisateur.objects.get(id=user_id)
           
-        if not user.is_deleted:
-            return Response({'error-fr': 'Cet utilisateur n\'est pas supprimé',
-                             'error-en':'User not deleted'},
+        if user.is_active:
+            return Response({'error-fr': 'Cet utilisateur est déja actif',
+                             'error-en':'User is already active'},
                             status=status.HTTP_400_BAD_REQUEST) 
 
+        user.is_active = True #reactivation
         user.is_deleted = False
-        user.deleted_at = None
         user.save()
 
         return Response({'error-fr': 'Utilisateur restauré avec succès',
-                         'error-en':'User restaured successfully'},
+                         'error-en':'User reactvated successfully'},
                         status=status.HTTP_200_OK)
 
     except Utilisateur.DoesNotExist:
