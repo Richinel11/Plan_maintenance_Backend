@@ -20,7 +20,7 @@ class UtilisateurShortSerializer(serializers.ModelSerializer):
 class CentraleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Centrale
-        fields = ['id', 'nom', 'type', 'capacite_mw']
+        fields = ['id', 'nom', 'capacite_mw']
 
 class EntiteMetierShortSerializer(serializers.ModelSerializer):
     class Meta:

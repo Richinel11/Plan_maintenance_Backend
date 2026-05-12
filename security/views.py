@@ -110,7 +110,8 @@ def create_permission(request):
         Permission.objects.create(
             nom = request.data["nom_permission"],
             code = request.data["code_permission"],
-            description = request.data["description"]
+            description = request.data["description"],
+            module = request.data["module"]
         )
         return Response({'message': 'Permission Created'}, status=status.HTTP_201_CREATED)
     return Response({'Error': 'Method not Allowed'}, status=status.HTTP_400_BAD_REQUEST)
@@ -130,6 +131,7 @@ def get_update_permission(request, code_permission):
             permisison.code = request.data['code_permission']
             permisison.nom = request.data['nom']
             permisison.description = request.data['description']
+            permisison.module = request.data['module']
             
             permisison.save()
             return Response({"error-en":"Permission Updated",

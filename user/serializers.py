@@ -23,7 +23,7 @@ class UtilisateurSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Utilisateur
-        fields = ['id','username', 'first_name', 'last_name', 'email',  'is_active', 'is_ldap', 'roles', 'entite_metier','first_connection']
+        fields = ['id','username', 'first_name', 'last_name', 'email',  'is_active', 'is_ldap', 'roles', 'entite_metier','first_connection', 'region']
 
     def get_roles(self, obj):
         # Récupère les roles de l'utilisateur via UserRole
@@ -41,6 +41,7 @@ class UtilisateurUpdateSerializer(serializers.ModelSerializer):
             'email',
             'first_connection',
             'is_ldap',
+            'region',
         ]
 
 class LoginSerializer(serializers.Serializer):
@@ -93,7 +94,8 @@ class LoginResponseSerializer(serializers.Serializer):
     role = serializers.CharField()
     ldap_dn = serializers.CharField(allow_blank=True)
     ldap_groups = serializers.ListField(child=serializers.CharField())
-    first_password_change_required = serializers.BooleanField(default=False)    
+    first_password_change_required = serializers.BooleanField(default=False)
+    region = serializers.CharField(allow_blank=True)
    
     
 class SetPasswordSerializer(serializers.Serializer):

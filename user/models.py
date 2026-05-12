@@ -52,6 +52,10 @@ class Utilisateur(AbstractUser):
     deleted_at = models.DateTimeField(default=None, blank=True, null=True)
     deleted_by = models.CharField( max_length=150, blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
+
+
+    # Field add after de request of Blanche
+    region = models.CharField(max_length=100, blank=True, null=True)
     
 
     USERNAME_FIELD = "username"
