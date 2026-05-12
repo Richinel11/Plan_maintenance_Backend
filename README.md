@@ -2,6 +2,16 @@
 
 
 
+## Documentation API
+
+Ce projet expose une documentation OpenAPI/Swagger via `drf-spectacular`.
+
+- Swagger UI : `http://127.0.0.1:8000/api/docs/`
+- Redoc : `http://127.0.0.1:8000/api/redoc/`
+- Schéma OpenAPI JSON : `http://127.0.0.1:8000/api/schema/`
+
+> Pour utiliser l\'authentification JWT dans Swagger, ajoutez un header `Authorization: Bearer <token>`.
+
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.

@@ -6,7 +6,9 @@ from .models import Troncon, Depart, Localisation, ReferenceReseau, Poste, Ouvra
 from .serializers import *
 
 
-class TronconViewSet(viewsets.ViewSet):
+class TronconViewSet(viewsets.ModelViewSet):
+    queryset = Troncon.objects.all().order_by('-date_creation')
+    serializer_class = TronconSerializer
 
     def list(self, request):
         troncons = Troncon.objects.all().order_by('-date_creation')
@@ -51,7 +53,9 @@ class TronconViewSet(viewsets.ViewSet):
         })
         
         
-class DepartViewSet(viewsets.ViewSet):
+class DepartViewSet(viewsets.ModelViewSet):
+    queryset = Depart.objects.all().order_by('-date_creation')
+    serializer_class = DepartSerializer
 
     def list(self, request):
         departs = Depart.objects.all()
@@ -79,7 +83,9 @@ class DepartViewSet(viewsets.ViewSet):
 
    #ouvrage viewset
     
-class OuvrageViewset(viewsets.ViewSet):
+class OuvrageViewset(viewsets.ModelViewSet):
+    queryset = Ouvrage.objects.all().order_by('-date_creation')
+    serializer_class = OuvrageSerializer
     
     def list(self, request):
         ouvrage = Ouvrage.objects.all()
@@ -114,7 +120,10 @@ class OuvrageViewset(viewsets.ViewSet):
 
     #localisation viewset
     
-class LocalisationViewset(viewsets.ViewSet):
+class LocalisationViewset(viewsets.ModelViewSet):
+    queryset = Localisation.objects.all().order_by('-date_creation')
+    serializer_class = LocalisationSerializer
+
     def list(self, request):
         Loc = Localisation.objects.all()
         serializer = LocalisationSerializer(Loc,many = True)
@@ -147,7 +156,9 @@ class LocalisationViewset(viewsets.ViewSet):
 
     
     #poste Viewset
-class PosteViewSet(viewsets.ViewSet):
+class PosteViewSet(viewsets.ModelViewSet):
+    queryset = Poste.objects.all().order_by('-date_creation')
+    serializer_class = PosteSerializer
 
     def list(self, request):
         postes = Poste.objects.all()
@@ -155,7 +166,7 @@ class PosteViewSet(viewsets.ViewSet):
         return Response(serializer.data)
     
     def retrieve(self, request, pk=None):
-        poste = get_object_or_404(Localisation, id=pk)
+        poste = get_object_or_404(Poste, id=pk)
         serializer = PosteSerializer(poste)
         return Response(serializer.data)
     
@@ -174,7 +185,9 @@ class PosteViewSet(viewsets.ViewSet):
         return Response({"actif": poste.actif})
    
    #reference reseau Viewset 
-class ReferenceReseauViewSet(viewsets.ViewSet):
+class ReferenceReseauViewSet(viewsets.ModelViewSet):
+    queryset = ReferenceReseau.objects.all().order_by('-date_creation')
+    serializer_class = ReferenceReseauSerializer
 
     def list(self, request):
         refs = ReferenceReseau.objects.all()
