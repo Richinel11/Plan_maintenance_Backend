@@ -42,7 +42,7 @@ def create_user(request):
             first_connection = True,
             is_ldap = request.data['is_ldap'],
             region = request.data.get('region', None),
-            entite_metier = EntiteMetier.objects.get(id=request.data['entite_metier_id']) if request.data.get('entite_metier_id') else None
+            entite_metier = EntiteMetier.objects.get(id=request.data['entite_metier']) if request.data.get('entite_metier') else None
         )
         UserRole.objects.create(
             user = user,

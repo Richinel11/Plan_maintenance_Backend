@@ -42,6 +42,7 @@ class UtilisateurUpdateSerializer(serializers.ModelSerializer):
             'first_connection',
             'is_ldap',
             'region',
+            'entite_metier',
         ]
 
 class LoginSerializer(serializers.Serializer):
