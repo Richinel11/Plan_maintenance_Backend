@@ -19,7 +19,7 @@ def ldap_login(user_id, password):
     # Configuration basée sur votre code JavaScript
     LDAP_SERVER = os.getenv("LDAP_SERVER")
     LDAP_DOMAIN = os.getenv("LDAP_DOMAIN")
-    LDAP_URL = f"ldap://{LDAP_SERVER}:{os.getenv("LDAP_PORT")}"
+    LDAP_URL = f"ldap://{LDAP_SERVER}:{os.getenv('LDAP_PORT')}"
     print(f"Tentative de connexion AD pour: {user_id}")
     try:
         # --- CONNEXION ET AUTHENTIFICATION ---

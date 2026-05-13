@@ -1,10 +1,12 @@
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 AUTH_USER_MODEL = 'user.Utilisateur'
+load_dotenv()
 
 # SECURITY
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7pn-i#t&r0i^x)i(9*7!_d_$vg)qk#91b0mn5%b!^px2=e6zs(')
