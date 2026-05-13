@@ -1,8 +1,11 @@
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv()
 
 AUTH_USER_MODEL = 'user.Utilisateur'
 

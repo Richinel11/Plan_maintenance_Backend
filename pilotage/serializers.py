@@ -91,7 +91,7 @@ class WorkflowHistorySerializer(serializers.ModelSerializer):
 class WorkflowWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workflow
-        fields = ['name', 'code', 'description', 'is_active']
+        fields = ['id', 'name', 'code', 'description', 'is_active']
 
     def validate_code(self, value):
         # Vérifier l'unicité du code en excluant l'instance actuelle (update)
@@ -106,7 +106,7 @@ class WorkflowWriteSerializer(serializers.ModelSerializer):
 class WorkflowStepWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkflowStep
-        fields = ['number', 'name', 'code', 'description', 'is_terminal']
+        fields = ['id', 'number', 'name', 'code', 'description', 'is_terminal']
 
     def validate(self, attrs):
         # Vérifier l'unicité du number dans le workflow
@@ -139,7 +139,7 @@ class WorkflowTransitionWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkflowTransition
-        fields = ['name', 'from_step', 'to_step','can_go_back', 'comment_required', 'is_active']
+        fields = ['id', 'name', 'from_step', 'to_step','can_go_back', 'comment_required', 'is_active']
 
     def validate(self, attrs):
         workflow = self.context.get('workflow')
@@ -169,7 +169,7 @@ class WorkflowTransitionWriteSerializer(serializers.ModelSerializer):
 class WorkflowValidationWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkflowValidation
-        fields = ['step', 'role', 'status', 'motif']
+        fields = ['id', 'step', 'role', 'status', 'motif']
 
     def validate_step(self, value):
         # Vérifier que le step appartient au même workflow que la transition
@@ -177,3 +177,13 @@ class WorkflowValidationWriteSerializer(serializers.ModelSerializer):
         if transition and value.workflow != transition.workflow:
             raise serializers.ValidationError("Ce step n'appartient pas au workflow de cette transition.")
         return value
+
+
+class ExecuteTransitionSerializer(serializers.Serializer):
+    transition_id = serializers.UUIDField()
+    comment = serializers.CharField(required=False, allow_blank=True)
+
+
+class RejectTransitionSerializer(serializers.Serializer):
+    transition_id = serializers.UUIDField()
+    motif = serializers.CharField(required=False, allow_blank=True)

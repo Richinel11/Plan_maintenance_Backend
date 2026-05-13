@@ -5,10 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from .models import Utilisateur, EntiteMetier
 from security.models import Role, UserRole
 from security.permission import HasPermissionFactory
 from .serializers import(
+    CreateUserSerializer,
     SetPasswordSerializer,
     UtilisateurSerializer,
     EntiteMetierSerializer,
@@ -20,6 +22,12 @@ from utils import LDAP_connect
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
+@extend_schema(
+    tags=["Users"],
+    request=CreateUserSerializer,
+    responses={201: {"type": "object"}, 400: {"type": "object"}, 500: {"type": "object"}},
+    description="Créer un nouvel utilisateur avec rôle"
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, HasPermissionFactory('MANAGE_USERS')])
 def create_user(request):
@@ -59,6 +67,11 @@ def create_user(request):
 
 # list all user
 
+@extend_schema(
+    tags=["Users"],
+    responses={200: UtilisateurSerializer(many=True)},
+    description="Récupérer la liste de tous les utilisateurs"
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')])
 def get_users(request):
@@ -74,6 +87,11 @@ def get_users(request):
 
 # find user
 
+@extend_schema(
+    tags=["Users"],
+    responses={200: UtilisateurSerializer, 404: {"type": "object"}},
+    description="Récupérer les informations d'un utilisateur"
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def find_user(request, user_id):
@@ -90,6 +108,12 @@ def find_user(request, user_id):
 
 # update user
 
+@extend_schema(
+    tags=["Users"],
+    request=UtilisateurUpdateSerializer,
+    responses={200: UtilisateurSerializer, 400: {"type": "object"}, 404: {"type": "object"}},
+    description="Mettre à jour les informations d'un utilisateur"
+)
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')])
 def get_update_user(request, user_id):
@@ -133,6 +157,11 @@ def get_update_user(request, user_id):
 
     
 # delete user (soft delete)
+@extend_schema(
+    tags=["Users"],
+    responses={200: {"type": "object"}, 404: {"type": "object"}},
+    description="Désactiver un utilisateur"
+)
 @api_view(['DELETE'])   
 @permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')]) 
 def delete_user(request, user_id):
@@ -154,6 +183,11 @@ def delete_user(request, user_id):
     
     
 #restauration d'un utilisateur
+@extend_schema(
+    tags=["Users"],
+    responses={200: {"type": "object"}, 400: {"type": "object"}, 404: {"type": "object"}},
+    description="Réactiver un utilisateur"
+)
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated,HasPermissionFactory('MANAGE_USERS')])
 def restore_user(request, user_id):
@@ -181,9 +215,14 @@ def restore_user(request, user_id):
 
 # changer de password
 
+@extend_schema(
+    tags=["Users"],
+    request=SetPasswordSerializer,
+    responses={200: {"type": "object"}, 400: {"type": "object"}},
+    description="Changer le mot de passe de l'utilisateur connecté"
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-
 def change_password(request):
     user = request.user   
     new_password = request.data.get('new_password') 
@@ -221,6 +260,23 @@ class LoginAPIView(APIView):
     permission_classes = []  # Pas d'authentification requise pour le login
     authentication_classes = []  # Pas d'authentification requise pour le login
     
+    @extend_schema(
+        tags=["Users"],
+        request=LoginSerializer,
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "user_id": {"type": "string"},
+                    "access": {"type": "string"},
+                    "refresh": {"type": "string"},
+                    "user": {"type": "object"},
+                    "first_connection": {"type": "boolean"},
+                }
+            }
+        },
+        description="Authentification utilisateur avec username et password"
+    )
     def post(self, request) :
         username = request.data["username"]
         password = request.data["password"]
@@ -306,6 +362,12 @@ class LogoutAPIView(APIView):
     """Déconnexion de l'utilisateur : blacklist du refresh token"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        tags=["Users"],
+        request={"type": "object", "properties": {"refresh": {"type": "string"}}},
+        responses={200: {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}}}},
+        description="Déconnexion et blacklist du refresh token"
+    )
     def post(self, request):
         try:
             refresh_token = request.data.get('refresh')
@@ -319,6 +381,14 @@ class LogoutAPIView(APIView):
 
 
         
+@extend_schema_view(
+    list=extend_schema(tags=["Users"]),
+    create=extend_schema(tags=["Users"]),
+    retrieve=extend_schema(tags=["Users"]),
+    update=extend_schema(tags=["Users"]),
+    partial_update=extend_schema(tags=["Users"]),
+    destroy=extend_schema(tags=["Users"]),
+)
 class EntiteMetierViewSet(ModelViewSet):
     queryset = EntiteMetier.objects.all()
     serializer_class = EntiteMetierSerializer

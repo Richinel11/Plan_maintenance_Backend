@@ -1,12 +1,12 @@
 from django.utils import timezone
 from .models import WorkflowTransition, WorkflowValidation, WorkflowHistory
-from planning.models import PlanningTravaux
+from planning.models import Planning
 from security.models import UserRole
 
 
 #  RÉCUPÉRER LES TRANSITIONS DISPONIBLES
 
-def get_available_transitions(planning: PlanningTravaux):
+def get_available_transitions(planning: Planning):
     """
     Retourne les transitions disponibles pour un planning
     selon son current_step
@@ -38,7 +38,7 @@ def can_user_transition(user, transition: WorkflowTransition) -> bool:
 
 #  EXECUTER LA TRANSITION
 
-def execute_transition(planning: PlanningTravaux, transition: WorkflowTransition, user, comment: str = "") -> dict:
+def execute_transition(planning: Planning, transition: WorkflowTransition, user, comment: str = "") -> dict:
     """
     Exécute une transition sur un planning :
     - Vérifie que la transition est valide
@@ -104,7 +104,7 @@ def execute_transition(planning: PlanningTravaux, transition: WorkflowTransition
     }
 # REFUSER UNE TRANSITION
 
-def reject_transition(planning: PlanningTravaux, transition: WorkflowTransition, user, motif: str = "") -> dict:
+def reject_transition(planning: Planning, transition: WorkflowTransition, user, motif: str = "") -> dict:
     """
     Refuse une transition :
     - Vérifie les droits
@@ -131,7 +131,7 @@ def reject_transition(planning: PlanningTravaux, transition: WorkflowTransition,
     old_step = planning.current_step
     if transition.can_go_back:
         planning.current_step = transition.from_step
-        planning.save(update_fields=['current_step', 'updated_at'])
+        planning.save(update_fields=['current_step'])
 
     #  Enregistrer dans WorkflowHistory
     WorkflowHistory.objects.create(
@@ -155,7 +155,7 @@ def reject_transition(planning: PlanningTravaux, transition: WorkflowTransition,
 
 #  RÉCUPÉRER L'HISTORIQUE D'UN PLANNING
 
-def get_planning_history(planning: PlanningTravaux):
+def get_planning_history(planning: Planning):
     """
     Retourne l'historique complet des transitions d'un planning
     """

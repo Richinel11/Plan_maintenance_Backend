@@ -97,7 +97,7 @@ class WorkflowValidation(models.Model):
 
 class WorkflowHistory(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    planning = models.ForeignKey('planning.PlanningTravaux', on_delete=models.CASCADE, related_name="workflow_history")
+    planning = models.ForeignKey('planning.Planning', on_delete=models.CASCADE, related_name="workflow_history")
     transition = models.ForeignKey(WorkflowTransition, on_delete=models.SET_NULL, null=True)
     from_step = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL, null=True, related_name="history_départ")
     to_step = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL, null=True, related_name="history_arrivé")

@@ -1,4 +1,4 @@
-from ..models import Role
+from ...models import Role
 from django.core.management.base import BaseCommand
 
 

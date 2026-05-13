@@ -19,7 +19,7 @@ class EntiteMetierSerializer(serializers.ModelSerializer):
 
 class UtilisateurSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
-    entite_metier = EntiteMetierSerializer(many =True, read_only =True)
+    entite_metier = EntiteMetierSerializer(read_only=True)
 
     class Meta:
         model = Utilisateur
@@ -32,6 +32,15 @@ class UtilisateurSerializer(serializers.ModelSerializer):
         return RoleSerializer(roles, many=True).data
     
 class UtilisateurUpdateSerializer(serializers.ModelSerializer):
+    entite_metier = EntiteMetierSerializer(read_only=True)
+    entite_metier_id = serializers.PrimaryKeyRelatedField(
+        queryset=EntiteMetier.objects.all(),
+        source='entite_metier',
+        write_only=True,
+        allow_null=True,
+        required=False,
+    )
+
     class Meta:
         model = Utilisateur
         fields = [
@@ -43,6 +52,7 @@ class UtilisateurUpdateSerializer(serializers.ModelSerializer):
             'is_ldap',
             'region',
             'entite_metier',
+            'entite_metier_id',
         ]
 
 class LoginSerializer(serializers.Serializer):
@@ -99,8 +109,20 @@ class LoginResponseSerializer(serializers.Serializer):
     region = serializers.CharField(allow_blank=True)
    
     
+class CreateUserSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+    email = serializers.EmailField()
+    password = serializers.CharField(min_length=8, write_only=True)
+    is_ldap = serializers.BooleanField(default=False)
+    code_role = serializers.CharField(max_length=100)
+    region = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    entite_metier = serializers.UUIDField(required=False, allow_null=True)
+
+
 class SetPasswordSerializer(serializers.Serializer):
-    password = serializers.CharField()
+    new_password = serializers.CharField(min_length=8, write_only=True)
 
 
 class ToggleStatusSerializer(serializers.Serializer):
