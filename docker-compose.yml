@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: mysql:8.4.9
-    container_name: mysql_db
+    container_name: mysql_db1
     restart: always
     environment:
       MYSQL_DATABASE: ${DJANGO_DATABASE_NAME}
@@ -22,7 +22,7 @@ services:
 
   web:
     build: .
-    container_name: django_api
+    container_name: django_api1
     restart: always
     command: >
       sh -c "python manage.py migrate &&
