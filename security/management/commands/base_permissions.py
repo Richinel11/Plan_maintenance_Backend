@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from ..models import Role, Permission, RolePermission
+from ...models import Role, Permission, RolePermission
 
 class Command(BaseCommand):
     help = 'Initialise les permissions et les assigne aux rôles'
@@ -28,7 +28,7 @@ class Command(BaseCommand):
             {'code': 'VIEW_NAPT',         'description': 'Consulter les NAPT'},
             {'code': 'DIFFUSE_NAPT',      'description': 'Diffuser une NAPT'},
             {'code': 'VIEW_KPI',          'description': 'Consulter les indicateurs KPI'},
-            {'code': 'VIEW_HISTOTY',   'description': 'Consulter l\'historique complet'},
+            {'code': 'VIEW_HISTORY',   'description': 'Consulter l\'historique complet'},
             {'code': 'VIEW_AUDIT',        'description': 'Accès lecture seule pour audit'},
             
             #permissions accordées à un utilisateur (admin)
@@ -49,7 +49,7 @@ class Command(BaseCommand):
 
         for p in permissions:
             obj, created = Permission.objects.get_or_create(
-                code_permission=p['code'],
+                code=p['code'],
                 defaults={
                     'nom': p['code'].replace('_', ' ').title(),
                     'description': p['description'],
@@ -76,7 +76,7 @@ class Command(BaseCommand):
             'CCR': [
                 'VIEW_WORK', 'FOLLOW_WORK',
                 'VIEW_PLANNING',
-                'VIEW_DDR', 'APPOVE_DDR', 'REFUSE_DDR', 'REPORT_DDR',
+                'VIEW_DDR', 'APROVE_DDR', 'REFUSE_DDR', 'REPORT_DDR',
                 'GENERATE_NAPT', 'VIEW_NAPT',
             ],
             'EQUIPE_COMMUNICATION': [
@@ -90,10 +90,10 @@ class Command(BaseCommand):
             'ADMIN':[
                 'CREATE_WORK', 'UPDATE_WORK','VIEW_WORK', 'FOLLOW_WORK', 'END_WORK', 
                 'VIEW_PLANNING', 'ALIGN_PLANNING', 'TRANSMIT_PLANNING','VALIDATE_PLANNING',
-                'GENERATE_DDR', 'DIFFUSE_NAPT','APPOVE_DDR', 'REFUSE_DDR', 'REPORT_DDR',
-                'GENERATE_NAPT', 'VIEW_NAPT''VIEW_DDR','VIEW_KPI', 'VIEW_HISTORY', 'VIEW_AUDIT',
+                'GENERATE_DDR', 'DIFFUSE_NAPT','APROVE_DDR', 'REFUSE_DDR', 'REPORT_DDR',
+                'GENERATE_NAPT', 'VIEW_NAPT','VIEW_DDR','VIEW_KPI', 'VIEW_HISTORY', 'VIEW_AUDIT',
                 'CREATE_USER', 'VIEW_USER', 'UPDATE_USER', 'DELETE_USER', 'RESTORE_USER',
-                'CREATE_ROLE', 'VIEW_ROLE', 'UPDATE_ROLE', 'DELETE_ROLE','ASSIGN_ROLE', 'VIEW_ROLES',
+                'CREATE_ROLE', 'VIEW_ROLES', 'UPDATE_ROLE', 'DELETE_ROLE','ASSIGN_ROLE', 'VIEW_ROLES',
                 'ASSIGN_PERMISSION','VIEWS_PERMISSIONS', 'MANAGE_PERMISSIONS'
             ]
         }
@@ -107,7 +107,7 @@ class Command(BaseCommand):
 
             for code_perm in perms:
                 try:
-                    permission = Permission.objects.get(code_permission=code_perm)
+                    permission = Permission.objects.get(code=code_perm)
                     _, created = RolePermission.objects.get_or_create(
                         role=role,
                         permission=permission
