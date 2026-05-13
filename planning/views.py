@@ -8,6 +8,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, inline_seri
 from rest_framework import serializers as drf_serializers
 from .models import Planning, Travail, TypeActivite
 from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer
+from pilotage.models import Workflow, WorkflowStep
 
 
 @extend_schema_view(
@@ -31,6 +32,7 @@ class TypeActiviteViewSet(ModelViewSet):
     update=extend_schema(tags=["Planning"]),
     partial_update=extend_schema(tags=["Planning"]),
     destroy=extend_schema(tags=["Planning"]),
+    assigner_workflow=extend_schema(tags=["Planning"]),
 )
 class PlanningViewSet(ModelViewSet):
     queryset = Planning.objects.all().order_by('-date_creation').select_related(
@@ -48,6 +50,47 @@ class PlanningViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return super().update(request, *args, **kwargs)
+
+    @extend_schema(
+        request=inline_serializer('AssignerWorkflowSerializer', fields={
+            'workflow_id': drf_serializers.UUIDField()
+        }),
+        responses={200: PlanningSerializer, 400: {"type": "object"}, 404: {"type": "object"}},
+        description="Assigner un workflow à un planning et initialiser automatiquement le step de départ"
+    )
+    @action(detail=True, methods=['POST'], url_path='assigner-workflow')
+    def assigner_workflow(self, request, pk=None):
+        planning = self.get_object()
+
+        workflow_id = request.data.get('workflow_id')
+        if not workflow_id:
+            return Response(
+                {"error": "workflow_id est requis."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            workflow = Workflow.objects.get(id=workflow_id)
+        except Workflow.DoesNotExist:
+            return Response(
+                {"error": "Workflow introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        initial_step = WorkflowStep.objects.filter(workflow=workflow).order_by('number').first()
+        if not initial_step:
+            return Response(
+                {"error": "Ce workflow ne possède aucun step."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        planning.workflow = workflow
+        planning.current_step = initial_step
+        planning.modifie_par = request.user
+        planning.save()
+
+        serializer = self.get_serializer(planning)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @extend_schema_view(

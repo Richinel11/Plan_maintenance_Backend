@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Workflow, WorkflowStep, WorkflowTransition, WorkflowValidation, WorkflowHistory
+from security.models import Role
 
 
 # WORKFLOW STEP SERIALIZER
@@ -136,17 +137,20 @@ class WorkflowTransitionWriteSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=False
     )
+    role = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(),
+        write_only=True
+    )
 
     class Meta:
         model = WorkflowTransition
-        fields = ['id', 'name', 'from_step', 'to_step','can_go_back', 'comment_required', 'is_active']
+        fields = ['id', 'name', 'from_step', 'to_step', 'can_go_back', 'comment_required', 'is_active', 'role']
 
     def validate(self, attrs):
         workflow = self.context.get('workflow')
         from_step = attrs.get('from_step')
         to_step = attrs.get('to_step')
 
-        # Vérifier que from_step et to_step appartiennent au même workflow
         if from_step and from_step.workflow != workflow:
             raise serializers.ValidationError(
                 {"from_step": "Ce step n'appartient pas à ce workflow."}
@@ -156,14 +160,28 @@ class WorkflowTransitionWriteSerializer(serializers.ModelSerializer):
                 {"to_step": "Ce step n'appartient pas à ce workflow."}
             )
 
-        # Vérifier l'unicité de la transition
-        qs = WorkflowTransition.objects.filter(workflow=workflow, from_step=from_step,to_step=to_step)
+        if not from_step:
+            raise serializers.ValidationError(
+                {"from_step": "Le step de départ est requis pour créer la validation automatique."}
+            )
+
+        qs = WorkflowTransition.objects.filter(workflow=workflow, from_step=from_step, to_step=to_step)
         if self.instance:
             qs = qs.exclude(id=self.instance.id)
         if qs.exists():
             raise serializers.ValidationError("Une transition entre ces deux steps existe déjà.")
 
         return attrs
+
+    def create(self, validated_data):
+        role = validated_data.pop('role')
+        transition = WorkflowTransition.objects.create(**validated_data)
+        WorkflowValidation.objects.create(
+            transition=transition,
+            step=transition.from_step,
+            role=role,
+        )
+        return transition
 
 
 class WorkflowValidationWriteSerializer(serializers.ModelSerializer):
