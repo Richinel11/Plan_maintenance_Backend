@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from drf_spectacular.utils import extend_schema
 from .models import Utilisateur, EntiteMetier
 from security.models import Role, UserRole
 from security.permission import HasPermissionFactory
@@ -221,6 +222,22 @@ class LoginAPIView(APIView):
     permission_classes = []  # Pas d'authentification requise pour le login
     authentication_classes = []  # Pas d'authentification requise pour le login
     
+    @extend_schema(
+        request=LoginSerializer,
+        responses={
+            200: {
+                "type": "object",
+                "properties": {
+                    "user_id": {"type": "string"},
+                    "access": {"type": "string"},
+                    "refresh": {"type": "string"},
+                    "user": {"type": "object"},
+                    "first_connection": {"type": "boolean"},
+                }
+            }
+        },
+        description="Authentification utilisateur avec username et password"
+    )
     def post(self, request) :
         username = request.data["username"]
         password = request.data["password"]
@@ -306,6 +323,11 @@ class LogoutAPIView(APIView):
     """Déconnexion de l'utilisateur : blacklist du refresh token"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        request={"type": "object", "properties": {"refresh": {"type": "string"}}},
+        responses={200: {"type": "object", "properties": {"success": {"type": "boolean"}, "message": {"type": "string"}}}},
+        description="Déconnexion et blacklist du refresh token"
+    )
     def post(self, request):
         try:
             refresh_token = request.data.get('refresh')
