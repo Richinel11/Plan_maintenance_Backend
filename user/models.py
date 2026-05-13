@@ -35,7 +35,7 @@ class EntiteMetier(models.Model):
 class Utilisateur(AbstractUser):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     username = models.CharField(max_length=150, unique=True)
-    entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.CASCADE, related_name="entite_metier", blank=True, null=True)
+    entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.SET_NULL, related_name="utilisateurs", blank=True, null=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(blank=True, null=True)

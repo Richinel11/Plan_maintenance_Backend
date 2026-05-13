@@ -4,168 +4,209 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from security.permission import HasPermission
-from .models import PlanningTravaux, TypeActivite
-from .serializers import PlanningTravauxSerializer, TypeActiviteSerializer
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
+from rest_framework import serializers as drf_serializers
+from .models import Planning, Travail, TypeActivite
+from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer
 
+
+@extend_schema_view(
+    list=extend_schema(tags=["Planning"]),
+    create=extend_schema(tags=["Planning"]),
+    retrieve=extend_schema(tags=["Planning"]),
+    update=extend_schema(tags=["Planning"]),
+    partial_update=extend_schema(tags=["Planning"]),
+    destroy=extend_schema(tags=["Planning"]),
+)
 class TypeActiviteViewSet(ModelViewSet):
-    """ViewSet CRUD pour TypeActivite."""
-
     queryset = TypeActivite.objects.all().order_by('libelle')
     serializer_class = TypeActiviteSerializer
     permission_classes = [IsAuthenticated]
-    
-class PlanningTravauxViewSet(ModelViewSet):
-    """ViewSet CRUD + actions custom pour PlanningTravaux."""
 
-    queryset = PlanningTravaux.objects.all().order_by('-date_creation').select_related(
-        'type_travaux', 'cree_par', 'modifie_par', 'unite_demanderesse',
-        'ouvrage', 'poste', 'depart', 'troncon',
-        'charge_consignation', 'centrale_thermique_sollicitee',
-        'workflow', 'current_step'
+
+@extend_schema_view(
+    list=extend_schema(tags=["Planning"]),
+    create=extend_schema(tags=["Planning"]),
+    retrieve=extend_schema(tags=["Planning"]),
+    update=extend_schema(tags=["Planning"]),
+    partial_update=extend_schema(tags=["Planning"]),
+    destroy=extend_schema(tags=["Planning"]),
+)
+class PlanningViewSet(ModelViewSet):
+    queryset = Planning.objects.all().order_by('-date_creation').select_related(
+        'entite_metier', 'workflow', 'current_step', 'cree_par', 'modifie_par'
     )
-    serializer_class = PlanningTravauxSerializer
+    serializer_class = PlanningSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def perform_create(self, serializer):
-        serializer.save(cree_par=self.request.user)
+        serializer.save(cree_par=self.request.user, modifie_par=self.request.user)
 
     def perform_update(self, serializer):
         serializer.save(modifie_par=self.request.user)
-        
-    # def perform_destroy(self, instance):
-    #     instance.deleted_by = self.request.user
-    #     instance.deleted_at = timezone.now()
-    #     instance.save()
- 
+
     def update(self, request, *args, **kwargs):
-        kwargs['partial'] = True  # force le partial sur tous les updates
+        kwargs['partial'] = True
         return super().update(request, *args, **kwargs)
-    
-    # ACTIONS WORKFLOW
-    
+
+
+@extend_schema_view(
+    list=extend_schema(tags=["Travail"]),
+    create=extend_schema(tags=["Travail"]),
+    retrieve=extend_schema(tags=["Travail"]),
+    update=extend_schema(tags=["Travail"]),
+    partial_update=extend_schema(tags=["Travail"]),
+    destroy=extend_schema(tags=["Travail"]),
+    reporter=extend_schema(tags=["Travail"]),
+    changer_statut=extend_schema(tags=["Travail"]),
+    soumettre=extend_schema(tags=["Travail"]),
+    valider=extend_schema(tags=["Travail"]),
+    demarrer=extend_schema(tags=["Travail"]),
+    terminer=extend_schema(tags=["Travail"]),
+    par_segment=extend_schema(tags=["Travail"]),
+    conflits=extend_schema(tags=["Travail"]),
+)
+class TravailViewSet(ModelViewSet):
+    queryset = Travail.objects.all().order_by('-date_creation').select_related(
+        'planning', 'type_travaux', 'cree_par', 'modifie_par', 'entite_metier',
+        'ouvrage', 'poste', 'depart', 'troncon',
+        'charge_consignation', 'centrale_thermique_sollicitee',
+    )
+    serializer_class = TravailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(cree_par=self.request.user, modifie_par=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(modifie_par=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return super().update(request, *args, **kwargs)
+
+    # ── ACTIONS WORKFLOW ──
+
+    @extend_schema(
+        request=inline_serializer('ReporterSerializer', fields={
+            'date_report_travaux': drf_serializers.DateField()
+        }),
+        responses={200: TravailSerializer, 400: {"type": "object"}},
+        description="Reporter la date du travail et passer le statut à REPORTE"
+    )
     @action(detail=True, methods=['POST'])
     def reporter(self, request, pk=None):
-        """Reporter la date et passer le statut à REPORTE"""
-        planning = self.get_object()
+        travail = self.get_object()
         nouvelle_date = request.data.get('date_report_travaux')
         if not nouvelle_date:
             return Response(
                 {"error": "La nouvelle date est requise."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        planning.date_report_travaux = nouvelle_date
-        planning.statut_travaux = 'REPORTE'
-        planning.save()
-        return Response(self.get_serializer(planning).data)
+        travail.date_report_travaux = nouvelle_date
+        travail.statut_travaux = 'REPORTE'
+        travail.save()
+        return Response(self.get_serializer(travail).data)
 
+    @extend_schema(
+        request=inline_serializer('ChangerStatutSerializer', fields={
+            'statut_travaux': drf_serializers.ChoiceField(choices=[
+                'BROUILLON', 'SOUMIS', 'VALIDE', 'REPORTE', 'EN_COURS', 'TERMINE'
+            ])
+        }),
+        responses={200: TravailSerializer, 400: {"type": "object"}},
+        description="Changer librement le statut du travail"
+    )
     @action(detail=True, methods=['POST'])
     def changer_statut(self, request, pk=None):
-        """Changer librement le statut du travail"""
-        planning = self.get_object()
+        travail = self.get_object()
         nouveau_statut = request.data.get('statut_travaux')
-        statuts_valides = dict(PlanningTravaux.STATUT_TRAVAUX)
+        statuts_valides = dict(Travail.STATUT_TRAVAUX)
         if nouveau_statut not in statuts_valides:
             return Response(
                 {"error": f"Statut invalide. Valeurs acceptées : {list(statuts_valides.keys())}"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        planning.statut_travaux = nouveau_statut
-        planning.save()
-        return Response(self.get_serializer(planning).data)
+        travail.statut_travaux = nouveau_statut
+        travail.save()
+        return Response(self.get_serializer(travail).data)
 
     @action(detail=True, methods=['POST'])
     def soumettre(self, request, pk=None):
-        """Soumettre un travail en BROUILLON pour validation"""
-        planning = self.get_object()
-        if planning.statut_travaux != 'BROUILLON':
+        travail = self.get_object()
+        if travail.statut_travaux != 'BROUILLON':
             return Response(
                 {"error": "Le travail doit être en BROUILLON pour être soumis."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        planning.statut_travaux = 'SOUMIS'
-        planning.save()
+        travail.statut_travaux = 'SOUMIS'
+        travail.save()
         return Response({"status": "Travail soumis pour validation."})
 
     @action(detail=True, methods=['POST'])
     def valider(self, request, pk=None):
-        """Valider un travail SOUMIS"""
-        planning = self.get_object()
-        if planning.statut_travaux != 'SOUMIS':
+        travail = self.get_object()
+        if travail.statut_travaux != 'SOUMIS':
             return Response(
                 {"error": "Le travail doit être SOUMIS pour être validé."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        planning.statut_travaux = 'VALIDE'
-        planning.travail_en_alignement = False
-        planning.save()
+        travail.statut_travaux = 'VALIDE'
+        travail.travail_en_alignement = False
+        travail.save()
         return Response({"status": "Travail validé."})
 
     @action(detail=True, methods=['POST'])
     def demarrer(self, request, pk=None):
-        """Démarrer un travail VALIDE"""
-        planning = self.get_object()
-        if planning.statut_travaux != 'VALIDE':
+        travail = self.get_object()
+        if travail.statut_travaux != 'VALIDE':
             return Response(
                 {"error": "Le travail doit être VALIDE pour pouvoir démarrer."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        planning.statut_travaux = 'EN_COURS'
-        planning.save()
+        travail.statut_travaux = 'EN_COURS'
+        travail.save()
         return Response({"status": "Travail en cours."})
 
     @action(detail=True, methods=['POST'])
     def terminer(self, request, pk=None):
-        """Terminer un travail EN_COURS"""
-        planning = self.get_object()
-        if planning.statut_travaux != 'EN_COURS':
+        travail = self.get_object()
+        if travail.statut_travaux != 'EN_COURS':
             return Response(
                 {"error": "Le travail doit être EN_COURS pour être terminé."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        planning.statut_travaux = 'TERMINE'
-        planning.save()
+        travail.statut_travaux = 'TERMINE'
+        travail.save()
         return Response({"status": "Travail terminé."})
 
-    # FILTRES PAR SEGMENT
+    # ── FILTRES ──
 
     @action(detail=False, methods=['GET'])
     def par_segment(self, request):
-        """Filtrer les plannings par segment"""
         segment = request.query_params.get('segment')
         if not segment:
             return Response(
                 {"error": "Le paramètre segment est requis. Valeurs: DISTRIBUTION, TRANSPORT, PRODUCTION"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        plannings = self.get_queryset().filter(segment=segment)
-        serializer = self.get_serializer(plannings, many=True)
-        return Response(serializer.data)
-    
-    # GESTION DES CONFLITS
-    
+        travaux = self.get_queryset().filter(segment=segment)
+        return Response(self.get_serializer(travaux, many=True).data)
+
     @action(detail=False, methods=['GET'])
     def conflits(self, request):
-        """Retourne les plannings dont les périodes se chevauchent sur le même troncon"""
+        """Retourne les travaux dont les périodes se chevauchent sur le même troncon"""
         travaux = self.get_queryset().filter(
             heure_debut_planifie__isnull=False,
             heure_fin_planifie__isnull=False
         )
         ids_en_conflit = set()
-
         for t1 in travaux:
             en_conflit = travaux.filter(
                 troncon=t1.troncon,
                 heure_debut_planifie__lte=t1.heure_fin_planifie,
                 heure_fin_planifie__gte=t1.heure_debut_planifie,
             ).exclude(id=t1.id)
-
             if en_conflit.exists():
                 ids_en_conflit.add(str(t1.id))
-
         return Response({"conflits": list(ids_en_conflit)})
-
-
-
-
-

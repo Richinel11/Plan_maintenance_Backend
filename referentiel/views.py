@@ -2,10 +2,21 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema_view, extend_schema
 from .models import Troncon, Depart, Localisation, ReferenceReseau, Poste, Ouvrage
 from .serializers import *
 
+_REF_ACTIONS = dict(
+    list=extend_schema(tags=["Referentiel"]),
+    create=extend_schema(tags=["Referentiel"]),
+    retrieve=extend_schema(tags=["Referentiel"]),
+    update=extend_schema(tags=["Referentiel"]),
+    partial_update=extend_schema(tags=["Referentiel"]),
+    destroy=extend_schema(tags=["Referentiel"]),
+    toggle_status=extend_schema(tags=["Referentiel"]),
+)
 
+@extend_schema_view(**_REF_ACTIONS)
 class TronconViewSet(viewsets.ModelViewSet):
     queryset = Troncon.objects.all().order_by('-date_creation')
     serializer_class = TronconSerializer
@@ -53,6 +64,7 @@ class TronconViewSet(viewsets.ModelViewSet):
         })
         
         
+@extend_schema_view(**_REF_ACTIONS)
 class DepartViewSet(viewsets.ModelViewSet):
     queryset = Depart.objects.all().order_by('-date_creation')
     serializer_class = DepartSerializer
@@ -83,6 +95,7 @@ class DepartViewSet(viewsets.ModelViewSet):
 
    #ouvrage viewset
     
+@extend_schema_view(**{k: v for k, v in _REF_ACTIONS.items() if k != 'toggle_status'})
 class OuvrageViewset(viewsets.ModelViewSet):
     queryset = Ouvrage.objects.all().order_by('-date_creation')
     serializer_class = OuvrageSerializer
@@ -120,6 +133,7 @@ class OuvrageViewset(viewsets.ModelViewSet):
 
     #localisation viewset
     
+@extend_schema_view(**{k: v for k, v in _REF_ACTIONS.items() if k != 'toggle_status'})
 class LocalisationViewset(viewsets.ModelViewSet):
     queryset = Localisation.objects.all().order_by('-date_creation')
     serializer_class = LocalisationSerializer
@@ -156,6 +170,7 @@ class LocalisationViewset(viewsets.ModelViewSet):
 
     
     #poste Viewset
+@extend_schema_view(**_REF_ACTIONS)
 class PosteViewSet(viewsets.ModelViewSet):
     queryset = Poste.objects.all().order_by('-date_creation')
     serializer_class = PosteSerializer
@@ -185,6 +200,7 @@ class PosteViewSet(viewsets.ModelViewSet):
         return Response({"actif": poste.actif})
    
    #reference reseau Viewset 
+@extend_schema_view(**_REF_ACTIONS)
 class ReferenceReseauViewSet(viewsets.ModelViewSet):
     queryset = ReferenceReseau.objects.all().order_by('-date_creation')
     serializer_class = ReferenceReseauSerializer

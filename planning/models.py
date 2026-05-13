@@ -1,9 +1,7 @@
 from django.db import models
-
-from django.db import models
 from pilotage.models import Workflow, WorkflowStep
 from user.models import Utilisateur, EntiteMetier
-from referentiel.models import Ouvrage,Poste,Depart,Troncon
+from referentiel.models import Ouvrage, Poste, Depart, Troncon
 from django.utils.translation import gettext as _
 import uuid
 
@@ -15,25 +13,43 @@ class TypeActivite(models.Model):
 
     def __str__(self):
         return self.libelle
+
     class Meta:
         ordering = ['date_creation']
-        
-        
-# class ChargeConsignation(models.Model):
-#     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-#     nom = models.CharField(max_length=150)
-#     prenom = models.CharField(max_length=150)
-#     matricule = models.CharField(max_length=50, unique=True, blank=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"{self.nom} {self.prenom}"
-
-#     class Meta:
-#         ordering = ['created_at']
 
 
-class PlanningTravaux(models.Model):
+class Planning(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    nom = models.CharField(max_length=255)
+    code = models.CharField(max_length=255, unique=True, blank=True)  # auto-généré
+    entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, null=True, blank=True, related_name='plannings')
+    workflow = models.ForeignKey(Workflow, on_delete=models.SET_NULL, null=True, blank=True)
+    current_step = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL, null=True, blank=True)
+    cree_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name='plannings_crees')
+    modifie_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name='plannings_modifies', null=True, blank=True)
+    date_creation = models.DateTimeField(auto_now_add=True)
+    date_modification = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = self._generate_code()
+        super().save(*args, **kwargs)
+
+    def _generate_code(self):
+        from django.utils import timezone
+        now = timezone.now()
+        prefix = f"PLAN-{now.strftime('%Y%m')}"
+        count = Planning.objects.filter(code__startswith=prefix).count() + 1
+        return f"{prefix}-{count:04d}"
+
+    def __str__(self):
+        return f"{self.code} - {self.nom}"
+
+    class Meta:
+        ordering = ['-date_creation']
+
+
+class Travail(models.Model):
 
     class Segment(models.TextChoices):
         DISTRIBUTION = "DISTRIBUTION", _("Distribution")
@@ -59,8 +75,9 @@ class PlanningTravaux(models.Model):
     ]
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    planning = models.ForeignKey(Planning, on_delete=models.CASCADE, related_name='travaux')
 
-    #  Identification 
+    #  Identification
     segment = models.CharField(max_length=20, choices=Segment.choices)
     reference = models.CharField(max_length=255, unique=True, blank=True)  # auto-générée
     ouvrage = models.ForeignKey(Ouvrage, on_delete=models.PROTECT, null=True, blank=True)
@@ -68,59 +85,53 @@ class PlanningTravaux(models.Model):
     depart = models.ForeignKey(Depart, on_delete=models.PROTECT, null=True, blank=True)
     troncon = models.ForeignKey(Troncon, on_delete=models.PROTECT, null=True, blank=True)
 
-    #  Détails organisationnels 
-    unite_demanderesse = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, null=True, blank=True)
+    #  Détails organisationnels
+    entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, null=True, blank=True, related_name='travaux')
     type_travaux = models.ForeignKey(TypeActivite, on_delete=models.PROTECT, null=True, blank=True)
-    type_reseau = models.CharField(max_length=10, choices=TypeReseau.choices, null=True, blank=True)  # DISTRIBUTION seulement
+    type_reseau = models.CharField(max_length=10, choices=TypeReseau.choices, null=True, blank=True)
     consistance_travaux = models.TextField(blank=True)
 
-    #  Localisation & Consistance (DISTRIBUTION) 
+    #  Localisation & Consistance (DISTRIBUTION)
     troncons_consignes = models.TextField(blank=True)
     localites_impactees = models.CharField(max_length=255, blank=True)
     moyens_mis_en_oeuvre = models.TextField(blank=True)
 
-    #  Charges de consignation (DISTRIBUTION + TRANSPORT) 
+    #  Charges de consignation (DISTRIBUTION + TRANSPORT)
     charge_consignation = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, blank=True)
 
-    #  Programmation Temporelle 
+    #  Programmation Temporelle
     heure_debut_planifie = models.DateTimeField(null=True, blank=True)
     duree = models.PositiveIntegerField(null=True, blank=True)
-    unite_duree = models.CharField(max_length=10, choices=UniteDuree.choices,default=UniteDuree.HEURES)
+    unite_duree = models.CharField(max_length=10, choices=UniteDuree.choices, default=UniteDuree.HEURES)
     heure_fin_planifie = models.DateTimeField(null=True, blank=True)        # calculé auto
     date_programmee = models.DateField(null=True, blank=True)
     nombre_jours_avant_travaux = models.PositiveIntegerField(null=True, blank=True)  # calculé auto
 
-    #  Indicateurs d'Impact (PRODUCTION) 
-    disponibilite_mecanique_mw = models.DecimalField( max_digits=10, decimal_places=2, null=True, blank=True)
+    #  Indicateurs d'Impact (PRODUCTION)
+    disponibilite_mecanique_mw = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     prevision_puissance_sollicitee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    prevision_puissance_interrompue = models.DecimalField( max_digits=10, decimal_places=2, null=True, blank=True)
+    prevision_puissance_interrompue = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     prevision_enf_mwh = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # calculé auto
-    centrale_thermique_sollicitee = models.ForeignKey('referentiel.Centrale', on_delete=models.SET_NULL,null=True, blank=True)# PRODUCTION seulement
+    centrale_thermique_sollicitee = models.ForeignKey('referentiel.Centrale', on_delete=models.SET_NULL, null=True, blank=True)
     qte_fuel_sollicitee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     observations = models.TextField(blank=True)
 
-    #  Statut 
-    statut_travaux = models.CharField( max_length=20, choices=STATUT_TRAVAUX, default='BROUILLON')
+    #  Statut
+    statut_travaux = models.CharField(max_length=20, choices=STATUT_TRAVAUX, default='BROUILLON')
     statut_probleme = models.BooleanField(default=False)
     probleme_rencontre = models.TextField(blank=True)
     travail_en_alignement = models.BooleanField(default=False)
     date_report_travaux = models.DateField(null=True, blank=True)
 
-    #  Workflow 
-    workflow = models.ForeignKey(Workflow, on_delete=models.SET_NULL,null=True, blank=True)
-    current_step = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL,null=True, blank=True)
-
-    #  Audit 
-    cree_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name="plannings_crees")
-    modifie_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name="plannings_modifies")
+    #  Audit
+    cree_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name='travaux_crees')
+    modifie_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name='travaux_modifies', null=True, blank=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        # Auto-génération de la référence
         self.reference = self._generate_reference()
 
-        # Auto-calcul heure_fin_planifie
         if self.heure_debut_planifie and self.duree:
             from datetime import timedelta
             if self.unite_duree == 'HEURES':
@@ -128,7 +139,6 @@ class PlanningTravaux(models.Model):
             else:
                 self.heure_fin_planifie = self.heure_debut_planifie + timedelta(days=self.duree)
 
-        # Auto-calcul nombre_jours_avant_travaux
         if self.date_programmee and self.heure_debut_planifie:
             self.nombre_jours_avant_travaux = (
                 self.heure_debut_planifie.date() - self.date_programmee
@@ -165,3 +175,5 @@ class PlanningTravaux(models.Model):
     def __str__(self):
         return f"{self.reference}"
 
+    class Meta:
+        ordering = ['-date_creation']

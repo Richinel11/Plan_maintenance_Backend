@@ -177,3 +177,13 @@ class WorkflowValidationWriteSerializer(serializers.ModelSerializer):
         if transition and value.workflow != transition.workflow:
             raise serializers.ValidationError("Ce step n'appartient pas au workflow de cette transition.")
         return value
+
+
+class ExecuteTransitionSerializer(serializers.Serializer):
+    transition_id = serializers.UUIDField()
+    comment = serializers.CharField(required=False, allow_blank=True)
+
+
+class RejectTransitionSerializer(serializers.Serializer):
+    transition_id = serializers.UUIDField()
+    motif = serializers.CharField(required=False, allow_blank=True)

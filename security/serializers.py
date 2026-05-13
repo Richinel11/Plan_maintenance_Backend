@@ -47,3 +47,29 @@ class AssignRoleSerializer(serializers.Serializer):
 class AssignPermissionSerializer(serializers.Serializer):
     role_code = serializers.CharField()
     permission_code = serializers.CharField()
+
+
+class CreateRoleSerializer(serializers.Serializer):
+    nom_role = serializers.CharField(max_length=100)
+    code_role = serializers.CharField(max_length=50)
+    description = serializers.CharField(required=False, allow_blank=True)
+
+
+class UpdateRoleSerializer(serializers.Serializer):
+    code_role = serializers.CharField(max_length=50)
+    nom = serializers.CharField(max_length=100)
+    description = serializers.CharField(required=False, allow_blank=True)
+
+
+class CreatePermissionSerializer(serializers.Serializer):
+    nom_permission = serializers.CharField(max_length=100)
+    code_permission = serializers.CharField(max_length=50)
+    description = serializers.CharField(required=False, allow_blank=True)
+    module = serializers.CharField(max_length=100)
+
+
+class UpdatePermissionSerializer(serializers.Serializer):
+    code_permission = serializers.CharField(max_length=50)
+    nom = serializers.CharField(max_length=100)
+    description = serializers.CharField(required=False, allow_blank=True)
+    module = serializers.CharField(max_length=100)
