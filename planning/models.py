@@ -79,7 +79,7 @@ class Travail(models.Model):
 
     #  Identification
     segment = models.CharField(max_length=20, choices=Segment.choices)
-    reference = models.CharField(max_length=255, unique=True, blank=True)  # auto-générée
+    reference = models.CharField(max_length=255, unique=False, blank=True)  # auto-générée
     ouvrage = models.ForeignKey(Ouvrage, on_delete=models.PROTECT, null=True, blank=True)
     poste = models.ForeignKey(Poste, on_delete=models.PROTECT, null=True, blank=True)
     depart = models.ForeignKey(Depart, on_delete=models.PROTECT, null=True, blank=True)
