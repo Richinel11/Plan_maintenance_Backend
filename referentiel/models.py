@@ -9,7 +9,7 @@ class Ouvrage(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     nom = models.CharField(max_length=150)
     type = models.CharField(max_length=100)
-
+    entite_metier = models.ForeignKey('user.EntiteMetier', on_delete=models.PROTECT, null=True, blank=True, related_name='ouvrages')
     date_creation = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
@@ -19,6 +19,7 @@ class Ouvrage(models.Model):
 class Poste(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     nom = models.CharField(max_length=150)
+    entite_metier = models.ForeignKey('user.EntiteMetier', on_delete=models.PROTECT, null=True, blank=True, related_name='postes')
     date_creation = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     actif = models.BooleanField(default=False)
     def __str__(self):
@@ -28,6 +29,7 @@ class Poste(models.Model):
 class Depart(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     nom = models.CharField(max_length=150)
+    entite_metier = models.ForeignKey('user.EntiteMetier', on_delete=models.PROTECT, null=True, blank=True, related_name='departs')
     date_creation = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     actif = models.BooleanField(default=False)
     def __str__(self):
@@ -37,6 +39,7 @@ class Depart(models.Model):
 class Troncon(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     nom = models.CharField(max_length=150)
+    entite_metier = models.ForeignKey('user.EntiteMetier', on_delete=models.PROTECT, null=True, blank=True, related_name='troncons')
     date_creation = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     actif = models.BooleanField(default=False)
     def __str__(self):

@@ -33,12 +33,13 @@ class WorkflowShortSerializer(serializers.ModelSerializer):
 class WorkflowTransitionSerializer(serializers.ModelSerializer):
     from_step = WorkflowStepSerializer(read_only=True)
     to_step = WorkflowStepSerializer(read_only=True)
+    go_back_to = WorkflowStepSerializer(read_only=True)
 
     class Meta:
         model = WorkflowTransition
         fields = [
             'id', 'name', 'from_step', 'to_step',
-            'can_go_back', 'comment_required', 'is_active'
+            'can_go_back', 'go_back_to', 'comment_required', 'is_active'
         ]
 
 
@@ -137,6 +138,11 @@ class WorkflowTransitionWriteSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=False
     )
+    go_back_to = serializers.PrimaryKeyRelatedField(
+        queryset=WorkflowStep.objects.all(),
+        allow_null=True,
+        required=False
+    )
     role = serializers.PrimaryKeyRelatedField(
         queryset=Role.objects.all(),
         write_only=True
@@ -144,12 +150,14 @@ class WorkflowTransitionWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkflowTransition
-        fields = ['id', 'name', 'from_step', 'to_step', 'can_go_back', 'comment_required', 'is_active', 'role']
+        fields = ['id', 'name', 'from_step', 'to_step', 'can_go_back', 'go_back_to', 'comment_required', 'is_active', 'role']
 
     def validate(self, attrs):
         workflow = self.context.get('workflow')
         from_step = attrs.get('from_step')
         to_step = attrs.get('to_step')
+        can_go_back = attrs.get('can_go_back', False)
+        go_back_to = attrs.get('go_back_to')
 
         if from_step and from_step.workflow != workflow:
             raise serializers.ValidationError(
@@ -158,6 +166,15 @@ class WorkflowTransitionWriteSerializer(serializers.ModelSerializer):
         if to_step and to_step.workflow != workflow:
             raise serializers.ValidationError(
                 {"to_step": "Ce step n'appartient pas à ce workflow."}
+            )
+
+        if can_go_back and not go_back_to:
+            raise serializers.ValidationError(
+                {"go_back_to": "Ce champ est obligatoire lorsque can_go_back est activé."}
+            )
+        if go_back_to and go_back_to.workflow != workflow:
+            raise serializers.ValidationError(
+                {"go_back_to": "Ce step n'appartient pas à ce workflow."}
             )
 
         if not from_step:
