@@ -3,14 +3,10 @@ from .models import Planning, Travail, TypeActivite
 from user.models import Utilisateur, EntiteMetier
 from referentiel.models import Centrale, Reference
 from referentiel.serializers import CentraleSerializer, ReferenceSerializer
+from user.models import UniteDemanderesse
+from user.serializers import UniteDemanderesseSerializer
 from pilotage.serializers import WorkflowStepSerializer, WorkflowShortSerializer
 from pilotage.models import WorkflowStep, Workflow
-
-
-class TypeActiviteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TypeActivite
-        fields = ['id', 'libelle']
 
 
 class UtilisateurShortSerializer(serializers.ModelSerializer):
@@ -23,6 +19,18 @@ class EntiteMetierShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = EntiteMetier
         fields = ['id', 'name']
+
+
+class TypeActiviteSerializer(serializers.ModelSerializer):
+    entite_metier = EntiteMetierShortSerializer(read_only=True)
+    entite_metier_id = serializers.PrimaryKeyRelatedField(
+        queryset=EntiteMetier.objects.all(), source='entite_metier',
+        write_only=True, allow_null=True, required=False
+    )
+
+    class Meta:
+        model = TypeActivite
+        fields = ['id', 'libelle', 'entite_metier', 'entite_metier_id']
 
 
 # ─────────────────────────────────────────────
@@ -78,6 +86,7 @@ class TravailSerializer(serializers.ModelSerializer):
     cree_par = UtilisateurShortSerializer(read_only=True)
     modifie_par = UtilisateurShortSerializer(read_only=True)
     entite_metier = EntiteMetierShortSerializer(read_only=True)
+    unite_demanderesse = UniteDemanderesseSerializer(read_only=True)
     reference = ReferenceSerializer(read_only=True)
     charge_consignation = UtilisateurShortSerializer(read_only=True)
     centrale_thermique_sollicitee = CentraleSerializer(read_only=True)
@@ -92,6 +101,10 @@ class TravailSerializer(serializers.ModelSerializer):
     )
     entite_metier_id = serializers.PrimaryKeyRelatedField(
         queryset=EntiteMetier.objects.all(), source='entite_metier',
+        write_only=True, allow_null=True, required=False
+    )
+    unite_demanderesse_id = serializers.PrimaryKeyRelatedField(
+        queryset=UniteDemanderesse.objects.all(), source='unite_demanderesse',
         write_only=True, allow_null=True, required=False
     )
     reference_id = serializers.PrimaryKeyRelatedField(
@@ -130,11 +143,12 @@ class TravailSerializer(serializers.ModelSerializer):
 
             # READ
             'planning', 'type_travaux', 'cree_par', 'modifie_par',
-            'entite_metier', 'reference', 'charge_consignation',
-            'centrale_thermique_sollicitee',
+            'entite_metier', 'unite_demanderesse', 'reference',
+            'charge_consignation', 'centrale_thermique_sollicitee',
 
             # WRITE
-            'planning_id', 'type_travaux_id', 'entite_metier_id', 'reference_id',
+            'planning_id', 'type_travaux_id', 'entite_metier_id',
+            'unite_demanderesse_id', 'reference_id',
             'charge_consignation_id', 'centrale_thermique_sollicitee_id',
         ]
         read_only_fields = ['heure_fin_planifie', 'nombre_jours_avant_travaux',

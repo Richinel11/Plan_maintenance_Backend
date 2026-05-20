@@ -3,7 +3,7 @@ from venv import logger
 from rest_framework import serializers
 from security.models import UserRole
 from security.serializers import RoleSerializer
-from .models import Utilisateur, EntiteMetier
+from .models import Utilisateur, EntiteMetier, UniteDemanderesse
 from django.contrib.auth.hashers import make_password, check_password
 from utils import LDAP_connect 
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -15,6 +15,18 @@ class EntiteMetierSerializer(serializers.ModelSerializer):
     class Meta:
         model = EntiteMetier
         fields = '__all__'
+
+
+class UniteDemanderesseSerializer(serializers.ModelSerializer):
+    entite_metier = EntiteMetierSerializer(read_only=True)
+    entite_metier_id = serializers.PrimaryKeyRelatedField(
+        queryset=EntiteMetier.objects.all(), source='entite_metier', write_only=True
+    )
+
+    class Meta:
+        model = UniteDemanderesse
+        fields = ['id', 'nom', 'entite_metier', 'entite_metier_id', 'created_at']
+        read_only_fields = ['created_at']
 
 
 class UtilisateurSerializer(serializers.ModelSerializer):

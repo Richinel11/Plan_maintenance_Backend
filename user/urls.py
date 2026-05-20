@@ -5,6 +5,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'entites', views.EntiteMetierViewSet)
+router.register(r'unites-demanderesses', views.UniteDemanderesseViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

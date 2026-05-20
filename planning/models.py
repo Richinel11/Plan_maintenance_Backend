@@ -9,13 +9,14 @@ import uuid
 class TypeActivite(models.Model):
     id = models.UUIDField(_('id'), default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     libelle = models.CharField(max_length=100)
+    entite_metier = models.ForeignKey('user.EntiteMetier', on_delete=models.PROTECT, null=True, blank=True, related_name='types_activite')
     date_creation = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
         return self.libelle
 
     class Meta:
-        ordering = ['date_creation']
+        ordering = ['libelle']
 
 
 class Planning(models.Model):
@@ -83,6 +84,7 @@ class Travail(models.Model):
 
     #  Détails organisationnels
     entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, null=True, blank=True, related_name='travaux')
+    unite_demanderesse = models.ForeignKey('user.UniteDemanderesse', on_delete=models.SET_NULL, null=True, blank=True, related_name='travaux')
     type_travaux = models.ForeignKey(TypeActivite, on_delete=models.PROTECT, null=True, blank=True)
     type_reseau = models.CharField(max_length=10, choices=TypeReseau.choices, null=True, blank=True)
     consistance_travaux = models.TextField(blank=True)

@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from .models import Centrale, TypeReferentiel, Reference, ReferentielItem
@@ -31,6 +32,14 @@ class TypeReferentielViewSet(viewsets.ModelViewSet):
 class ReferenceViewSet(viewsets.ModelViewSet):
     queryset = Reference.objects.prefetch_related('items__type').all()
     serializer_class = ReferenceSerializer
+
+    @extend_schema(tags=["Referentiel"], responses=ReferentielItemSerializer(many=True))
+    @action(detail=True, methods=['get'], url_path='items')
+    def items(self, request, pk=None):
+        reference = get_object_or_404(Reference, pk=pk)
+        items = ReferentielItem.objects.select_related('type').filter(reference=reference)
+        serializer = ReferentielItemSerializer(items, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema_view(**_TAG)

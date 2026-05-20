@@ -20,9 +20,16 @@ from pilotage.models import Workflow, WorkflowStep
     destroy=extend_schema(tags=["Planning"]),
 )
 class TypeActiviteViewSet(ModelViewSet):
-    queryset = TypeActivite.objects.all().order_by('libelle')
+    queryset = TypeActivite.objects.select_related('entite_metier').all().order_by('libelle')
     serializer_class = TypeActiviteSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        entite_id = self.request.query_params.get('entite_metier_id')
+        if entite_id:
+            qs = qs.filter(entite_metier_id=entite_id)
+        return qs
 
 
 @extend_schema_view(
@@ -111,9 +118,9 @@ class PlanningViewSet(ModelViewSet):
 )
 class TravailViewSet(ModelViewSet):
     queryset = Travail.objects.all().order_by('-date_creation').select_related(
-        'planning', 'type_travaux', 'cree_par', 'modifie_par', 'entite_metier',
-        'ouvrage', 'poste', 'depart', 'troncon',
-        'charge_consignation', 'centrale_thermique_sollicitee',
+        'planning', 'type_travaux', 'cree_par', 'modifie_par',
+        'entite_metier', 'unite_demanderesse',
+        'reference', 'charge_consignation', 'centrale_thermique_sollicitee',
     )
     serializer_class = TravailSerializer
     permission_classes = [IsAuthenticated]
@@ -238,15 +245,16 @@ class TravailViewSet(ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def conflits(self, request):
-        """Retourne les travaux dont les périodes se chevauchent sur le même troncon"""
+        """Retourne les travaux dont les périodes se chevauchent sur la même référence"""
         travaux = self.get_queryset().filter(
             heure_debut_planifie__isnull=False,
-            heure_fin_planifie__isnull=False
+            heure_fin_planifie__isnull=False,
+            reference__isnull=False,
         )
         ids_en_conflit = set()
         for t1 in travaux:
             en_conflit = travaux.filter(
-                troncon=t1.troncon,
+                reference=t1.reference,
                 heure_debut_planifie__lte=t1.heure_fin_planifie,
                 heure_fin_planifie__gte=t1.heure_debut_planifie,
             ).exclude(id=t1.id)

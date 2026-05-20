@@ -30,6 +30,16 @@ class EntiteMetier(models.Model):
         return f"{self.name} ({self.type}) "
 
 
+class UniteDemanderesse(models.Model):
+    id = models.UUIDField(_('id'), default=uuid.uuid4, primary_key=True, editable=False)
+    nom = models.CharField(max_length=150)
+    entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, related_name='unites_demanderesses')
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    def __str__(self):
+        return self.nom
+
+
 # Model For User
 
 class Utilisateur(AbstractUser):

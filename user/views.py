@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from .models import Utilisateur, EntiteMetier
+from .models import Utilisateur, EntiteMetier, UniteDemanderesse
 from security.models import Role, UserRole
 from security.permission import HasPermissionFactory
 from .serializers import(
@@ -14,6 +14,7 @@ from .serializers import(
     SetPasswordSerializer,
     UtilisateurSerializer,
     EntiteMetierSerializer,
+    UniteDemanderesseSerializer,
     UtilisateurUpdateSerializer,
     LoginSerializer,
 )
@@ -392,3 +393,23 @@ class LogoutAPIView(APIView):
 class EntiteMetierViewSet(ModelViewSet):
     queryset = EntiteMetier.objects.all()
     serializer_class = EntiteMetierSerializer
+
+
+@extend_schema_view(
+    list=extend_schema(tags=["Users"]),
+    create=extend_schema(tags=["Users"]),
+    retrieve=extend_schema(tags=["Users"]),
+    update=extend_schema(tags=["Users"]),
+    partial_update=extend_schema(tags=["Users"]),
+    destroy=extend_schema(tags=["Users"]),
+)
+class UniteDemanderesseViewSet(ModelViewSet):
+    queryset = UniteDemanderesse.objects.select_related('entite_metier').all().order_by('nom')
+    serializer_class = UniteDemanderesseSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        entite_id = self.request.query_params.get('entite_metier_id')
+        if entite_id:
+            qs = qs.filter(entite_metier_id=entite_id)
+        return qs
