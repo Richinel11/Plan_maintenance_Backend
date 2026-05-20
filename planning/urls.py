@@ -16,6 +16,7 @@ urlpatterns = [
 # GET/POST    /plannings/                             liste / créer un planning
 # GET/PATCH   /plannings/<id>/                        détail / modifier un planning
 # DELETE      /plannings/<id>/                        supprimer un planning
+# POST        /plannings/<id>/assigner-workflow/      assigner un workflow et initialiser le step de départ
 #
 # GET/POST    /travaux/                               liste / créer un travail
 # GET/PATCH   /travaux/<id>/                          détail / modifier un travail
