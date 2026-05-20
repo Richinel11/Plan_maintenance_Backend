@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from .models import Planning, Travail, TypeActivite
 from user.models import Utilisateur, EntiteMetier
-from referentiel.models import Centrale, Ouvrage, Troncon, Depart, Poste
-from referentiel.serializers import OuvrageSerializer, DepartSerializer, TronconSerializer, PosteSerializer
+from referentiel.models import Centrale, Reference
+from referentiel.serializers import CentraleSerializer, ReferenceSerializer
 from pilotage.serializers import WorkflowStepSerializer, WorkflowShortSerializer
 from pilotage.models import WorkflowStep, Workflow
 
@@ -17,12 +17,6 @@ class UtilisateurShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Utilisateur
         fields = ['id', 'username', 'first_name', 'last_name']
-
-
-class CentraleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Centrale
-        fields = ['id', 'nom', 'capacite_mw']
 
 
 class EntiteMetierShortSerializer(serializers.ModelSerializer):
@@ -84,10 +78,7 @@ class TravailSerializer(serializers.ModelSerializer):
     cree_par = UtilisateurShortSerializer(read_only=True)
     modifie_par = UtilisateurShortSerializer(read_only=True)
     entite_metier = EntiteMetierShortSerializer(read_only=True)
-    ouvrage = OuvrageSerializer(read_only=True)
-    poste = PosteSerializer(read_only=True)
-    depart = DepartSerializer(read_only=True)
-    troncon = TronconSerializer(read_only=True)
+    reference = ReferenceSerializer(read_only=True)
     charge_consignation = UtilisateurShortSerializer(read_only=True)
     centrale_thermique_sollicitee = CentraleSerializer(read_only=True)
 
@@ -103,20 +94,8 @@ class TravailSerializer(serializers.ModelSerializer):
         queryset=EntiteMetier.objects.all(), source='entite_metier',
         write_only=True, allow_null=True, required=False
     )
-    ouvrage_id = serializers.PrimaryKeyRelatedField(
-        queryset=Ouvrage.objects.all(), source='ouvrage',
-        write_only=True, allow_null=True, required=False
-    )
-    poste_id = serializers.PrimaryKeyRelatedField(
-        queryset=Poste.objects.all(), source='poste',
-        write_only=True, allow_null=True, required=False
-    )
-    depart_id = serializers.PrimaryKeyRelatedField(
-        queryset=Depart.objects.all(), source='depart',
-        write_only=True, allow_null=True, required=False
-    )
-    troncon_id = serializers.PrimaryKeyRelatedField(
-        queryset=Troncon.objects.all(), source='troncon',
+    reference_id = serializers.PrimaryKeyRelatedField(
+        queryset=Reference.objects.all(), source='reference',
         write_only=True, allow_null=True, required=False
     )
     charge_consignation_id = serializers.PrimaryKeyRelatedField(
@@ -131,15 +110,13 @@ class TravailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Travail
         fields = [
-            'id', 'segment', 'reference', 'statut_travaux',
+            'id', 'segment', 'statut_travaux',
             'consistance_travaux', 'observations',
             'type_reseau', 'troncons_consignes', 'localites_impactees', 'moyens_mis_en_oeuvre',
 
             # Programmation temporelle
             'heure_debut_planifie', 'duree', 'unite_duree',
-            'heure_fin_planifie',
-            'date_programmee',
-            'nombre_jours_avant_travaux',
+            'heure_fin_planifie', 'date_programmee', 'nombre_jours_avant_travaux',
 
             # Indicateurs PRODUCTION
             'disponibilite_mecanique_mw', 'prevision_puissance_sollicitee',
@@ -153,13 +130,12 @@ class TravailSerializer(serializers.ModelSerializer):
 
             # READ
             'planning', 'type_travaux', 'cree_par', 'modifie_par',
-            'entite_metier', 'ouvrage', 'poste', 'depart',
-            'troncon', 'charge_consignation', 'centrale_thermique_sollicitee',
+            'entite_metier', 'reference', 'charge_consignation',
+            'centrale_thermique_sollicitee',
 
             # WRITE
-            'planning_id', 'type_travaux_id', 'entite_metier_id',
-            'ouvrage_id', 'poste_id', 'depart_id', 'troncon_id',
+            'planning_id', 'type_travaux_id', 'entite_metier_id', 'reference_id',
             'charge_consignation_id', 'centrale_thermique_sollicitee_id',
         ]
-        read_only_fields = ['reference', 'heure_fin_planifie', 'nombre_jours_avant_travaux',
+        read_only_fields = ['heure_fin_planifie', 'nombre_jours_avant_travaux',
                             'prevision_enf_mwh', 'date_creation', 'date_modification']

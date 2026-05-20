@@ -1,34 +1,23 @@
 from django.contrib import admin
-from .models import Troncon, Ouvrage, ReferenceReseau, Depart, Poste, Localisation
-# Register your models here.
-
-@admin.register(Troncon)
-class AdminTroncons(admin.ModelAdmin):
-    list_display = ('id','nom','date_creation')
- 
-
-@admin.register(Ouvrage)
-class AdminOuvrage(admin.ModelAdmin):
-    list_display = ('id','nom','type','date_creation')
+from .models import Centrale, TypeReferentiel, Reference, ReferentielItem
 
 
-@admin.register(Depart)
-class AdminDepart(admin.ModelAdmin):
-    list_display = ('id','nom','date_creation')
+@admin.register(Centrale)
+class AdminCentrale(admin.ModelAdmin):
+    list_display = ('id', 'nom', 'capacite_mw', 'actif')
 
 
-@admin.register(Poste)
-class AdminPoste(admin.ModelAdmin):
-    list_display = ('id','nom','date_creation')
+@admin.register(TypeReferentiel)
+class AdminTypeReferentiel(admin.ModelAdmin):
+    list_display = ('id', 'nom')
 
 
-@admin.register(Localisation)
-class AdminLocalisation(admin.ModelAdmin):
-    list_display = ('id','adresse','ville','longitude','latitude','date_creation')
+@admin.register(Reference)
+class AdminReference(admin.ModelAdmin):
+    list_display = ('id', 'valeur')
 
 
-@admin.register(ReferenceReseau)
-class AdminReferenceReseau(admin.ModelAdmin):
-    list_display = ('id','code_reference','libelle','ouvrage','poste','depart','troncon','localisation',)
-    list_filter =('date_creation',)
-
+@admin.register(ReferentielItem)
+class AdminReferentielItem(admin.ModelAdmin):
+    list_display = ('id', 'valeur', 'type', 'reference')
+    list_filter = ('type',)

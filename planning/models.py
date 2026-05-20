@@ -1,7 +1,7 @@
 from django.db import models
 from pilotage.models import Workflow, WorkflowStep
 from user.models import Utilisateur, EntiteMetier
-from referentiel.models import Ouvrage, Poste, Depart, Troncon
+from referentiel.models import Reference
 from django.utils.translation import gettext as _
 import uuid
 
@@ -21,7 +21,7 @@ class TypeActivite(models.Model):
 class Planning(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     nom = models.CharField(max_length=255)
-    code = models.CharField(max_length=255, unique=True, blank=True)  # auto-généré
+    code = models.CharField(max_length=255, unique=True, blank=True)
     entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, null=True, blank=True, related_name='plannings')
     workflow = models.ForeignKey(Workflow, on_delete=models.SET_NULL, null=True, blank=True)
     current_step = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL, null=True, blank=True)
@@ -79,11 +79,7 @@ class Travail(models.Model):
 
     #  Identification
     segment = models.CharField(max_length=20, choices=Segment.choices)
-    reference = models.CharField(max_length=255, unique=True, blank=True)  # auto-générée
-    ouvrage = models.ForeignKey(Ouvrage, on_delete=models.PROTECT, null=True, blank=True)
-    poste = models.ForeignKey(Poste, on_delete=models.PROTECT, null=True, blank=True)
-    depart = models.ForeignKey(Depart, on_delete=models.PROTECT, null=True, blank=True)
-    troncon = models.ForeignKey(Troncon, on_delete=models.PROTECT, null=True, blank=True)
+    reference = models.ForeignKey(Reference, on_delete=models.SET_NULL, null=True, blank=True, related_name='travaux')
 
     #  Détails organisationnels
     entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, null=True, blank=True, related_name='travaux')
@@ -103,15 +99,15 @@ class Travail(models.Model):
     heure_debut_planifie = models.DateTimeField(null=True, blank=True)
     duree = models.PositiveIntegerField(null=True, blank=True)
     unite_duree = models.CharField(max_length=10, choices=UniteDuree.choices, default=UniteDuree.HEURES)
-    heure_fin_planifie = models.DateTimeField(null=True, blank=True)        # calculé auto
+    heure_fin_planifie = models.DateTimeField(null=True, blank=True)
     date_programmee = models.DateField(null=True, blank=True)
-    nombre_jours_avant_travaux = models.PositiveIntegerField(null=True, blank=True)  # calculé auto
+    nombre_jours_avant_travaux = models.PositiveIntegerField(null=True, blank=True)
 
     #  Indicateurs d'Impact (PRODUCTION)
     disponibilite_mecanique_mw = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     prevision_puissance_sollicitee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     prevision_puissance_interrompue = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    prevision_enf_mwh = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # calculé auto
+    prevision_enf_mwh = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     centrale_thermique_sollicitee = models.ForeignKey('referentiel.Centrale', on_delete=models.SET_NULL, null=True, blank=True)
     qte_fuel_sollicitee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     observations = models.TextField(blank=True)
@@ -130,8 +126,6 @@ class Travail(models.Model):
     date_modification = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        self.reference = self._generate_reference()
-
         if self.heure_debut_planifie and self.duree:
             from datetime import timedelta
             if self.unite_duree == 'HEURES':
@@ -146,34 +140,8 @@ class Travail(models.Model):
 
         super().save(*args, **kwargs)
 
-    def _generate_reference(self):
-        if self.segment == 'DISTRIBUTION':
-            parts = [
-                self.segment,
-                self.troncon.nom if self.troncon else '',
-                self.poste.nom if self.poste else '',
-                self.depart.nom if self.depart else '',
-            ]
-        elif self.segment == 'TRANSPORT':
-            parts = [
-                self.segment,
-                self.troncon.nom if self.troncon else '',
-                self.ouvrage.nom if self.ouvrage else '',
-                self.poste.nom if self.poste else '',
-            ]
-        elif self.segment == 'PRODUCTION':
-            parts = [
-                self.segment,
-                self.troncon.nom if self.troncon else '',
-                self.ouvrage.nom if self.ouvrage else '',
-                self.poste.nom if self.poste else '',
-            ]
-        else:
-            parts = []
-        return '_'.join(filter(None, parts))
-
     def __str__(self):
-        return f"{self.reference}"
+        return self.reference.valeur if self.reference else str(self.id)
 
     class Meta:
         ordering = ['-date_creation']
