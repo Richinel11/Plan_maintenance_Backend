@@ -52,6 +52,7 @@ class WorkflowTransition(models.Model):
     from_step = models.ForeignKey(WorkflowStep, on_delete=models.CASCADE, related_name="transition_sortantes", null=True, blank=True)
     to_step = models.ForeignKey(WorkflowStep, on_delete=models.CASCADE, related_name="transitions_entrantes",null=True, blank=True)
     can_go_back = models.BooleanField(default=False)
+    go_back_to = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL, null=True, blank=True, related_name="back_transitions")
     comment_required = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
