@@ -1,6 +1,7 @@
 from rest_framework.routers import DefaultRouter
 from .views import PlanningViewSet, TravailViewSet, TypeActiviteViewSet
 from django.urls import path, include
+from user.views import get_charges_consignation
 
 router = DefaultRouter()
 router.register(r'plannings', PlanningViewSet, basename='planning')
@@ -8,8 +9,10 @@ router.register(r'travaux', TravailViewSet, basename='travail')
 router.register(r'types-activite', TypeActiviteViewSet, basename='typeactivite')
 
 urlpatterns = [
+    path('charges-consignation/', get_charges_consignation, name='charges-consignation'),
     path('', include(router.urls)),
 ]
+
 
 # Routes générées :
 #

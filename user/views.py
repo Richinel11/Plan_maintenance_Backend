@@ -413,3 +413,18 @@ class UniteDemanderesseViewSet(ModelViewSet):
         if entite_id:
             qs = qs.filter(entite_metier_id=entite_id)
         return qs
+
+
+@extend_schema(
+    tags=["Users"],
+    responses={200: UtilisateurSerializer(many=True)},
+    description="Récupérer la liste des charges de consignation"
+)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_charges_consignation(request):
+    from security.models import UserRole
+    user_roles = UserRole.objects.filter(role__code_role="CHARGE_CONSIGNATION").select_related('user')
+    users = [ur.user for ur in user_roles if ur.user.is_active and not ur.user.is_deleted]
+    serializer = UtilisateurSerializer(users, many=True)
+    return Response(serializer.data)

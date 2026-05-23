@@ -46,14 +46,7 @@ docker compose up -d
 **Option B — Vider uniquement les tables concernées (si données à conserver ailleurs)**
 
 ```bash
-docker compose exec db psql -U <DB_USER> -d <DB_NAME> -c "
-DROP TABLE IF EXISTS exploitation_demanderetrait CASCADE;
-DROP TABLE IF EXISTS exploitation_notearret CASCADE;
-DROP TABLE IF EXISTS pilotage_workflowhistory CASCADE;
-DROP TABLE IF EXISTS planning_planningtravaux CASCADE;
-DROP TABLE IF EXISTS planning_planning CASCADE;
-DROP TABLE IF EXISTS planning_travail CASCADE;
-"
+docker compose exec db mysql -u plan -p mydb -e "SET FOREIGN_KEY_CHECKS = 0; DROP TABLE IF EXISTS exploitation_demanderetrait, exploitation_notearret, pilotage_workflowhistory, planning_planningtravaux, planning_planning, planning_travail; SET FOREIGN_KEY_CHECKS = 1;"
 ```
 
 ### 4. Appliquer les migrations
