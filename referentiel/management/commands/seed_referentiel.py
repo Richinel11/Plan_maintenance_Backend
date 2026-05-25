@@ -6,28 +6,41 @@ BASE_DIR = os.path.dirname(
 )
 EXCEL_PATH = os.path.join(BASE_DIR, "docs", "BD asset - système électrique (1) (1).xlsx")
 
-# sheet name → (entite_metier_name, ordered list of (col_index, TypeReferentiel.nom))
+# Structure réelle du fichier Excel (vérifiée ligne d'en-tête) :
+#   col 0 : "Segment"      → identifiant de la référence
+#   col 1 : "OUVRAGES..."  → TypeReferentiel "Ouvrage"
+#   col 2 : "GR/TFO/..."   → TypeReferentiel "Poste"
+#   col 3 : "DEPARTS"      → TypeReferentiel "Départ"  (distribution uniquement)
+#
+# sheet name → (entite_metier_name, [(col_index, TypeReferentiel.nom), ...])
 SHEET_CONFIG = {
     "Type réseau et Réf production": ("Production", [
-        (1, "Tronçon"),
-        (2, "Ouvrage"),
+        (1, "Ouvrage"),
+        (2, "Poste"),
     ]),
     "Type de réseau et réf transport": ("Transport", [
-        (1, "Tronçon"),
-        (2, "Ouvrage"),
+        (1, "Ouvrage"),
+        (2, "Poste"),
     ]),
     "Type de réseau et réf distribut": ("Distribution", [
-        (1, "Tronçon"),
+        (1, "Ouvrage"),
         (2, "Poste"),
         (3, "Départ"),
     ]),
 }
 
-TYPE_NOMS = ["Tronçon", "Ouvrage", "Poste", "Départ"]
+TYPE_NOMS = ["Ouvrage", "Poste", "Départ"]
 
 
 class Command(BaseCommand):
     help = "Seed TypeReferentiel, Reference et ReferentielItem depuis le fichier Excel BD asset"
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--reset',
+            action='store_true',
+            help="Supprime tous les TypeReferentiel, Reference et ReferentielItem avant de re-seeder",
+        )
 
     def handle(self, *args, **kwargs):
         try:
@@ -38,6 +51,17 @@ class Command(BaseCommand):
 
         from referentiel.models import TypeReferentiel, Reference, ReferentielItem
         from user.models import EntiteMetier
+
+        # ── Reset optionnel ───────────────────────────────────────────────────
+        if kwargs['reset']:
+            deleted_items, _ = ReferentielItem.objects.all().delete()
+            deleted_refs, _ = Reference.objects.all().delete()
+            deleted_types, _ = TypeReferentiel.objects.all().delete()
+            self.stdout.write(
+                f"  [reset] {deleted_types} TypeReferentiel, "
+                f"{deleted_refs} Reference, "
+                f"{deleted_items} ReferentielItem supprimés"
+            )
 
         # ── Vérifier les EntiteMetier ─────────────────────────────────────────
         entites = {e.name: e for e in EntiteMetier.objects.filter(
@@ -62,37 +86,39 @@ class Command(BaseCommand):
         self.stdout.write("\n[2/3] Reference  +  [3/3] ReferentielItem...")
 
         wb = openpyxl.load_workbook(EXCEL_PATH, read_only=True, data_only=True)
-
         stats = {"reference": 0, "item": 0}
 
         for sheet_name, (entite_name, col_map) in SHEET_CONFIG.items():
             entite = entites[entite_name]
             ws = wb[sheet_name]
+
+            # Ligne 0 = titre éventuel, ligne 1 = en-têtes → on commence à la ligne 2
             rows = [r for r in list(ws.rows)[2:] if any(c.value for c in r)]
             self.stdout.write(f"\n  → {sheet_name} [{entite_name}] ({len(rows)} lignes)")
 
             for row in rows:
                 vals = [c.value for c in row]
 
-                col0 = str(vals[0]).strip() if vals[0] else None
-                if not col0 or col0.startswith("=") or col0 == "Segment":
+                # col 0 = valeur du segment (identifiant de la référence)
+                segment = str(vals[0]).strip() if vals[0] else None
+                if not segment or segment == "Segment":
                     continue
 
-                # Collecter les valeurs des colonnes définies
+                # Lire les valeurs de chaque colonne item
                 col_vals = {}
                 for col_idx, type_nom in col_map:
                     raw = vals[col_idx] if col_idx < len(vals) else None
-                    val = str(raw).strip() if raw and not str(raw).startswith("=") else None
+                    val = str(raw).strip() if raw and str(raw).strip() and not str(raw).startswith("=") else None
                     col_vals[type_nom] = val
 
                 if not any(col_vals.values()):
                     continue
 
-                # Valeur de référence : col0 + valeurs dans l'ordre
-                parts = [col0] + [v for v in col_vals.values() if v]
+                # Valeur de la référence : segment + toutes les valeurs non vides
+                parts = [segment] + [v for v in col_vals.values() if v]
                 ref_valeur = "_".join(parts)
 
-                # Étape 2 : Reference (liée à l'entité métier)
+                # Étape 2 : Reference
                 reference, created = Reference.objects.get_or_create(
                     valeur=ref_valeur,
                     entite_metier=entite,

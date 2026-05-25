@@ -102,6 +102,3 @@ WorkflowHistory
 - Le workflow (`workflow`, `current_step`) est porté par **Planning**, pas par Travail.
 - Les transitions DDR/NAPT dans `exploitation/views.py` accèdent au step via `travail.planning.current_step`.
 - L'URL `ddr/generer/<uuid>` prend désormais un `travail_id` et non plus un `planning_id`.
-
-
-okay, check la branche sur la quelle je suis et cree une release qui explique les modif fait et quoi appliquer sur la bd et comment les a[ppliquer
