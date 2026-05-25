@@ -7,29 +7,35 @@ BASE_DIR = os.path.dirname(
 EXCEL_PATH = os.path.join(BASE_DIR, "docs", "BD asset - système électrique (1) (1).xlsx")
 
 # Structure réelle du fichier Excel (vérifiée ligne d'en-tête) :
-#   col 0 : "Segment"      → identifiant de la référence
+#   col 0 : "Segment"      → TypeReferentiel "Segment"
 #   col 1 : "OUVRAGES..."  → TypeReferentiel "Ouvrage"
 #   col 2 : "GR/TFO/..."   → TypeReferentiel "Poste"
 #   col 3 : "DEPARTS"      → TypeReferentiel "Départ"  (distribution uniquement)
 #
+# Chaque colonne produit un ReferentielItem. La valeur de la Reference
+# est la concaténation de toutes les valeurs non vides (ordre de col_map).
+#
 # sheet name → (entite_metier_name, [(col_index, TypeReferentiel.nom), ...])
 SHEET_CONFIG = {
     "Type réseau et Réf production": ("Production", [
+        (0, "Segment"),
         (1, "Ouvrage"),
         (2, "Poste"),
     ]),
     "Type de réseau et réf transport": ("Transport", [
+        (0, "Segment"),
         (1, "Ouvrage"),
         (2, "Poste"),
     ]),
     "Type de réseau et réf distribut": ("Distribution", [
+        (0, "Segment"),
         (1, "Ouvrage"),
         (2, "Poste"),
         (3, "Départ"),
     ]),
 }
 
-TYPE_NOMS = ["Ouvrage", "Poste", "Départ"]
+TYPE_NOMS = ["Segment", "Ouvrage", "Poste", "Départ"]
 
 
 class Command(BaseCommand):
@@ -99,23 +105,20 @@ class Command(BaseCommand):
             for row in rows:
                 vals = [c.value for c in row]
 
-                # col 0 = valeur du segment (identifiant de la référence)
-                segment = str(vals[0]).strip() if vals[0] else None
-                if not segment or segment == "Segment":
-                    continue
-
-                # Lire les valeurs de chaque colonne item
+                # Lire toutes les colonnes définies dans col_map (col 0 inclus)
                 col_vals = {}
                 for col_idx, type_nom in col_map:
                     raw = vals[col_idx] if col_idx < len(vals) else None
                     val = str(raw).strip() if raw and str(raw).strip() and not str(raw).startswith("=") else None
                     col_vals[type_nom] = val
 
-                if not any(col_vals.values()):
+                # Ignorer la ligne d'en-tête résiduelle et les lignes vides
+                segment = col_vals.get("Segment")
+                if not segment or segment == "Segment" or not any(col_vals.values()):
                     continue
 
-                # Valeur de la référence : segment + toutes les valeurs non vides
-                parts = [segment] + [v for v in col_vals.values() if v]
+                # Valeur de la référence : toutes les valeurs non vides dans l'ordre
+                parts = [v for v in col_vals.values() if v]
                 ref_valeur = "_".join(parts)
 
                 # Étape 2 : Reference

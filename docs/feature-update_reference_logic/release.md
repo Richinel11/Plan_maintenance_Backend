@@ -121,18 +121,29 @@ Réponse :
 
 **Structure réelle des feuilles Excel :**
 
-| Colonne | En-tête Excel | Type créé |
-|---------|---------------|-----------|
-| 0 | `Segment` | identifiant de la référence |
-| 1 | `OUVRAGES (Centrales/lignes RT & postes RT)` | `Ouvrage` |
-| 2 | `GR/TFO/POSTES/` | `Poste` |
-| 3 | `DEPARTS` *(distribution uniquement)* | `Départ` |
+| Colonne | En-tête Excel | Type créé | Feuilles concernées |
+|---------|---------------|-----------|---------------------|
+| 0 | `Segment` | `Segment` | toutes |
+| 1 | `OUVRAGES (Centrales/lignes RT & postes RT)` | `Ouvrage` | toutes |
+| 2 | `GR/TFO/POSTES/` | `Poste` | toutes |
+| 3 | `DEPARTS` | `Départ` | distribution uniquement |
+
+Chaque colonne produit un `ReferentielItem`. La valeur de la `Reference` est la concaténation de toutes les valeurs non vides séparées par `_`.
+
+**Nombre d'items par référence :**
+
+| Entité métier | Items par référence |
+|---------------|---------------------|
+| Production | 3 (Segment, Ouvrage, Poste) |
+| Transport | 3 (Segment, Ouvrage, Poste) |
+| Distribution | 4 (Segment, Ouvrage, Poste, Départ) |
 
 **Types `TypeReferentiel` en base :**
 
 | Avant | Après |
 |-------|-------|
 | Tronçon | *(supprimé)* |
+| *(absent)* | Segment |
 | Ouvrage | Ouvrage |
 | Poste | Poste |
 | Départ | Départ |
