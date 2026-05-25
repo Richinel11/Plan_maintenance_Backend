@@ -2,7 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema_view, extend_schema
+from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 from .models import Centrale, TypeReferentiel, Reference, ReferentielItem
 from .serializers import CentraleSerializer, TypeReferentielSerializer, ReferenceSerializer, ReferentielItemSerializer
 
@@ -28,7 +29,38 @@ class TypeReferentielViewSet(viewsets.ModelViewSet):
     serializer_class = TypeReferentielSerializer
 
 
-@extend_schema_view(**_TAG)
+_REFERENCE_TAG = dict(
+    create=extend_schema(tags=["Referentiel"]),
+    retrieve=extend_schema(tags=["Referentiel"]),
+    update=extend_schema(tags=["Referentiel"]),
+    partial_update=extend_schema(tags=["Referentiel"]),
+    destroy=extend_schema(tags=["Referentiel"]),
+    list=extend_schema(
+        tags=["Referentiel"],
+        summary="Lister les références",
+        description=(
+            "Retourne la liste de toutes les références avec leurs items.\n\n"
+            "Utilisez le paramètre `entite_metier_id` pour filtrer les références "
+            "appartenant à une entité métier spécifique (Production, Transport ou Distribution).\n\n"
+            "**Exemple :** `GET /referentiel/references/?entite_metier_id=<uuid>`"
+        ),
+        parameters=[
+            OpenApiParameter(
+                name='entite_metier_id',
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description=(
+                    "UUID de l'entité métier. "
+                    "Filtre les références associées à cette entité (ex: Production, Transport, Distribution)."
+                ),
+            )
+        ],
+    ),
+)
+
+
+@extend_schema_view(**_REFERENCE_TAG)
 class ReferenceViewSet(viewsets.ModelViewSet):
     queryset = Reference.objects.select_related('entite_metier').prefetch_related('items__type').all()
     serializer_class = ReferenceSerializer
