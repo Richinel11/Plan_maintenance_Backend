@@ -6,21 +6,21 @@ BASE_DIR = os.path.dirname(
 )
 EXCEL_PATH = os.path.join(BASE_DIR, "docs", "BD asset - système électrique (1) (1).xlsx")
 
-# sheet name → ordered list of (col_index, TypeReferentiel.nom)
+# sheet name → (entite_metier_name, ordered list of (col_index, TypeReferentiel.nom))
 SHEET_CONFIG = {
-    "Type réseau et Réf production": [
+    "Type réseau et Réf production": ("Production", [
         (1, "Tronçon"),
         (2, "Ouvrage"),
-    ],
-    "Type de réseau et réf transport": [
+    ]),
+    "Type de réseau et réf transport": ("Transport", [
         (1, "Tronçon"),
         (2, "Ouvrage"),
-    ],
-    "Type de réseau et réf distribut": [
+    ]),
+    "Type de réseau et réf distribut": ("Distribution", [
         (1, "Tronçon"),
         (2, "Poste"),
         (3, "Départ"),
-    ],
+    ]),
 }
 
 TYPE_NOMS = ["Tronçon", "Ouvrage", "Poste", "Départ"]
@@ -37,6 +37,18 @@ class Command(BaseCommand):
             return
 
         from referentiel.models import TypeReferentiel, Reference, ReferentielItem
+        from user.models import EntiteMetier
+
+        # ── Vérifier les EntiteMetier ─────────────────────────────────────────
+        entites = {e.name: e for e in EntiteMetier.objects.filter(
+            name__in=["Production", "Transport", "Distribution"]
+        )}
+        if len(entites) < 3:
+            self.stderr.write(
+                "Les 3 EntiteMetier sont introuvables. "
+                "Lancez d'abord : python manage.py seed_entite_metier"
+            )
+            return
 
         # ── Étape 1 : TypeReferentiel ─────────────────────────────────────────
         self.stdout.write("\n[1/3] TypeReferentiel...")
@@ -53,10 +65,11 @@ class Command(BaseCommand):
 
         stats = {"reference": 0, "item": 0}
 
-        for sheet_name, col_map in SHEET_CONFIG.items():
+        for sheet_name, (entite_name, col_map) in SHEET_CONFIG.items():
+            entite = entites[entite_name]
             ws = wb[sheet_name]
             rows = [r for r in list(ws.rows)[2:] if any(c.value for c in r)]
-            self.stdout.write(f"\n  → {sheet_name} ({len(rows)} lignes)")
+            self.stdout.write(f"\n  → {sheet_name} [{entite_name}] ({len(rows)} lignes)")
 
             for row in rows:
                 vals = [c.value for c in row]
@@ -72,16 +85,18 @@ class Command(BaseCommand):
                     val = str(raw).strip() if raw and not str(raw).startswith("=") else None
                     col_vals[type_nom] = val
 
-                # Ignorer les lignes sans aucune valeur utile
                 if not any(col_vals.values()):
                     continue
 
-                # Construire la valeur de référence : col0 + valeurs dans l'ordre
+                # Valeur de référence : col0 + valeurs dans l'ordre
                 parts = [col0] + [v for v in col_vals.values() if v]
                 ref_valeur = "_".join(parts)
 
-                # Étape 2 : Reference
-                reference, created = Reference.objects.get_or_create(valeur=ref_valeur)
+                # Étape 2 : Reference (liée à l'entité métier)
+                reference, created = Reference.objects.get_or_create(
+                    valeur=ref_valeur,
+                    entite_metier=entite,
+                )
                 if created:
                     stats["reference"] += 1
 

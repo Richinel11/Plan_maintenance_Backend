@@ -32,10 +32,7 @@ class Command(BaseCommand):
                 if not val:
                     continue
 
-                _, created = Centrale.objects.get_or_create(
-                    nom=val,
-                    defaults={"actif": True},
-                )
+                _, created = Centrale.objects.get_or_create(valeur=val)
                 if created:
                     created_count += 1
                     self.stdout.write(f"  [+] {val}")

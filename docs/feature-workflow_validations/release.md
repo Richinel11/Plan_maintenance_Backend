@@ -36,6 +36,7 @@ Entrée de référence liée à un travail. Regroupe plusieurs items.
 |-------|------|-------------|
 | `id` | UUID | Clé primaire |
 | `valeur` | CharField(500) | Valeur composite (ex : `TRONCON_OUVRAGE_DEPART`) |
+| `entite_metier` | FK → EntiteMetier (nullable) | Entité métier à laquelle appartient la référence |
 
 #### `ReferentielItem`
 Composant élémentaire d'une référence (une colonne du classeur Excel).
@@ -136,6 +137,14 @@ Journal des changements d'état du workflow pour un planning.
 
 ## 2. Modèles modifiés
 
+### `referentiel.Centrale`
+Simplification — champs retirés (`nom`, `capacite_mw`, `actif`), remplacés par un seul champ :
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Clé primaire |
+| `valeur` | CharField(255) | Nom de la centrale thermique |
+
 ### `planning.Travail`
 Champs ajoutés :
 
@@ -203,6 +212,15 @@ Base URL : `/referentiel/`
 | PUT/PATCH | `/referentiel/references/{id}/` | Modifier une référence |
 | DELETE | `/referentiel/references/{id}/` | Supprimer une référence |
 | GET | `/referentiel/references/{id}/items/` | Lister tous les items d'une référence |
+
+**Filtre disponible :**
+- `?entite_metier_id=<uuid>` — retourner uniquement les références appartenant à une entité métier
+
+**Exemple — références d'une entité métier :**
+```http
+GET /referentiel/references/?entite_metier_id=<uuid_production>
+Authorization: Bearer <token>
+```
 
 **Exemple — récupérer les items d'une référence :**
 ```http

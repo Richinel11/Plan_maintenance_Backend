@@ -4,7 +4,7 @@ from .models import Centrale, TypeReferentiel, Reference, ReferentielItem
 
 @admin.register(Centrale)
 class AdminCentrale(admin.ModelAdmin):
-    list_display = ('id', 'nom', 'capacite_mw', 'actif')
+    list_display = ('id', 'valeur')
 
 
 @admin.register(TypeReferentiel)

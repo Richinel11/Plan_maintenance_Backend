@@ -5,12 +5,10 @@ import uuid
 
 class Centrale(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    nom = models.CharField(max_length=150)
-    capacite_mw = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    actif = models.BooleanField(default=True)
+    valeur = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.nom
+        return self.valeur
 
 
 class TypeReferentiel(models.Model):
@@ -24,6 +22,10 @@ class TypeReferentiel(models.Model):
 class Reference(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     valeur = models.CharField(max_length=500)
+    entite_metier = models.ForeignKey(
+        'user.EntiteMetier', on_delete=models.PROTECT,
+        null=True, blank=True, related_name='references'
+    )
 
     def __str__(self):
         return self.valeur

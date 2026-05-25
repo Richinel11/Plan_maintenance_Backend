@@ -18,7 +18,7 @@ _TAG = dict(
 
 @extend_schema_view(**_TAG)
 class CentraleViewSet(viewsets.ModelViewSet):
-    queryset = Centrale.objects.all().order_by('nom')
+    queryset = Centrale.objects.all().order_by('valeur')
     serializer_class = CentraleSerializer
 
 
@@ -30,8 +30,15 @@ class TypeReferentielViewSet(viewsets.ModelViewSet):
 
 @extend_schema_view(**_TAG)
 class ReferenceViewSet(viewsets.ModelViewSet):
-    queryset = Reference.objects.prefetch_related('items__type').all()
+    queryset = Reference.objects.select_related('entite_metier').prefetch_related('items__type').all()
     serializer_class = ReferenceSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        entite_id = self.request.query_params.get('entite_metier_id')
+        if entite_id:
+            qs = qs.filter(entite_metier_id=entite_id)
+        return qs
 
     @extend_schema(tags=["Referentiel"], responses=ReferentielItemSerializer(many=True))
     @action(detail=True, methods=['get'], url_path='items')
