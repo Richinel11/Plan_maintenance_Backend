@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 from .models import Utilisateur, EntiteMetier, UniteDemanderesse
 from security.models import Role, UserRole
 from security.permission import HasPermissionFactory, is_admin
@@ -396,7 +397,25 @@ class EntiteMetierViewSet(ModelViewSet):
 
 
 @extend_schema_view(
-    list=extend_schema(tags=["Users"]),
+    list=extend_schema(
+        tags=["Users"],
+        summary="Lister les unités demanderesses",
+        description=(
+            "Retourne la liste des unités demanderesses.\n\n"
+            "Utilisez `entite_metier_id` pour filtrer par entité métier "
+            "(Production, Transport ou Distribution).\n\n"
+            "Le filtre par région est appliqué automatiquement selon le profil de l'utilisateur connecté."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name='entite_metier_id',
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="UUID de l'entité métier (Production, Transport, Distribution).",
+            ),
+        ],
+    ),
     create=extend_schema(tags=["Users"]),
     retrieve=extend_schema(tags=["Users"]),
     update=extend_schema(tags=["Users"]),
