@@ -42,4 +42,4 @@ class ReferenceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reference
-        fields = ['id', 'valeur', 'entite_metier', 'entite_metier_id', 'items']
+        fields = ['id', 'valeur', 'region', 'entite_metier', 'entite_metier_id', 'items']

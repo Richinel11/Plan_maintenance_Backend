@@ -25,7 +25,7 @@ class UniteDemanderesseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UniteDemanderesse
-        fields = ['id', 'nom', 'entite_metier', 'entite_metier_id', 'created_at']
+        fields = ['id', 'nom', 'region', 'entite_metier', 'entite_metier_id', 'created_at']
         read_only_fields = ['created_at']
 
 

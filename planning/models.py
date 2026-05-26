@@ -23,6 +23,7 @@ class Planning(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     nom = models.CharField(max_length=255)
     code = models.CharField(max_length=255, unique=True, blank=True)
+    region = models.CharField(max_length=100, blank=True, null=True)
     entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, null=True, blank=True, related_name='plannings')
     workflow = models.ForeignKey(Workflow, on_delete=models.SET_NULL, null=True, blank=True)
     current_step = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL, null=True, blank=True)
@@ -77,6 +78,7 @@ class Travail(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     planning = models.ForeignKey(Planning, on_delete=models.CASCADE, related_name='travaux')
+    region = models.CharField(max_length=100, blank=True, null=True)
 
     #  Identification
     segment = models.CharField(max_length=20, choices=Segment.choices)

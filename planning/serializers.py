@@ -63,7 +63,7 @@ class PlanningSerializer(serializers.ModelSerializer):
     class Meta:
         model = Planning
         fields = [
-            'id', 'nom', 'code',
+            'id', 'nom', 'code', 'region',
             'date_creation', 'date_modification',
             # READ
             'entite_metier', 'workflow', 'current_step',
@@ -123,7 +123,7 @@ class TravailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Travail
         fields = [
-            'id', 'segment', 'statut_travaux',
+            'id', 'segment', 'region', 'statut_travaux',
             'consistance_travaux', 'observations',
             'type_reseau', 'troncons_consignes', 'localites_impactees', 'moyens_mis_en_oeuvre',
 

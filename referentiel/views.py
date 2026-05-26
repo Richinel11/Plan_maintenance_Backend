@@ -6,6 +6,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiPara
 from drf_spectacular.types import OpenApiTypes
 from .models import Centrale, TypeReferentiel, Reference, ReferentielItem
 from .serializers import CentraleSerializer, TypeReferentielSerializer, ReferenceSerializer, ReferentielItemSerializer
+from security.permission import is_admin
 
 _TAG = dict(
     list=extend_schema(tags=["Referentiel"]),
@@ -70,6 +71,10 @@ class ReferenceViewSet(viewsets.ModelViewSet):
         entite_id = self.request.query_params.get('entite_metier_id')
         if entite_id:
             qs = qs.filter(entite_metier_id=entite_id)
+        if not is_admin(self.request.user):
+            region = self.request.user.region
+            if region:
+                qs = qs.filter(region=region)
         return qs
 
     @extend_schema(tags=["Referentiel"], responses=ReferentielItemSerializer(many=True))

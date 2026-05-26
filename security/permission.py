@@ -36,3 +36,8 @@ def HasPermissionFactory(*required_permissions):
             return user_has_all_permissions(request.user, list(required_permissions))
 
     return _Permission
+
+
+def is_admin(user) -> bool:
+    """Retourne True si l'utilisateur possède le rôle ADMIN."""
+    return user.user_roles.filter(role__code_role='ADMIN').exists()

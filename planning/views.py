@@ -9,6 +9,7 @@ from rest_framework import serializers as drf_serializers
 from .models import Planning, Travail, TypeActivite
 from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer
 from pilotage.models import Workflow, WorkflowStep
+from security.permission import is_admin
 
 
 @extend_schema_view(
@@ -47,6 +48,14 @@ class PlanningViewSet(ModelViewSet):
     )
     serializer_class = PlanningSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not is_admin(self.request.user):
+            region = self.request.user.region
+            if region:
+                qs = qs.filter(region=region)
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(cree_par=self.request.user, modifie_par=self.request.user)
@@ -124,6 +133,17 @@ class TravailViewSet(ModelViewSet):
     )
     serializer_class = TravailSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not is_admin(self.request.user):
+            region = self.request.user.region
+            if region:
+                qs = qs.filter(region=region)
+        entite_id = self.request.query_params.get('entite_metier_id')
+        if entite_id:
+            qs = qs.filter(entite_metier_id=entite_id)
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(cree_par=self.request.user, modifie_par=self.request.user)

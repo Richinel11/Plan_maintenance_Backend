@@ -8,7 +8,7 @@ from rest_framework import status
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from .models import Utilisateur, EntiteMetier, UniteDemanderesse
 from security.models import Role, UserRole
-from security.permission import HasPermissionFactory
+from security.permission import HasPermissionFactory, is_admin
 from .serializers import(
     CreateUserSerializer,
     SetPasswordSerializer,
@@ -412,6 +412,10 @@ class UniteDemanderesseViewSet(ModelViewSet):
         entite_id = self.request.query_params.get('entite_metier_id')
         if entite_id:
             qs = qs.filter(entite_metier_id=entite_id)
+        if not is_admin(self.request.user):
+            region = self.request.user.region
+            if region:
+                qs = qs.filter(region=region)
         return qs
 
 
