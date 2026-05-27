@@ -40,8 +40,22 @@ class Planning(models.Model):
         from django.utils import timezone
         now = timezone.now()
         prefix = f"PLAN-{now.strftime('%Y%m')}"
-        count = Planning.objects.filter(code__startswith=prefix).count() + 1
-        return f"{prefix}-{count:04d}"
+        
+        # On cherche le dernier code généré pour ce mois pour incrémenter correctement
+        last_planning = Planning.objects.filter(code__startswith=prefix).order_by('code').last()
+        
+        if last_planning:
+            try:
+                # On extrait le numéro à la fin du code (ex: 0005 de PLAN-202405-0005)
+                last_number = int(last_planning.code.split('-')[-1])
+                new_number = last_number + 1
+            except (ValueError, IndexError):
+                # Si le format est imprévu, on se rabat sur le count pour éviter de bloquer
+                new_number = Planning.objects.filter(code__startswith=prefix).count() + 1
+        else:
+            new_number = 1
+            
+        return f"{prefix}-{new_number:04d}"
 
     def __str__(self):
         return f"{self.code} - {self.nom}"
@@ -103,7 +117,7 @@ class Travail(models.Model):
     unite_duree = models.CharField(max_length=10, choices=UniteDuree.choices, default=UniteDuree.HEURES)
     heure_fin_planifie = models.DateTimeField(null=True, blank=True)
     date_programmee = models.DateField(null=True, blank=True)
-    nombre_jours_avant_travaux = models.PositiveIntegerField(null=True, blank=True)
+    nombre_jours_avant_travaux = models.IntegerField(null=True, blank=True)
 
     #  Indicateurs d'Impact (PRODUCTION)
     disponibilite_mecanique_mw = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)

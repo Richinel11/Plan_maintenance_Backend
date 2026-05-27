@@ -23,6 +23,11 @@ class Command(BaseCommand):
             'description': 'Affilie les équipes et valide les plannings transmis'
         },
         {
+            'nom': 'Chargé de consignation',
+            'code_role': 'CHARGE_CONSIGNATION',
+            'description': 'Assure la consignation et la déconsignation des équipements'
+        },
+        {
             'nom': 'CCR',
             'code_role': 'CCR',
             'description': 'Reçoit les DDR, autorise ou refuse les arrêts et génère les NAPT'

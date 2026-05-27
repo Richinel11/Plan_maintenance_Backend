@@ -14,8 +14,7 @@ urlpatterns = [
     
     path('find-user/<uuid:user_id>/',views.find_user, name='find_user'),
     path('change-password/', views.change_password, name = 'change_password'),
-     
-    
+    path('charges-consignation/', views.get_charges_consignation, name='get-charges-consignation'),
     path('delete-user/<uuid:user_id>',views.delete_user, name='delete-user'),
     path('update-user/<uuid:user_id>',views.get_update_user, name='update-user'),
     path('patch-user/<uuid:user_id>',views.get_update_user, name='modify-user'),

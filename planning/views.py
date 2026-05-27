@@ -49,7 +49,23 @@ class PlanningViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(cree_par=self.request.user, modifie_par=self.request.user)
+        # ── Liaison automatique au workflow actif ──────────────────────────
+        # Il ne peut y avoir qu'un seul workflow actif à la fois.
+        # On le récupère et on initialise le planning sur son premier step.
+        workflow_actif = Workflow.objects.filter(is_active=True).first()
+
+        first_step = None
+        if workflow_actif:
+            first_step = WorkflowStep.objects.filter(
+                workflow=workflow_actif
+            ).order_by('number').first()
+
+        serializer.save(
+            cree_par=self.request.user,
+            modifie_par=self.request.user,
+            workflow=workflow_actif,
+            current_step=first_step,
+        )
 
     def perform_update(self, serializer):
         serializer.save(modifie_par=self.request.user)
