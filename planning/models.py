@@ -161,3 +161,62 @@ class Travail(models.Model):
 
     class Meta:
         ordering = ['-date_creation']
+
+
+class PropositionAlignement(models.Model):
+
+    class Statut(models.TextChoices):
+        EN_ATTENTE = "EN_ATTENTE", _("En attente")
+        ACCEPTEE   = "ACCEPTEE",   _("Acceptée")
+        REFUSEE    = "REFUSEE",    _("Refusée")
+        BLOQUEE    = "BLOQUEE",    _("Bloquée - Conflit charge consignation")
+
+    class TypeProposition(models.TextChoices):
+        ALIGNEMENT_TRANSPORT = "ALIGNEMENT_TRANSPORT", _("Alignement sur transport")
+        ALIGNEMENT_TRAVAUX   = "ALIGNEMENT_TRAVAUX",   _("Alignement entre travaux")
+
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+
+    # Le planning concerné par la proposition
+    planning = models.ForeignKey(Planning, on_delete=models.CASCADE,related_name='propositions')
+
+    # Le travail qu'on propose de modifier
+    travail_a_modifier = models.ForeignKey(Travail, on_delete=models.CASCADE,related_name='propositions_modification')
+
+    # Le travail de référence (celui sur lequel on aligne)
+    travail_reference = models.ForeignKey(Travail, on_delete=models.CASCADE,related_name='propositions_reference',null=True, blank=True)
+
+    type_proposition = models.CharField(max_length=30, choices=TypeProposition.choices)
+
+    # Infos sur les types de travaux pour aider le gestionnaire
+    type_travaux_reference = models.CharField(max_length=100, blank=True)
+    type_travaux_a_modifier = models.CharField(max_length=100, blank=True)
+    priorite_travail = models.CharField(max_length=5, blank=True)
+
+    # Anciens horaires
+    ancien_debut = models.DateTimeField()
+    ancienne_fin = models.DateTimeField(null=True, blank=True)
+
+    # Nouveaux horaires proposés
+    nouveau_debut = models.DateTimeField()
+    nouvelle_fin = models.DateTimeField(null=True, blank=True)
+
+    # Raison et notes
+    raison = models.TextField(blank=True)
+    note_compatibilite_types = models.TextField(blank=True)
+
+    # Conflit charge de consignation
+    conflit_charge_consignation = models.BooleanField(default=False)
+    detail_conflit = models.TextField(blank=True)
+
+    statut = models.CharField(max_length=20, choices=Statut.choices,default=Statut.EN_ATTENTE)
+
+    cree_par = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL,null=True, related_name='propositions_creees')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Proposition {self.type_proposition} - {self.travail_a_modifier}"
+
+    class Meta:
+        ordering = ['-created_at']
