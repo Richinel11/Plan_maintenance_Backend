@@ -6,9 +6,10 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
-from .models import Planning, Travail, TypeActivite
-from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer
+from .models import Planning, Travail, TypeActivite, PropositionAlignement
+from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer, PropositionAlignementSerializer
 from pilotage.models import Workflow, WorkflowStep
+from .alignement_service import analyser_et_proposer
 
 
 @extend_schema_view(
@@ -98,8 +99,123 @@ class PlanningViewSet(ModelViewSet):
 
         serializer = self.get_serializer(planning)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @extend_schema(tags=["Planning - Alignement"])
+    @action(detail=True, methods=['POST'], url_path='analyser-chevauchements')
+    def analyser_chevauchements(self, request, pk=None):
+        """analyser les travaux et propose des reprogrammations"""
+        planning = self.get_object()
+        result = analyser_et_proposer(planning, request.user)
+        propositions_data = PropositionAlignementSerializer(
+            result['propositions'], many=True
+        ).data
+        
+        return Response({
+        "message": result['message'],
+        "resume": result['resume'],
+        "chevauchements": result['chevauchements'],
+        "propositions": propositions_data 
+        }, status=status.HTTP_200_OK)
+        
+    @extend_schema(tags=["Planning - Aligenment"])
+    @action(detail=True, methods=['GET'], url_path='propositions')
+    
+    def lister_propositions(self, request, pk=None):
+        """Liste les propositions d'un planning avec filtre optionnel"""
+        planning = self.get_object()
+        statut_filtre = request.query_params.get('statut')
+        pa = PropositionAlignement.objects.filter(planning=planning).select_related(
+            'travail_a_modifier', 'travail-reference', 'cree_par'
+        )
+        if statut_filtre:
+            pa = pa.filter(statut=statut_filtre)
+        return Response((PropositionAlignementSerializer(pa, many=True).data), status=status.HTTP_200_OK)
+        
+    @extend_schema(tags=["Planning - Alignement"])
+    @action(detail=True, methods=['POST'], url_path='appliquer-proposition')
+    def appliquer_proposition(self, request, pk=None):
+        """Accepter une proposition et appliquer les changements d'horaires"""
+        proposition_id = request.data.get('proposition_id')
+        
+        if not proposition_id:
+            return Response({"error": "proposition_id est requis"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try: 
+            proposition = PropositionAlignement.objects.select_related(
+                'travail_a_modifier'
+                ).get(id=proposition_id)
+        except PropositionAlignement.DoesNotExist:
+            return Response({
+                "error-fr": "Proposition introuvable",
+                "error-en": "Proposition not  found",
+                },status=status.HTTP_404_NOT_FOUND)
 
+        if proposition.statut == PropositionAlignement.Statut.BLOQUEE:
+            return Response({
+                "error-fr" : "Proposition bloquée impossible à appliquer",
+                "error-en":  "Proposition blocked impossible to apply",
+                "detail": proposition.detail_conflit or proposition.raison
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        if proposition.statut != PropositionAlignement.Statut.EN_ATTENTE:
+            return Response({
+                "error-fr" : f"Proposition déjà '{proposition.statut}'."
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        travail = proposition.travail_a_modifier
+        travail.heure_debut_planifie = proposition.nouveau_debut
+        travail.heure_fin_planifie = proposition.nouvelle_fin
+        travail.travail_en_alignement = True
+        travail.modifie_par = request.user
+        travail.save()
+        
+        proposition.statut = PropositionAlignement.Statut.ACCEPTEE
+        proposition.save()
+        
+        return Response({
+           "message": "Proposition acceptée. Horaires mis à jour.",
+           "travail": {
+            "id": str(travail.id),
+            "ressource": travail.reference.valeur if travail.reference else str(travail.id),
+            "nouveau_debut": travail.heure_debut_planifie,
+            "nouvelle_fin": travail.heure_fin_planifie,
+           },
+           "proposition" : PropositionAlignementSerializer(proposition).data 
+        }, status=status.HTTP_200_OK)
+        
+        
+    @extend_schema(tags=["Planning - Alignement"])
+    @action(detail=True, methods=['POST'], url_path='refuser-proposition')
+    def refuser_proposition(self, request, pk=None):
+        """Refuse une proposition sans modifier le travail."""
+        proposition_id = request.data.get('proposition_id')
+        if not proposition_id:
+            return Response({"error": "proposition_id est requis"}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            proposition = PropositionAlignement.objects.get(id=proposition_id)
+        except PropositionAlignement.DoesNotExist:
+            return Response({"error": "Proposition introuvable"}, status=status.HTTP_404_NOT_FOUND)
+
+        if proposition.statut not in [
+            PropositionAlignement.Statut.EN_ATTENTE,
+            PropositionAlignement.Statut.BLOQUEE
+        ]:
+            return Response(
+                {"error": f"Proposition déjà '{proposition.statut}'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        proposition.statut = PropositionAlignement.Statut.REFUSEE
+        proposition.save()
+
+        return Response({
+            "message": "Proposition refusée. Aucun changement appliqué.",
+            "proposition": PropositionAlignementSerializer(proposition).data
+        }, status=status.HTTP_200_OK)
+
+                
+        
 @extend_schema_view(
     list=extend_schema(tags=["Travail"]),
     create=extend_schema(tags=["Travail"]),

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Planning, Travail, TypeActivite
+from .models import Planning, Travail, TypeActivite, PropositionAlignement
 from user.models import Utilisateur, EntiteMetier
 from referentiel.models import Centrale, Reference
 from referentiel.serializers import CentraleSerializer, ReferenceSerializer
@@ -33,9 +33,7 @@ class TypeActiviteSerializer(serializers.ModelSerializer):
         fields = ['id', 'libelle', 'entite_metier', 'entite_metier_id']
 
 
-# ─────────────────────────────────────────────
 #  Planning
-# ─────────────────────────────────────────────
 
 class PlanningSerializer(serializers.ModelSerializer):
 
@@ -74,9 +72,7 @@ class PlanningSerializer(serializers.ModelSerializer):
         read_only_fields = ['code', 'date_creation', 'date_modification']
 
 
-# ─────────────────────────────────────────────
 #  Travail
-# ─────────────────────────────────────────────
 
 class TravailSerializer(serializers.ModelSerializer):
 
@@ -153,3 +149,38 @@ class TravailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['heure_fin_planifie', 'nombre_jours_avant_travaux',
                             'prevision_enf_mwh', 'date_creation', 'date_modification']
+
+
+class PropositionAlignementSerializer(serializers.ModelSerializer):
+    
+    travail_a_modifier_ref = serializers.SerializerMethodField()
+    travail_reference_ref = serializers.SerializerMethodField()
+    cree_par_nom = serializers.CharField(source='cree_par.get_full_name', read_only=True)
+    
+    class Meta:
+        model = PropositionAlignement
+        
+        fields = [
+             'id', 'type_proposition', 'statut',
+            'priorite_travail','type_travaux_reference',
+            'type_travaux_a_modifier',
+            'note_compatibilite_types','ancien_debut',
+            'ancienne_fin','nouveau_debut', 'nouvelle_fin',
+            'raison','conflit_charge_consignation',
+            'detail_conflit','travail_a_modifier',
+            'travail_a_modifier_ref','travail_reference',
+            'travail_reference_ref','cree_par_nom', 'created_at'
+        ]
+        
+        
+    def get_travail_a_modifier_ref(self, obj):
+        if obj.travail_a_modifier and obj.travail_a_modifier.reference:
+            return obj.travail_a_modifier.reference.valeur
+        return str(obj.travail_a_modifier.id) 
+    
+    
+    def get_travail_reference_ref(self, obj):
+        if obj.travail_reference and obj.travail_reference.reference:
+            return obj.travail_reference.reference.valeur
+        return str(obj.travail_reference.id) if obj.travail_reference else None
+    

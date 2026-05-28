@@ -15,6 +15,11 @@ urlpatterns = [
 
 
 # Routes générées :
+
+# POST        /plannings/{id}/analyser-chevauchements/   
+# GET         /plannings/{id}/propositions/?statut=EN_ATTENTE
+# POST        /plannings/{id}/appliquer-proposition/      appliquer les propositions
+# POST        /plannings/{id}/refuser-proposition/        refuser les propositions
 #
 # GET/POST    /plannings/                             liste / créer un planning
 # GET/PATCH   /plannings/<id>/                        détail / modifier un planning
