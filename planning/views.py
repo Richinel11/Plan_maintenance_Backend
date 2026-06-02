@@ -1,4 +1,3 @@
-# planning/views.py
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,8 +5,15 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
-from .models import Planning, Travail, TypeActivite, PropositionAlignement
-from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer, PropositionAlignementSerializer
+from .models import (
+    Planning, Travail,
+    TypeActivite, PropositionAlignement
+    )
+from .serializers import (
+    PlanningSerializer,TravailSerializer,
+    TypeActiviteSerializer,
+    PropositionAlignementSerializer,
+    )
 from pilotage.models import Workflow, WorkflowStep
 from .alignement_service import analyser_et_proposer
 
@@ -50,9 +56,10 @@ class PlanningViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        # ── Liaison automatique au workflow actif ──────────────────────────
+        # Liaison automatique au workflow actif 
         # Il ne peut y avoir qu'un seul workflow actif à la fois.
-        # On le récupère et on initialise le planning sur son premier step.
+        # On le récupère et on initialise le planning sur son premier step
+        
         workflow_actif = Workflow.objects.filter(is_active=True).first()
 
         first_step = None
@@ -200,6 +207,41 @@ class PlanningViewSet(ModelViewSet):
         }, status=status.HTTP_200_OK)
         
         
+    #
+    # ROUTE : GET /plannings/<id>/travaux
+    # Pourquoi cette route existe ici  et pas dans TravailViewSet?
+    # TravailViewSet est une route independante(/travaux/)
+    # Le frontend a besoin de recuperer les travaux d'un id precis via une URL
+    # contextuelle : /plannings/<id>/travaux/
+    # On ajoute donc une action imbriqué dans PlanningViewSet sans modifier les
+    # routes presentes dans TravailViewset.
+    #
+    # Ajouté pour corriger : BUG-004 (voir bug_all_planning.md)
+    
+    @extend_schema(
+        tags=["Planning"],
+        responses={200: TravailSerializer(many=True)},
+        description="récupère tous les travaux appartenants à un planning donnée"
+    )
+    
+    @action(detail=True, methods=['GET'], url_path='travaux')
+    def travaux_du_planning(self, request, pk=None):
+        planning = self.get_object()
+        
+        # On filtre les travaux sur le planning courant.
+        # select_related evite les requetes N+1 sur les foreignKey fréquement affichées.
+        
+        travaux = Travail.objects.filter(planning=planning).order_by('-date_creation').select_related(
+            'type_travaux',
+            'unite_demanderesse',
+            'reference',
+            'charge_consignetion',
+            'entite-metier',
+        )
+        
+        serializer = TravailSerializer(travaux, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
     @extend_schema(tags=["Planning - Alignement"])
     @action(detail=True, methods=['POST'], url_path='refuser-proposition')
     def refuser_proposition(self, request, pk=None):
@@ -230,8 +272,7 @@ class PlanningViewSet(ModelViewSet):
             "proposition": PropositionAlignementSerializer(proposition).data
         }, status=status.HTTP_200_OK)
 
-                
-        
+                       
 @extend_schema_view(
     list=extend_schema(tags=["Travail"]),
     create=extend_schema(tags=["Travail"]),
@@ -258,16 +299,40 @@ class TravailViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(cree_par=self.request.user, modifie_par=self.request.user)
+        # Dériver entite_metier directement depuis le planning
+        # Le travail etant toujours rattaché à un planning qui lui-meme
+        # appartient à  une entite_metier, on evite la double saisie et les incohérences 
+        # potentielles entre deux champs
+        # si entite_metier est deja fournie on la respecte.
+        extra={
+            'cree_par': self.request.user,
+            'modifier_par': self.request.user,
+        }
+        planning = serializer.validated_data.get('planning')
+        entite_explicite = serializer.validated_date.get('entite_metier')
+        if planning and planning.entite_metier and not entite_explicite:
+            extra['entite_metier'] = planning.entite_metier
+        serializer.save(**extra)
 
     def perform_update(self, serializer):
-        serializer.save(modifie_par=self.request.user)
-
+        # Si le planning change lors d'une mise à jour et qu'aucune entité
+        # n'est fournie explicitement, on synchronise entite_metier avec
+        # celle du nouveau planning
+        extra = {'modifier_par': self.request.user}
+        planning = serializer.validated_data.get('planning')
+        entite_explicite = serializer.validated_date.get('entite_metier')
+        if planning and planning.entite_metier and not entite_explicite:
+            extra['entite_metier'] = planning.entite_metier
+        serializer.save(**extra)
+        
+        
     def update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return super().update(request, *args, **kwargs)
-
-    # ── ACTIONS WORKFLOW ──
+    
+    # creation des travaux en fonction des Type(Distribution, Transport et Production)
+    
+    #  ACTIONS WORKFLOW 
 
     @extend_schema(
         request=inline_serializer('ReporterSerializer', fields={
@@ -393,3 +458,6 @@ class TravailViewSet(ModelViewSet):
             if en_conflit.exists():
                 ids_en_conflit.add(str(t1.id))
         return Response({"conflits": list(ids_en_conflit)})
+
+
+

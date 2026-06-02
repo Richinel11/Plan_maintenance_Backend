@@ -68,7 +68,14 @@ class ReferenceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         qs = super().get_queryset()
         entite_id = self.request.query_params.get('entite_metier_id')
-        if entite_id:
+        
+        # Garde defensive: om ignore le parametre si il contient des valeurs
+        # invalides 'undefined' ou "null"
+        # Sans cela django leve une VaalidationError en tentant de convertir "undefined" 
+        # en UUID
+        #  Voir BUG-005 dans le bug_all_planning.md 
+        VALEURS_INVALIDES = {'undefined', 'null', ''}
+        if entite_id and entite_id not in VALEURS_INVALIDES:
             qs = qs.filter(entite_metier_id=entite_id)
         return qs
 

@@ -115,7 +115,8 @@ class TravailSerializer(serializers.ModelSerializer):
         queryset=Centrale.objects.all(), source='centrale_thermique_sollicitee',
         write_only=True, allow_null=True, required=False
     )
-
+    
+    
     class Meta:
         model = Travail
         fields = [
@@ -149,6 +150,30 @@ class TravailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['heure_fin_planifie', 'nombre_jours_avant_travaux',
                             'prevision_enf_mwh', 'date_creation', 'date_modification']
+
+    def validate(self, attrs):
+        segment = attrs.get('segment')
+        
+        if segment == 'DISTRIBUTION':
+            # troncon_consignes est optionnel mais localites_impactees recommandée 
+            pass
+        
+        elif segment == 'TRANSPORT':
+            #charge_consignation fortement recommandé
+            if not attrs.get('charge_consignation'):
+                raise serializers.ValidationError({
+                    "charge_consignation": "Requis pour le segment TRANSPORT."
+                })
+                
+        elif segment == 'PRODUCTION':
+            # disponnibilite_mecanique_mw requis
+            if not attrs.get('disponnibilite_mecanique_mw'):
+                raise serializers.ValidationError({
+                    "disponnibilite_mecanique_mw": "Requis pour le segment PRODUCTION."
+                })
+        return attrs 
+    
+    
 
 
 class PropositionAlignementSerializer(serializers.ModelSerializer):
