@@ -33,13 +33,13 @@ def _partage_ressource(travail_a: Travail, travail_b: Travail) -> bool:
     TYPES_PARTAGES = [ 'POSTE', 'OUVRAGE', 'TRONCON', 'SEGMENT']
     
     items_a = set(
-        travail_a.reference.items.filter(
+        travail_a.reference.items.filter( # type: ignore[attr-defined]
             type__nom__in=TYPES_PARTAGES
         ).values_lsit('valeur', 'type__nom')
     ) 
     
     items_b = set(
-        travail_a.reference.items.filter(
+        travail_a.reference.items.filter( # type: ignore[attr-defined]
             type__nom__in=TYPES_PARTAGES
         ).values_lsit('valeur', 'type__nom')
     ) 
@@ -59,12 +59,12 @@ def _ressources_communes(travail_a: Travail, travail_b: Travail) -> list:
     TYPES_PARTAGES = ['POSTE', 'TRONCON', 'OUVRAGE', 'SEGMENT']
 
     items_a = set(
-        travail_a.reference.items.filter(
+        travail_a.reference.items.filter( # type: ignore[attr-defined]
             type__nom__in=TYPES_PARTAGES
         ).values_list('valeur', 'type__nom')
     )
     items_b = set(
-        travail_b.reference.items.filter(
+        travail_b.reference.items.filter( # type: ignore[attr-defined]
             type__nom__in=TYPES_PARTAGES
         ).values_list('valeur', 'type__nom')
     )
@@ -297,7 +297,7 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
 
     # Récupérer les travaux avec horaires
     travaux = list(
-        planning.travaux.select_related(
+        Travail.objects.filter(planning=planning).select_related(
             'reference', 'charge_consignation', 'type_travaux'
         ).filter(
             heure_debut_planifie__isnull=False,
@@ -344,7 +344,7 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
                 "peut_bouger": _peut_bouger(reference),
                 #detail des composants de la reference
                 "composants": list(
-                    reference.reference.items.values('type__nom', 'valeur')
+                    reference.reference.items.values('type__nom', 'valeur') # type: ignore
                 ) if reference.reference else []
             },
             "travaux_en_conflit": [{

@@ -70,6 +70,11 @@ class Travail(models.Model):
         DISTRIBUTION = "DISTRIBUTION", _("Distribution")
         TRANSPORT    = "TRANSPORT",    _("Transport")
         PRODUCTION   = "PRODUCTION",   _("Production")
+        
+    class Priorite(models.TextChoices):
+        P1 = "P1", _("P1 - Urgent")
+        P2 = "P2", _("P2 - Non urgent 1 à 7 jours")
+        P3 = "P3", _("P3 -  Non urgent 7 jours")
 
     class TypeReseau(models.TextChoices):
         HTB = "HTB", _("HTB (Haute Tension)")
@@ -94,6 +99,12 @@ class Travail(models.Model):
 
     #  Identification
     segment = models.CharField(max_length=20, choices=Segment.choices)
+    priorite = models.CharField(
+        max_length=5,
+        choices=Priorite.choices,
+        default=Priorite.P3,
+        null=True, blank=True
+    )
     reference = models.ForeignKey(Reference, on_delete=models.SET_NULL, null=True, blank=True, related_name='travaux')
 
     #  Détails organisationnels
