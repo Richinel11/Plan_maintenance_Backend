@@ -284,7 +284,7 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
     Étapes :
     1. Récupérer tous les travaux du planning avec horaires
     2. Détecter les groupes de chevauchement
-    3. Pour chaque groupe → trouver la référence → proposer des alignements
+    3. Pour chaque groupe, trouver la référence ensuite proposer des alignements
     4. Vérifier les contraintes (priorité, charge de consignation)
     5. Sauvegarder et retourner les propositions
     """
