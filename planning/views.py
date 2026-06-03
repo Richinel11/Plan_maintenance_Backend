@@ -1,4 +1,3 @@
-# planning/views.py
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from rest_framework.response import Response
@@ -50,9 +49,10 @@ class PlanningViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        # ── Liaison automatique au workflow actif ──────────────────────────
+        # Liaison automatique au workflow actif 
         # Il ne peut y avoir qu'un seul workflow actif à la fois.
-        # On le récupère et on initialise le planning sur son premier step.
+        # On le récupère et on initialise le planning sur son premier step
+        
         workflow_actif = Workflow.objects.filter(is_active=True).first()
 
         first_step = None
@@ -236,6 +236,7 @@ class PlanningViewSet(ModelViewSet):
         serializer = TravailListSerializer(travaux, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
     @extend_schema(tags=["Planning - Alignement"])
     @action(detail=True, methods=['POST'], url_path='refuser-proposition')
     def refuser_proposition(self, request, pk=None):
@@ -266,8 +267,7 @@ class PlanningViewSet(ModelViewSet):
             "proposition": PropositionAlignementSerializer(proposition).data
         }, status=status.HTTP_200_OK)
 
-                
-        
+                       
 @extend_schema_view(
     list=extend_schema(tags=["Travail"]),
     create=extend_schema(tags=["Travail"]),
@@ -322,11 +322,14 @@ class TravailViewSet(ModelViewSet):
 
         serializer.save(**extra)
 
+
     def update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return super().update(request, *args, **kwargs)
-
-    # ── ACTIONS WORKFLOW ──
+    
+    # creation des travaux en fonction des Type(Distribution, Transport et Production)
+    
+    #  ACTIONS WORKFLOW 
 
     @extend_schema(
         request=inline_serializer('ReporterSerializer', fields={
@@ -452,3 +455,6 @@ class TravailViewSet(ModelViewSet):
             if en_conflit.exists():
                 ids_en_conflit.add(str(t1.id))
         return Response({"conflits": list(ids_en_conflit)})
+
+
+

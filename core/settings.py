@@ -15,6 +15,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7pn-i#t&r0i^x)i(9*7!_
 DEBUG = int(os.environ.get('DEBUG', 1))
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+DEBUG = 1
 # APPLICATIONS
 INSTALLED_APPS = [
     'django.contrib.admin',
