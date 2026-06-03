@@ -148,7 +148,24 @@ class TravailSerializer(serializers.ModelSerializer):
             'charge_consignation_id', 'centrale_thermique_sollicitee_id',
         ]
         read_only_fields = ['heure_fin_planifie', 'nombre_jours_avant_travaux',
-                            'prevision_enf_mwh', 'date_creation', 'date_modification']
+                            'date_creation', 'date_modification']
+
+
+class TravailListSerializer(TravailSerializer):
+    """Sérialiseur allégé utilisé pour GET /plannings/<id>/travaux/.
+
+    Exclut le champ 'planning' (et son write-only 'planning_id') pour éviter
+    les requêtes N+1 : le client connaît déjà le planning via getPlanningById.
+    Sans cette exclusion, Django fait ~6×N requêtes SQL supplémentaires
+    (planning + entite_metier + workflow + current_step + cree_par + modifie_par)
+    pour chaque travail de la liste.
+    """
+
+    class Meta(TravailSerializer.Meta):
+        fields = [
+            f for f in TravailSerializer.Meta.fields
+            if f not in ("planning", "planning_id")
+        ]
 
 
 class PropositionAlignementSerializer(serializers.ModelSerializer):

@@ -68,8 +68,17 @@ class ReferenceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         qs = super().get_queryset()
         entite_id = self.request.query_params.get('entite_metier_id')
-        if entite_id:
+
+        # Garde défensive : on ignore le paramètre s'il contient les valeurs
+        # invalides "undefined" ou "null" (chaînes envoyées par JavaScript quand
+        # la variable frontend n'est pas encore résolue).
+        # Sans cette garde, Django lève une ValidationError en tentant de convertir
+        # "undefined" en UUID → erreur 500 visible dans le navigateur.
+        # Voir BUG-005 dans bug_all_planning.md
+        VALEURS_INVALIDES = {'undefined', 'null', ''}
+        if entite_id and entite_id not in VALEURS_INVALIDES:
             qs = qs.filter(entite_metier_id=entite_id)
+
         return qs
 
     @extend_schema(tags=["Referentiel"], responses=ReferentielItemSerializer(many=True))

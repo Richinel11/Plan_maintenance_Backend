@@ -29,17 +29,50 @@ class WorkflowShortSerializer(serializers.ModelSerializer):
 
 
 #  WORKFLOW TRANSITION SERIALIZER
+#
+#  Ce sérialiseur est utilisé en LECTURE (GET) pour afficher les transitions
+#  dans la liste et dans le détail d'un workflow.
+#
+#  Architecture importante à comprendre :
+#    - WorkflowTransition ne stocke PAS le rôle directement.
+#    - Le rôle est stocké sur WorkflowValidation (table liée : transition.validations).
+#    - On utilise donc un SerializerMethodField pour aller le chercher.
+#
+#  Champs imbriqués (read_only) :
+#    - from_step  : l'étape de départ, retournée comme objet complet
+#    - to_step    : l'étape d'arrivée, retournée comme objet complet
+#    - go_back_to : l'étape de retour arrière (null si can_go_back=False)
+#    - role_info  : le rôle compétent, récupéré via WorkflowValidation
 
 class WorkflowTransitionSerializer(serializers.ModelSerializer):
-    from_step = WorkflowStepSerializer(read_only=True)
-    to_step = WorkflowStepSerializer(read_only=True)
-    go_back_to = WorkflowStepSerializer(read_only=True)
+    from_step    = WorkflowStepSerializer(read_only=True)
+    to_step      = WorkflowStepSerializer(read_only=True)
+    go_back_to   = WorkflowStepSerializer(read_only=True)
+
+    # Le rôle n'est pas un champ direct de WorkflowTransition.
+    # On le récupère depuis la WorkflowValidation associée à cette transition.
+    role_info = serializers.SerializerMethodField()
+
+    def get_role_info(self, obj):
+        # obj.validations est le related_name défini sur WorkflowValidation.
+        # On prend la première validation liée (une transition a généralement 1 validation).
+        validation = obj.validations.select_related('role').first()
+        if validation and validation.role:
+            return {
+                'id':        str(validation.role.id),
+                'nom':       validation.role.nom,
+                'code_role': validation.role.code_role,
+            }
+        return None
 
     class Meta:
         model = WorkflowTransition
         fields = [
-            'id', 'name', 'from_step', 'to_step',
-            'can_go_back', 'go_back_to', 'comment_required', 'is_active'
+            'id', 'name',
+            'from_step', 'to_step',
+            'can_go_back', 'go_back_to',
+            'comment_required', 'is_active',
+            'role_info',   # champ calculé — rôle compétent récupéré via WorkflowValidation
         ]
 
 

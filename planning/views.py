@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
 from .models import Planning, Travail, TypeActivite, PropositionAlignement
-from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer, PropositionAlignementSerializer
+from .serializers import PlanningSerializer, TravailSerializer, TravailListSerializer, TypeActiviteSerializer, PropositionAlignementSerializer
 from pilotage.models import Workflow, WorkflowStep
 from .alignement_service import analyser_et_proposer
 
@@ -200,6 +200,42 @@ class PlanningViewSet(ModelViewSet):
         }, status=status.HTTP_200_OK)
         
         
+    # ─────────────────────────────────────────────────────────────────────────
+    # ROUTE : GET /plannings/<id>/travaux/
+    #
+    # Pourquoi cette route existe ici et pas dans TravailViewSet ?
+    #   TravailViewSet est un router indépendant (/travaux/).
+    #   Le frontend a besoin de récupérer les travaux D'UN planning précis
+    #   via une URL contextuelle : /plannings/<id>/travaux/.
+    #   On ajoute donc une action imbriquée dans PlanningViewSet sans
+    #   modifier les routes existantes de TravailViewSet.
+    #
+    # Ajouté pour corriger : BUG-004 (voir bug_all_planning.md)
+    # ─────────────────────────────────────────────────────────────────────────
+    @extend_schema(
+        tags=["Planning"],
+        responses={200: TravailSerializer(many=True)},
+        description="Récupère tous les travaux appartenant à un planning donné"
+    )
+    @action(detail=True, methods=['GET'], url_path='travaux')
+    def travaux_du_planning(self, request, pk=None):
+        planning = self.get_object()
+
+        # On filtre les travaux sur le planning courant.
+        # select_related évite les requêtes N+1 sur les ForeignKey fréquemment affichées.
+        travaux = Travail.objects.filter(planning=planning).order_by('-date_creation').select_related(
+            'type_travaux__entite_metier',   # couvre TypeActiviteSerializer.entite_metier
+            'unite_demanderesse',
+            'reference',
+            'charge_consignation',
+            'entite_metier',
+            'centrale_thermique_sollicitee',
+        ).prefetch_related('reference__items__type')
+
+        # TravailListSerializer exclut le champ 'planning' pour éviter ~6×N requêtes SQL.
+        serializer = TravailListSerializer(travaux, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @extend_schema(tags=["Planning - Alignement"])
     @action(detail=True, methods=['POST'], url_path='refuser-proposition')
     def refuser_proposition(self, request, pk=None):
@@ -258,10 +294,33 @@ class TravailViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(cree_par=self.request.user, modifie_par=self.request.user)
+        # Dériver entite_metier automatiquement depuis le planning.
+        # Le travail étant toujours rattaché à un planning qui lui-même
+        # appartient à une entité métier, on évite la double saisie et
+        # les incohérences potentielles entre les deux champs.
+        # Si entite_metier est déjà fourni explicitement, on le respecte.
+        extra = {
+            'cree_par': self.request.user,
+            'modifie_par': self.request.user,
+        }
+        planning = serializer.validated_data.get('planning')
+        entite_explicite = serializer.validated_data.get('entite_metier')
+        if planning and planning.entite_metier and not entite_explicite:
+            extra['entite_metier'] = planning.entite_metier
+
+        serializer.save(**extra)
 
     def perform_update(self, serializer):
-        serializer.save(modifie_par=self.request.user)
+        # Si le planning change lors d'une mise à jour et qu'aucune entité
+        # n'est fournie explicitement, on synchronise entite_metier avec
+        # celle du nouveau planning.
+        extra = {'modifie_par': self.request.user}
+        planning = serializer.validated_data.get('planning')
+        entite_explicite = serializer.validated_data.get('entite_metier')
+        if planning and planning.entite_metier and not entite_explicite:
+            extra['entite_metier'] = planning.entite_metier
+
+        serializer.save(**extra)
 
     def update(self, request, *args, **kwargs):
         kwargs['partial'] = True
