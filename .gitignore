@@ -23,6 +23,3 @@ media/
 # Système
 .DS_Store
 Thumbs.db
-*/migrations/
-/migrations/
-

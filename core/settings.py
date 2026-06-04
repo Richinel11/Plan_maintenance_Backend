@@ -11,7 +11,7 @@ AUTH_USER_MODEL = 'user.Utilisateur'
 load_dotenv()
 
 # SECURITY
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7pn-i#t&r0i^x)i(9*7!_d_$vg)qk#91b0mn5%b!^px2=e6zs(')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7pn-i#t&r0i^x)i(9*7!_d_$$vg)qk#91b0mn5%b!^px2=e6zs(')
 DEBUG = int(os.environ.get('DEBUG', 1))
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
