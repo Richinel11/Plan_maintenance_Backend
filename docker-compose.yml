@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   db:
@@ -7,9 +6,9 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: ${DJANGO_DATABASE_NAME}
-      MYSQL_USER: ${DJANGO_DATABASE_USER}
+      MYSQL_USER: appuser
       MYSQL_PASSWORD: ${DJANGO_DATABASE_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DJANGO_DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: rootpassword
     ports:
       - "3307:3306"
     volumes:
@@ -47,5 +46,5 @@ services:
 
 volumes:
   db_data:
-  # static_volume:
-  # media_volume:
+  static_volume:
+  media_volume:
