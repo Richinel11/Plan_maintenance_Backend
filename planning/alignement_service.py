@@ -4,6 +4,13 @@ from .models import Travail, Planning, PropositionAlignement
 
 # HELPERS DE BASE
 
+ALIGNEMENT_COMPATIBLE = {
+    'TRANSPORT': ['TRANSPORT', 'DISTRIBUTION_POSTE_SOURCE', 'DISTRIBUTION_LIGNE', 'PRODUCTION'],
+    'DISTRIBUTION_POSTE_SOURCE': ['DISTRIBUTION_POSTE_SOURCE', 'DISTRIBUTION_LIGNE'],
+    'DISTRIBUTION_LIGNE': ['DISTRIBUTION_LIGNE'],
+    'PRODUCTION': ['TRANSPORT', 'PRODUCTION'],
+}
+
 def _periodes_se_chevauchent(debut_a, fin_a, debut_b, fin_b) -> bool:
     """
     Deux périodes se chevauchent si :
@@ -13,59 +20,89 @@ def _periodes_se_chevauchent(debut_a, fin_a, debut_b, fin_b) -> bool:
         return False
     return debut_a < fin_b and fin_a > debut_b
 
+def _get_poste(travail: Travail) -> str| None:
+    if not travail.reference:
+        return None
+    item = travail.reference.items.filter(type__nom='POSTE').first() # type: ignore[attr-defined]
+    return item.valeur if item else None
+
+# Trouver les travaux de la meme region
+def _get_region(travail: Travail) -> str| None:
+    if not travail.reference:
+        return None
+    item = travail.reference.items.filter(type__nom='REGION').first() # type: ignore[attr-defined]
+    return item.valeur if item else None
+
+def _get_depart(travail: Travail) -> str| None:
+    if not travail.reference:
+        return None
+    item = travail.reference.items.filter(type__nom='DEPART').first() # type: ignore[attr-defined]
+    return item.valeur if item else None
 
 def _partage_ressource(travail_a: Travail, travail_b: Travail) -> bool:
     """
-    Deux travaux partagent une ressource si :
-    1. Même Reference exacte (le cas le plus simple)
-    2. OU ils partagent un ReferentielItem commun de type
-       POSTE, TRONCON ou OUVRAGE
+    Deux travaux peuvent être alignés si :
+    1. Même région électrique
+    2. Même poste
+    3. Types d'alignement compatibles
+    4. Cas particulier DISTRIBUTION_LIGNE x DISTRIBUTION_LIGNE :
+       compatibles si AU MOINS UN des deux coupe au niveau du POSTE
+       (auquel cas tous les départs sont sans courant),
+       OU s'ils sont sur le MÊME départ.
     """
     
-    if not travail_a.reference or not travail_b.reference:
+    region_a = _get_region(travail_a)
+    region_b = _get_region(travail_b)
+    # Si l'une des references n'a pas de région connue, pas d'alignement possible.
+    if not region_a or not region_b or region_a != region_b:
         return False
     
-    # cas 1: meme référence
-    if travail_a.reference == travail_b.reference:
-        return True
+    poste_a = _get_poste(travail_a)
+    poste_b = _get_poste(travail_b)
+    if not poste_a or not poste_b or poste_a != poste_b:
+        return False
     
-    #cas 2: items communs(poste, ouvrage, tronçon)
-    TYPES_PARTAGES = [ 'POSTE', 'OUVRAGE', 'TRONCON', 'SEGMENT']
+    type_a = travail_a.type_alignement # type: ignore[attr-defined]
+    type_b = travail_b.type_alignement # type: ignore[attr-defined]
+   
+    if not type_a or not type_b:
+        return False
     
-    items_a = set(
-        travail_a.reference.items.filter( # type: ignore[attr-defined]
-            type__nom__in=TYPES_PARTAGES
-        ).values_lsit('valeur', 'type__nom')
-    ) 
+    # Cas particulier :deux travaux de type DISTRIBUTION_LIGNE sur le meme poste.
+    if type_a == 'DISTRIBUTION_LIGNE' and  type_b == 'DISTRIBUTION_LIGNE':
+        coupure_a = travail_a.niveau_coupure # type: ignore[attr-defined]
+        coupure_b = travail_b.niveau_coupure # type: ignore[attr-defined]
+        
+        #Si l'un des deux coupe au niveau du POSTE, alors tout le poste est sans courant et les deux travaux sont compatibles.
+        if coupure_a == 'POSTE' or coupure_b == 'POSTE':
+            return True
+        
+        # Sinon, compatible seulement si meme departs
+        depart_a = _get_depart(travail_a)
+        depart_b = _get_depart(travail_b)
+        return depart_a == depart_b
     
-    items_b = set(
-        travail_a.reference.items.filter( # type: ignore[attr-defined]
-            type__nom__in=TYPES_PARTAGES
-        ).values_lsit('valeur', 'type__nom')
-    ) 
-    
-    # si il y a au moins un item en commun
-    
-    return bool(items_a & items_b)
+     # TRANSPORT, DISTRIBUTION_POSTE_SOURCE, PRODUCTION → toujours niveau poste
+    return type_b in ALIGNEMENT_COMPATIBLE.get(type_a, [])
+
 
 def _ressources_communes(travail_a: Travail, travail_b: Travail) -> list:
     """
     Retourne la liste des ressources communes entre deux travaux.
-    Utile pour afficher dans la proposition pourquoi ils sont en conflit.
     """
     if not travail_a.reference or not travail_b.reference:
         return []
 
-    TYPES_PARTAGES = ['POSTE', 'TRONCON', 'OUVRAGE', 'SEGMENT']
+    TYPES_CONTROLES = ['POSTE', 'TRONCON', 'OUVRAGE', 'SEGMENT']
 
     items_a = set(
-        travail_a.reference.items.filter( # type: ignore[attr-defined]
-            type__nom__in=TYPES_PARTAGES
+        travail_a.reference.items  # type: ignore[attr-defined]
+        .filter(type__nom__in=TYPES_CONTROLES
         ).values_list('valeur', 'type__nom')
     )
     items_b = set(
-        travail_b.reference.items.filter( # type: ignore[attr-defined]
-            type__nom__in=TYPES_PARTAGES
+        travail_b.reference.items # type: ignore[attr-defined]
+        .filter(type__nom__in=TYPES_CONTROLES
         ).values_list('valeur', 'type__nom')
     )
 
@@ -241,25 +278,42 @@ def _trouver_reference(groupe: list) -> Travail:
     ))
 
 
+def _duree_en_heures(travail: Travail) -> timedelta:
+    
+    """
+    Calcule la durée du travail en timedelta.
+    Gère heures, jours et semaines.
+    """
+    
+    if travail.heure_debut_planifie and travail.heure_fin_planifie:
+        return travail.heure_fin_planifie - travail.heure_debut_planifie
+    
+    #Fallback sur le champ duree + unite_duree
+    
+    if not travail.duree:
+        return timedelta(hours=4) # durée par defaut
+    
+    if travail.unite_duree == 'HEURES':
+        return timedelta(hours=travail.duree)
+    elif travail.unite_duree == 'JOURS':
+        return timedelta(days=travail.duree)
+    elif travail.unite_duree == 'SEMAINES':
+        return timedelta(weeks=travail.duree)
+    return timedelta(hours=travail.duree)
+    
+
 def _calculer_nouvel_horaire(travail: Travail, reference: Travail) -> tuple:
     """
     Calcule le nouvel horaire pour aligner le travail sur la référence.
-
-    Raisonnement :
-    - On conserve la durée du travail
-    - On essaie de le caler au début de la fenêtre de la référence
-    - Si ça dépasse la fin de la référence, on recule pour tenir dans la fenêtre
+    Conserve la duree originale du travail quelle que soit son unité
     """
     
-    if (
-        travail.heure_fin_planifie is None or
-        travail.heure_debut_planifie is None or
-        reference.heure_debut_planifie is None or
-        reference.heure_fin_planifie is None
-    ):
-        raise ValueError("les horaires doivent etres definis.")
+    if not travail.heure_debut_planifie or not travail.heure_fin_planifie:
+        return reference.heure_debut_planifie, reference.heure_fin_planifie
+    if not reference.heure_debut_planifie or not reference.heure_fin_planifie:
+        return travail.heure_debut_planifie, travail.heure_fin_planifie
     
-    duree: timedelta = travail.heure_fin_planifie - travail.heure_debut_planifie
+    duree: timedelta = _duree_en_heures(travail)
     nouveau_debut: datetime = reference.heure_debut_planifie
     nouvelle_fin: datetime = nouveau_debut + duree
 

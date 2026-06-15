@@ -84,7 +84,18 @@ class Travail(models.Model):
     class UniteDuree(models.TextChoices):
         HEURES = "HEURES", _("Heures")
         JOURS  = "JOURS",  _("Jours")
+        SEMAINES = "SEMAINES", _("Semaines")
+        
+    class TypeAlignement(models.TextChoices):
+        TRANSPORT = "TRANSPORT",  _("transport")
+        DISTRIBUTION_POSTE_SOURCE = "DISTRIBUTION_POSTE_SOURCE",  _("Distribution - Poste source")
+        DISTRIBUTION_LIGNE = "DISTRIBUTION_LIGNE",  _("Distribution - Ligne")
+        PRODUCTION = "PRODUCTION",  _("Production")
 
+    class NiveauCoupure (models.TextChoices):
+        POSTES = "POSTES", _("coupure au niveau du Postes(affecte tous les départs)")
+        DEPARTS = "DEPARTS", _("Départs (affecte seulement les départs concernés)")
+        
     STATUT_TRAVAUX = [
         ('BROUILLON', 'Brouillon'),
         ('SOUMIS', 'Soumis'),
@@ -105,8 +116,20 @@ class Travail(models.Model):
         default=Priorite.P3,
         null=True, blank=True
     )
-    reference = models.ForeignKey(Reference, on_delete=models.SET_NULL, null=True, blank=True, related_name='travaux')
+    reference = models.ForeignKey(
+        Reference, on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='travaux'
+    )
 
+    type_alignement = models.CharField(
+        max_length=30, choices=TypeAlignement.choices,
+        null=True, blank=True
+    )
+    niveau_coupure = models.CharField(
+        max_length=20, choices = NiveauCoupure.choices,
+        null=True, blank=True
+    )
     #  Détails organisationnels
     entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, null=True, blank=True, related_name='travaux')
     unite_demanderesse = models.ForeignKey('user.UniteDemanderesse', on_delete=models.SET_NULL, null=True, blank=True, related_name='travaux')
@@ -152,7 +175,11 @@ class Travail(models.Model):
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
+             
     def save(self, *args, **kwargs):
+          # Determiner le type_alignement automatiquement
+        if not self.type_alignement and self.reference:
+            self.type_alignement = self._determiner_type_alignement()
         if self.heure_debut_planifie and self.duree:
             from datetime import timedelta
             if self.unite_duree == 'HEURES':
@@ -166,6 +193,21 @@ class Travail(models.Model):
             ).days
 
         super().save(*args, **kwargs)
+        
+    def _determiner_type_alignement(self):
+        if self.segment == 'TRANSPORT':
+         return self.TypeAlignement.TRANSPORT
+        if self.segment == 'PRODUCTION':
+            return self.TypeAlignement.PRODUCTION
+        if self.segment == 'DISTRIBUTION':
+        # On regarde le SEGMENT de la Reference (ex: "DISTRIBUTION-MAINTENANCE POSTES")
+            segment_item = self.reference.items.filter(  # type: ignore[attr-defined]
+                type__nom='SEGMENT'
+            ).first()
+            if segment_item and 'MAINTENANCE POSTES' in segment_item.valeur.upper():
+                return self.TypeAlignement.DISTRIBUTION_POSTE_SOURCE
+            return self.TypeAlignement.DISTRIBUTION_LIGNE
+        return None
 
     def __str__(self):
         return self.reference.valeur if self.reference else str(self.id)

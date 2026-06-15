@@ -127,6 +127,9 @@ class TravailSerializer(serializers.ModelSerializer):
             # Programmation temporelle
             'heure_debut_planifie', 'duree', 'unite_duree',
             'heure_fin_planifie', 'date_programmee', 'nombre_jours_avant_travaux',
+             #  Nouveaux champs
+             'type_alignement',   # calculé automatiquement (read-only)
+             'niveau_coupure',     # rempli par l'utilisateur pour DISTRIBUTION
 
             # Indicateurs PRODUCTION
             'disponibilite_mecanique_mw', 'prevision_puissance_sollicitee',
@@ -148,15 +151,18 @@ class TravailSerializer(serializers.ModelSerializer):
             'unite_demanderesse_id', 'reference_id',
             'charge_consignation_id', 'centrale_thermique_sollicitee_id',
         ]
-        read_only_fields = ['heure_fin_planifie', 'nombre_jours_avant_travaux',
-                            'prevision_enf_mwh', 'date_creation', 'date_modification']
+        read_only_fields = [
+            'heure_fin_planifie', 'nombre_jours_avant_travaux',
+            'prevision_enf_mwh', 'date_creation', 'date_modification',
+            'type_alignement'   #  calculé automatiquement
+            ]
 
     def validate(self, attrs):
         segment = attrs.get('segment')
         
         if segment == 'DISTRIBUTION':
-            # troncon_consignes est optionnel mais localites_impactees recommandée 
-            pass
+            # niveau_coupure recommandé pour que l'alignement fonctionne bien
+            pass 
         
         elif segment == 'TRANSPORT':
             #charge_consignation fortement recommandé
@@ -167,9 +173,9 @@ class TravailSerializer(serializers.ModelSerializer):
                 
         elif segment == 'PRODUCTION':
             # disponnibilite_mecanique_mw requis
-            if not attrs.get('disponnibilite_mecanique_mw'):
+            if not attrs.get('disponibilite_mecanique_mw'):
                 raise serializers.ValidationError({
-                    "disponnibilite_mecanique_mw": "Requis pour le segment PRODUCTION."
+                    "disponibilite_mecanique_mw": "Requis pour le segment PRODUCTION."
                 })
         return attrs 
     

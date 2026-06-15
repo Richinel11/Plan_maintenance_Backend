@@ -215,7 +215,7 @@ class PlanningViewSet(ModelViewSet):
     # contextuelle : /plannings/<id>/travaux/
     # On ajoute donc une action imbriqué dans PlanningViewSet sans modifier les
     # routes presentes dans TravailViewset.
-    #
+    
     # Ajouté pour corriger : BUG-004 (voir bug_all_planning.md)
     
     @extend_schema(
