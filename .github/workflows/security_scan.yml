@@ -1,0 +1,22 @@
+name: Backend Security Scan
+
+on:
+  push:
+    branches:
+      - modify_backend
+    paths:
+      - '**'
+
+jobs:
+  scan:
+    name: Run Security Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log Progress
+        run: |
+          echo "Backend code checked out successfully."
+          echo "Ready to initialize scanning tools."
