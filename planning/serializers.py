@@ -120,7 +120,7 @@ class TravailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Travail
         fields = [
-            'id', 'segment', 'statut_travaux',
+            'id', 'segment','priorite', 'statut_travaux',
             'consistance_travaux', 'observations',
             'type_reseau', 'troncons_consignes', 'localites_impactees', 'moyens_mis_en_oeuvre',
 

@@ -18,4 +18,4 @@ class TravailAdmin(admin.ModelAdmin):
 
 @admin.register(TypeActivite)
 class TypeActiviteAdmin(admin.ModelAdmin):
-    list_display = ['libelle', 'date_creation']
+    list_display = ['id','libelle', 'date_creation']

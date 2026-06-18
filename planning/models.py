@@ -94,6 +94,7 @@ class Travail(models.Model):
 
     class NiveauCoupure (models.TextChoices):
         POSTES = "POSTES", _("coupure au niveau du Postes(affecte tous les départs)")
+        RAME  = "RAME", _("coupure au niveau de la Rame (affecte tous les départs de la rame)")
         DEPARTS = "DEPARTS", _("Départs (affecte seulement les départs concernés)")
         
     STATUT_TRAVAUX = [

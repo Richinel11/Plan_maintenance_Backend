@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Centrale, TypeReferentiel, Reference, ReferentielItem
+from .models import Centrale, TypeReferentiel, Reference, ReferentielItem, Region
 
 
 @admin.register(Centrale)
@@ -21,3 +21,7 @@ class AdminReference(admin.ModelAdmin):
 class AdminReferentielItem(admin.ModelAdmin):
     list_display = ('id', 'valeur', 'type', 'reference')
     list_filter = ('type',)
+
+@admin.register(Region)
+class AdminRegion(admin.ModelAdmin):
+    list_display = ('id', 'code')

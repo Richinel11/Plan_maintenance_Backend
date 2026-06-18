@@ -306,10 +306,10 @@ class TravailViewSet(ModelViewSet):
         # si entite_metier est deja fournie on la respecte.
         extra={
             'cree_par': self.request.user,
-            'modifier_par': self.request.user,
+            'modifie_par': self.request.user,
         }
         planning = serializer.validated_data.get('planning')
-        entite_explicite = serializer.validated_date.get('entite_metier')
+        entite_explicite = serializer.validated_data.get('entite_metier')
         if planning and planning.entite_metier and not entite_explicite:
             extra['entite_metier'] = planning.entite_metier
         serializer.save(**extra)
@@ -318,9 +318,9 @@ class TravailViewSet(ModelViewSet):
         # Si le planning change lors d'une mise à jour et qu'aucune entité
         # n'est fournie explicitement, on synchronise entite_metier avec
         # celle du nouveau planning
-        extra = {'modifier_par': self.request.user}
+        extra = {'modifie_par': self.request.user}
         planning = serializer.validated_data.get('planning')
-        entite_explicite = serializer.validated_date.get('entite_metier')
+        entite_explicite = serializer.validated_data.get('entite_metier')
         if planning and planning.entite_metier and not entite_explicite:
             extra['entite_metier'] = planning.entite_metier
         serializer.save(**extra)
@@ -459,5 +459,5 @@ class TravailViewSet(ModelViewSet):
                 ids_en_conflit.add(str(t1.id))
         return Response({"conflits": list(ids_en_conflit)})
 
-
+    
 
