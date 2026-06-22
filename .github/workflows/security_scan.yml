@@ -1,0 +1,39 @@
+name: Backend Security Scan
+
+on:
+  push:
+    branches:
+      - modify_backend
+
+jobs:
+  security_analysis:
+    name: Run Python Security Scanners
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python Runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Security Scanners
+        run: |
+          pip install bandit safety
+
+      - name: Run Bandit (SAST Code Scan)
+        run: |
+          echo "Analyzing Python source code for security flaws..."
+          # Scans recursively, exits with an error code if issues are found
+          bandit -r . -v
+
+      - name: Run Safety (SCA Dependency Scan)
+        run: |
+          echo "Checking software dependencies for vulnerabilities..."
+          if [ -f requirements.txt ]; then
+            safety check -r requirements.txt
+          else
+            echo "No requirements.txt found. Skipping dependency check."
+          fi

@@ -11,6 +11,13 @@ class Centrale(models.Model):
         return self.valeur
 
 
+class Region(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    code = models.CharField(max_length=20, unique=True)
+    
+    def __str__(self):
+        return self.code
+
 class TypeReferentiel(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     nom = models.CharField(max_length=100, unique=True)
@@ -26,6 +33,10 @@ class Reference(models.Model):
         'user.EntiteMetier', on_delete=models.PROTECT,
         null=True, blank=True, related_name='references'
     )
+    region = models.ForeignKey(
+        Region, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='references'
+    )
 
     def __str__(self):
         return self.valeur
@@ -39,3 +50,4 @@ class ReferentielItem(models.Model):
 
     def __str__(self):
         return f"{self.type.nom}: {self.valeur}"
+

@@ -115,17 +115,21 @@ class TravailSerializer(serializers.ModelSerializer):
         queryset=Centrale.objects.all(), source='centrale_thermique_sollicitee',
         write_only=True, allow_null=True, required=False
     )
-
+    
+    
     class Meta:
         model = Travail
         fields = [
-            'id', 'segment', 'statut_travaux',
+            'id', 'segment','priorite', 'statut_travaux',
             'consistance_travaux', 'observations',
             'type_reseau', 'troncons_consignes', 'localites_impactees', 'moyens_mis_en_oeuvre',
 
             # Programmation temporelle
             'heure_debut_planifie', 'duree', 'unite_duree',
             'heure_fin_planifie', 'date_programmee', 'nombre_jours_avant_travaux',
+             #  Nouveaux champs
+             'type_alignement',   # calculé automatiquement (read-only)
+             'niveau_coupure',     # rempli par l'utilisateur pour DISTRIBUTION
 
             # Indicateurs PRODUCTION
             'disponibilite_mecanique_mw', 'prevision_puissance_sollicitee',
@@ -147,8 +151,35 @@ class TravailSerializer(serializers.ModelSerializer):
             'unite_demanderesse_id', 'reference_id',
             'charge_consignation_id', 'centrale_thermique_sollicitee_id',
         ]
-        read_only_fields = ['heure_fin_planifie', 'nombre_jours_avant_travaux',
-                            'prevision_enf_mwh', 'date_creation', 'date_modification']
+        read_only_fields = [
+            'heure_fin_planifie', 'nombre_jours_avant_travaux',
+            'prevision_enf_mwh', 'date_creation', 'date_modification',
+            'type_alignement'   #  calculé automatiquement
+            ]
+
+    def validate(self, attrs):
+        segment = attrs.get('segment')
+        
+        if segment == 'DISTRIBUTION':
+            # niveau_coupure recommandé pour que l'alignement fonctionne bien
+            pass 
+        
+        elif segment == 'TRANSPORT':
+            #charge_consignation fortement recommandé
+            if not attrs.get('charge_consignation'):
+                raise serializers.ValidationError({
+                    "charge_consignation": "Requis pour le segment TRANSPORT."
+                })
+                
+        elif segment == 'PRODUCTION':
+            # disponnibilite_mecanique_mw requis
+            if not attrs.get('disponibilite_mecanique_mw'):
+                raise serializers.ValidationError({
+                    "disponibilite_mecanique_mw": "Requis pour le segment PRODUCTION."
+                })
+        return attrs 
+    
+    
 
 
 class PropositionAlignementSerializer(serializers.ModelSerializer):

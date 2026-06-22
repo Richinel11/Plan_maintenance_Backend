@@ -11,10 +11,11 @@ AUTH_USER_MODEL = 'user.Utilisateur'
 load_dotenv()
 
 # SECURITY
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7pn-i#t&r0i^x)i(9*7!_d_$vg)qk#91b0mn5%b!^px2=e6zs(')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7pn-i#t&r0i^x)i(9*7!_d_$$vg)qk#91b0mn5%b!^px2=e6zs(')
 DEBUG = int(os.environ.get('DEBUG', 1))
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+DEBUG = 1
 # APPLICATIONS
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -83,39 +84,39 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# # DATABASE DOCKER CONFIG
+# DATABASE DOCKER CONFIG
 
-# DATABASES = {
+DATABASES = {
+    'default': {
+        'ENGINE': os.environ.get('DJANGO_DATABASE_ENGINE', 'django.db.backends.mysql'),
+        'NAME': os.environ.get('DJANGO_DATABASE_NAME', 'mydb'),
+        'USER': os.environ.get('DJANGO_DATABASE_USER', 'root'),
+        'PASSWORD': os.environ.get('DJANGO_DATABASE_PASSWORD', 'P@ssw0rd'),
+        'HOST': os.environ.get('DJANGO_DATABASE_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('DJANGO_DATABASE_PORT', '3307'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        }
+    }
+}
+
+# config de la database en local
+
+# DATABASES={
 #     'default': {
-#         'ENGINE': os.environ.get('DJANGO_DATABASE_ENGINE', 'django.db.backends.mysql'),
-#         'NAME': os.environ.get('DJANGO_DATABASE_NAME', 'mydb'),
-#         'USER': os.environ.get('DJANGO_DATABASE_USER', 'root'),
-#         'PASSWORD': os.environ.get('DJANGO_DATABASE_PASSWORD', 'P@ssw0rd'),
-#         'HOST': os.environ.get('DJANGO_DATABASE_HOST', '127.0.0.1'),
-#         'PORT': os.environ.get('DJANGO_DATABASE_PORT', '3307'),
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'mydb',
+#         'USER': 'marco',
+#         'PASSWORD': 'P@ssw0rd',
+#         'HOST': '127.0.0.1',
+#         'PORT': '3307',
 #         'OPTIONS': {
 #             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
 #             'charset': 'utf8mb4',
 #         }
 #     }
 # }
-
-# config de la database en local
-
-DATABASES={
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mydb',
-        'USER': 'marco',
-        'PASSWORD': 'P@ssw0rd',
-        'HOST': '127.0.0.1',
-        'PORT': '3307',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'charset': 'utf8mb4',
-        }
-    }
-} 
 
 # LDAP
 LDAP_SERVER = os.environ.get('LDAP_SERVER', '10.250.90.8')

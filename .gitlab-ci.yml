@@ -1,0 +1,10 @@
+stages:
+  - test
+
+backend_security_scan:
+  stage: test
+  image: python:3.9-slim  # Change this to match your runtime environment if needed
+  script:
+    - echo "Starting Backend Security Scan..."
+    # If using SonarQube, Snyk, or pip-audit, add the execution commands below:
+    # - sonarqube-scanner

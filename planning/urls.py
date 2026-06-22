@@ -1,12 +1,21 @@
 from rest_framework.routers import DefaultRouter
-from .views import PlanningViewSet, TravailViewSet, TypeActiviteViewSet
+from .views import (
+    PlanningViewSet, TravailViewSet,
+    TypeActiviteViewSet,
+)
 from django.urls import path, include
 from user.views import get_charges_consignation
 
 router = DefaultRouter()
+
+# Planning
 router.register(r'plannings', PlanningViewSet, basename='planning')
-router.register(r'travaux', TravailViewSet, basename='travail')
+
+# Types d'activités
 router.register(r'types-activite', TypeActiviteViewSet, basename='typeactivite')
+
+#Travaux génériques (pour lire tous les travaux)
+router.register(r'travaux', TravailViewSet, basename='travail')
 
 urlpatterns = [
     path('charges-consignation/', get_charges_consignation, name='charges-consignation'),
