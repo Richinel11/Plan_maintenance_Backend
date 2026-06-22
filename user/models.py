@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import make_password
 from security import models as securitymodels
 from django.contrib.auth.models import AbstractBaseUser, AbstractUser
 from .manager import UtilisateurManager
+from referentiel.models import Region
 
 
 
@@ -25,6 +26,8 @@ class EntiteMetier(models.Model):
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, related_name="entite_metier", blank=True, null=True)
+
 
     def __str__(self):
         return f"{self.name} ({self.type}) "
@@ -65,7 +68,7 @@ class Utilisateur(AbstractUser):
 
 
     # Field add after de request of Blanche
-    region = models.CharField(max_length=100, blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, related_name="utilisateurs", blank=True, null=True)
     
 
     USERNAME_FIELD = "username"

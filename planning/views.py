@@ -229,14 +229,13 @@ class PlanningViewSet(ModelViewSet):
         planning = self.get_object()
         
         # On filtre les travaux sur le planning courant.
-        # select_related evite les requetes N+1 sur les foreignKey fréquement affichées.
         
         travaux = Travail.objects.filter(planning=planning).order_by('-date_creation').select_related(
             'type_travaux',
             'unite_demanderesse',
             'reference',
-            'charge_consignetion',
-            'entite-metier',
+            'charge_consignation',
+            'entite_metier',
         )
         
         serializer = TravailSerializer(travaux, many=True)
@@ -272,7 +271,6 @@ class PlanningViewSet(ModelViewSet):
             "proposition": PropositionAlignementSerializer(proposition).data
         }, status=status.HTTP_200_OK)
 
-                       
 @extend_schema_view(
     list=extend_schema(tags=["Travail"]),
     create=extend_schema(tags=["Travail"]),
@@ -460,4 +458,4 @@ class TravailViewSet(ModelViewSet):
         return Response({"conflits": list(ids_en_conflit)})
 
     
-
+    
