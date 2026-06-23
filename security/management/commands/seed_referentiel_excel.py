@@ -100,7 +100,10 @@ class Command(BaseCommand):
                 ouvrage = str(row[1]).strip() if row[1] else ''
                 gr_tfo = str(row[2]).strip() if row[2] else ''
                 depart = str(row[3]).strip() if entite_key == 'DISTRIBUTION' and row[3] else None
-                reference_val = str(row[ref_col_index - 1]).strip() if row[ref_col_index - 1] else ''
+                if entite_key == 'PRODUCTION':
+                    reference_val = '_'.join(p for p in [segment, ouvrage, gr_tfo] if p)
+                else:
+                    reference_val = str(row[ref_col_index - 1]).strip() if row[ref_col_index - 1] else ''
 
                 if not reference_val or reference_val == 'None':
                     continue

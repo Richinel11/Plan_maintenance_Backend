@@ -17,7 +17,7 @@ class Command(BaseCommand):
         self._seed_permissions()
         self._seed_roles()
         self._seed_users()
-        #self._seed_referentiel()
+        self._seed_referentiel()
         self._seed_types_activite()
         self._seed_workflow()
         self._seed_plannings_et_travaux()

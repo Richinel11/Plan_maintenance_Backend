@@ -165,7 +165,6 @@ class TravailSerializer(serializers.ModelSerializer):
             pass 
         
         elif segment == 'TRANSPORT':
-            #charge_consignation fortement recommandé
             if not attrs.get('charge_consignation'):
                 raise serializers.ValidationError({
                     "charge_consignation": "Requis pour le segment TRANSPORT."

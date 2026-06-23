@@ -4,8 +4,8 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
-from .models import Centrale, TypeReferentiel, Reference, ReferentielItem
-from .serializers import CentraleSerializer, TypeReferentielSerializer, ReferenceSerializer, ReferentielItemSerializer
+from .models import Centrale, TypeReferentiel, Reference, ReferentielItem, Region
+from .serializers import CentraleSerializer, TypeReferentielSerializer, ReferenceSerializer, ReferentielItemSerializer, RegionSerializer
 
 _TAG = dict(
     list=extend_schema(tags=["Referentiel"]),
@@ -15,6 +15,12 @@ _TAG = dict(
     partial_update=extend_schema(tags=["Referentiel"]),
     destroy=extend_schema(tags=["Referentiel"]),
 )
+
+
+@extend_schema_view(**_TAG)
+class RegionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Region.objects.all().order_by('code')
+    serializer_class = RegionSerializer
 
 
 @extend_schema_view(**_TAG)
@@ -40,9 +46,9 @@ _REFERENCE_TAG = dict(
         summary="Lister les références",
         description=(
             "Retourne la liste de toutes les références avec leurs items.\n\n"
-            "Utilisez le paramètre `entite_metier_id` pour filtrer les références "
-            "appartenant à une entité métier spécifique (Production, Transport ou Distribution).\n\n"
-            "**Exemple :** `GET /referentiel/references/?entite_metier_id=<uuid>`"
+            "Utilisez `entite_metier_id` pour filtrer par entité métier "
+            "et/ou `region_id` pour filtrer par région.\n\n"
+            "**Exemple :** `GET /referentiel/references/?region_id=<uuid>`"
         ),
         parameters=[
             OpenApiParameter(
@@ -50,11 +56,15 @@ _REFERENCE_TAG = dict(
                 type=OpenApiTypes.UUID,
                 location=OpenApiParameter.QUERY,
                 required=False,
-                description=(
-                    "UUID de l'entité métier. "
-                    "Filtre les références associées à cette entité (ex: Production, Transport, Distribution)."
-                ),
-            )
+                description="UUID de l'entité métier (Production, Transport, Distribution).",
+            ),
+            OpenApiParameter(
+                name='region_id',
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="UUID de la région. Filtre les références appartenant à cette région.",
+            ),
         ],
     ),
 )
@@ -67,16 +77,16 @@ class ReferenceViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        INVALIDES = {'undefined', 'null', ''}
+
         entite_id = self.request.query_params.get('entite_metier_id')
-        
-        # Garde defensive: om ignore le parametre si il contient des valeurs
-        # invalides 'undefined' ou "null"
-        # Sans cela django leve une VaalidationError en tentant de convertir "undefined" 
-        # en UUID
-        #  Voir BUG-005 dans le bug_all_planning.md 
-        VALEURS_INVALIDES = {'undefined', 'null', ''}
-        if entite_id and entite_id not in VALEURS_INVALIDES:
+        if entite_id and entite_id not in INVALIDES:
             qs = qs.filter(entite_metier_id=entite_id)
+
+        region_id = self.request.query_params.get('region_id')
+        if region_id and region_id not in INVALIDES:
+            qs = qs.filter(region_id=region_id)
+
         return qs
 
     @extend_schema(tags=["Referentiel"], responses=ReferentielItemSerializer(many=True))

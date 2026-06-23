@@ -148,7 +148,7 @@ class PlanningViewSet(ModelViewSet):
         planning = self.get_object()
         statut_filtre = request.query_params.get('statut')
         pa = PropositionAlignement.objects.filter(planning=planning).select_related(
-            'travail_a_modifier', 'travail-reference', 'cree_par'
+            'travail_a_modifier', 'travail_reference', 'cree_par'
         )
         if statut_filtre:
             pa = pa.filter(statut=statut_filtre)
@@ -235,8 +235,8 @@ class PlanningViewSet(ModelViewSet):
             'type_travaux',
             'unite_demanderesse',
             'reference',
-            'charge_consignetion',
-            'entite-metier',
+            'charge_consignation',
+            'entite_metier',
         )
         
         serializer = TravailSerializer(travaux, many=True)
@@ -297,6 +297,20 @@ class TravailViewSet(ModelViewSet):
     )
     serializer_class = TravailSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        INVALIDES = {'undefined', 'null', ''}
+
+        region_id = self.request.query_params.get('region_id')
+        if region_id and region_id not in INVALIDES:
+            qs = qs.filter(reference__region_id=region_id)
+
+        entite_id = self.request.query_params.get('entite_metier_id')
+        if entite_id and entite_id not in INVALIDES:
+            qs = qs.filter(entite_metier_id=entite_id)
+
+        return qs
 
     def perform_create(self, serializer):
         # Dériver entite_metier directement depuis le planning
