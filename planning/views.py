@@ -60,7 +60,7 @@ class PlanningViewSet(ModelViewSet):
         # Il ne peut y avoir qu'un seul workflow actif à la fois.
         # On le récupère et on initialise le planning sur son premier step
         
-        workflow_actif = Workflow.objects.filter(is_active=True).first()
+        workflow_actif = Workflow.objects.filter(code='TRAVAUX_PROGRAMMES',is_active=True).first()
 
         first_step = None
         if workflow_actif:
@@ -148,7 +148,7 @@ class PlanningViewSet(ModelViewSet):
         planning = self.get_object()
         statut_filtre = request.query_params.get('statut')
         pa = PropositionAlignement.objects.filter(planning=planning).select_related(
-            'travail_a_modifier', 'travail-reference', 'cree_par'
+            'travail_a_modifier', 'travail_reference', 'cree_par'
         )
         if statut_filtre:
             pa = pa.filter(statut=statut_filtre)
