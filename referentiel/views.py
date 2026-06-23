@@ -4,8 +4,12 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
-from .models import Centrale, TypeReferentiel, Reference, ReferentielItem
-from .serializers import CentraleSerializer, TypeReferentielSerializer, ReferenceSerializer, ReferentielItemSerializer
+from .models import Centrale, TypeReferentiel, Reference, ReferentielItem, Region
+from .serializers import(
+    CentraleSerializer, TypeReferentielSerializer,
+    ReferenceSerializer, ReferentielItemSerializer,
+    RegionSerializer
+)
 
 _TAG = dict(
     list=extend_schema(tags=["Referentiel"]),
@@ -22,7 +26,10 @@ class CentraleViewSet(viewsets.ModelViewSet):
     queryset = Centrale.objects.all().order_by('valeur')
     serializer_class = CentraleSerializer
 
-
+@extend_schema_view(**_TAG)
+class RegionViewset(viewsets.ModelViewSet):
+    queryset= Region.objects.all().order_by('code')
+    serializer_class= RegionSerializer
 @extend_schema_view(**_TAG)
 class TypeReferentielViewSet(viewsets.ModelViewSet):
     queryset = TypeReferentiel.objects.all().order_by('nom')
