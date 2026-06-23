@@ -102,3 +102,5 @@ class ReferentielItemViewSet(viewsets.ModelViewSet):
         if type_id:
             qs = qs.filter(type_id=type_id)
         return qs
+
+

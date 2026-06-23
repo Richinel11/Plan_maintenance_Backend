@@ -6,7 +6,6 @@ env/
 *.pyc
 *.pyo
 */__pycache__/
-
 # Django
 db.sqlite3
 *.log

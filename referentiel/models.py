@@ -3,20 +3,25 @@ from django.utils.translation import gettext as _
 import uuid
 
 
-class Centrale(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    valeur = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.valeur
-
-
 class Region(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     code = models.CharField(max_length=20, unique=True)
     
     def __str__(self):
         return self.code
+
+class Centrale(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    valeur = models.CharField(max_length=255)
+    region = models.ForeignKey(
+        Region, on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='centrales'
+    )
+
+    def __str__(self):
+        return self.valeur
+
 
 class TypeReferentiel(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
