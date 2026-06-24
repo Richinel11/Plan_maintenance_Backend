@@ -18,6 +18,7 @@ class Command(BaseCommand):
         self._seed_roles()
         self._seed_users()
         #self._seed_referentiel()
+        self._seed_referentiel()
         self._seed_types_activite()
         self._seed_workflow()
         self._seed_plannings_et_travaux()
@@ -670,10 +671,10 @@ class Command(BaseCommand):
         type_inspection   = TypeActivite.objects.get(libelle="INSPECTION")
         type_entretien    = TypeActivite.objects.get(libelle="Entretien")
 
-        ref_dist1 = Reference.objects.get(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D11")
-        ref_dist2 = Reference.objects.get(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D12")
-        ref_trans = Reference.objects.get(valeur__startswith="TRANSPORT-CSE_BRGM_POSTE SOURCE_HTB_AT N°1")
-        ref_prod  = Reference.objects.get(valeur__startswith="PRODUCTION - EDEA_DCP_Groupe 01")
+        ref_dist1 = Reference.objects.filter(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D11").first()
+        ref_dist2 = Reference.objects.filter(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D12").first()
+        ref_trans = Reference.objects.filter(valeur__startswith="TRANSPORT-CSE_BRGM_POSTE SOURCE_HTB_AT N°1").first()
+        ref_prod  = Reference.objects.filter(valeur__startswith="PRODUCTION - EDEA_DCP_Groupe 01").first()
 
         # ── Planning DISTRIBUTION ──
         planning_dist, _ = Planning.objects.get_or_create(
