@@ -24,6 +24,9 @@ urlpatterns = [
 
 
 # Routes générées :
+#POST         /plannings/analyser-mois/ + body {"annee": 2026, "mois": 7} Juillet 2026
+#POST         /plannings/analyser-mois/ + body {"mois": 7}           Juillet mois en cours
+#POST         /plannings/analyser-mois/                            Mois en cours
 
 # POST        /plannings/{id}/analyser-chevauchements/   
 # GET         /plannings/{id}/propositions/?statut=EN_ATTENTE
