@@ -15,7 +15,7 @@ from .serializers import (
     PropositionAlignementSerializer,
     )
 from pilotage.models import Workflow, WorkflowStep
-from .alignement_service import analyser_et_proposer
+from .alignement_service import analyser_et_proposer, analyser_mois
 
 
 @extend_schema_view(
@@ -138,6 +138,60 @@ class PlanningViewSet(ModelViewSet):
         "resume": result['resume'],
         "chevauchements": result['chevauchements'],
         "propositions": propositions_data 
+        }, status=status.HTTP_200_OK)
+      
+    # FONCTION POUR ALIGNER LES TRAVAUX SUR LE UN MOIS DONNEE  
+        
+    @extend_schema(
+        tags=["Planning - Alignement"],
+        description=(
+        "Analyse les chevauchements de TOUS les travaux sur une période mensuelle. "
+        "Paramètres optionnels : ?annee=2026&mois=6 (par défaut : mois en cours). "
+        "Option C : inclut tout travail dont la période chevauche le mois demandé."
+        )
+    )
+    @action(detail=False, methods=['POST'], url_path='analyser-mois')
+    def analyser_mois_complet(self, request):
+        """Analyse les chevauchements de tous les travaux sur le mois courant
+       (ou le mois/année passés en paramètres).
+       Usage :
+        POST /plannings/analyser-mois/
+        Body optionnel : { "annee": 2026 (int), "mois": 7 (int) }
+        Sans body -> mois en cours"""
+        
+        annee = request.data.get('annee') or request.query_params.get('annee')
+        mois  = request.data.get('mois')  or request.query_params.get('mois')
+        # Convertir en int si fournis
+        try:
+            annee = int(annee) if annee else None
+            mois  = int(mois)  if mois  else None
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "annee et mois doivent être des entiers (ex: annee=2026, mois=7)"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        #Validation des valeurs
+        if mois and not (1 <= mois <=12):
+            return Response(
+                {"error": "mois doit etre entre 1 et 12"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        result = analyser_mois(
+            user=request.user,
+            annee=annee, # type: ignore
+            mois=mois # type: ignore
+            )
+
+        propositions_data = PropositionAlignementSerializer(
+            result['propositions'], many=True
+        ).data
+
+        return Response({
+            "message":        result['message'],
+            "periode":        result['periode'],
+            "resume":         result['resume'],
+            "chevauchements": result['chevauchements'],
+            "propositions":   propositions_data
         }, status=status.HTTP_200_OK)
         
     @extend_schema(tags=["Planning - Aligenment"])
