@@ -86,37 +86,37 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # # DATABASE DOCKER CONFIG
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': os.environ.get('DJANGO_DATABASE_ENGINE', 'django.db.backends.mysql'),
-#         'NAME': os.environ.get('DJANGO_DATABASE_NAME', 'mydb'),
-#         'USER': os.environ.get('DJANGO_DATABASE_USER', 'root'),
-#         'PASSWORD': os.environ.get('DJANGO_DATABASE_PASSWORD', 'P@ssw0rd'),
-#         'HOST': os.environ.get('DJANGO_DATABASE_HOST', '127.0.0.1'),
-#         'PORT': os.environ.get('DJANGO_DATABASE_PORT', '3307'),
-#         'OPTIONS': {
-#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-#             'charset': 'utf8mb4',
-#         }
-#     }
-# }
-
-# config de la database en local
-
-DATABASES={
+DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mydb',
-        'USER': 'marco',
-        'PASSWORD': 'P@ssw0rd',
-        'HOST': '127.0.0.1',
-        'PORT': '3307',
+        'ENGINE': os.environ.get('DJANGO_DATABASE_ENGINE', 'django.db.backends.mysql'),
+        'NAME': os.environ.get('DJANGO_DATABASE_NAME', 'mydb'),
+        'USER': os.environ.get('DJANGO_DATABASE_USER', 'root'),
+        'PASSWORD': os.environ.get('DJANGO_DATABASE_PASSWORD', 'P@ssw0rd'),
+        'HOST': os.environ.get('DJANGO_DATABASE_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('DJANGO_DATABASE_PORT', '3307'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
         }
     }
 }
+
+# config de la database en local
+
+# DATABASES={
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'mydb',
+#         'USER': 'marco',
+#         'PASSWORD': 'P@ssw0rd',
+#         'HOST': '127.0.0.1',
+#         'PORT': '3307',
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#             'charset': 'utf8mb4',
+#         }
+#     }
+# }
 
 # LDAP
 LDAP_SERVER = os.environ.get('LDAP_SERVER', '10.250.90.8')
