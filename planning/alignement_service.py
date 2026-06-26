@@ -168,8 +168,8 @@ def _charge_disponible(charge, nouveau_debut, nouvelle_fin, exclure_id=None) -> 
                                     t.heure_debut_planifie, t.heure_fin_planifie):
             return False, (
                 f"{charge.get_full_name()} est déjà affecté au travail "
-                f"'{_nom_ressource(t)}' de {t.heure_debut_planifie.strftime('%d/%m %H:%M') if t.heure_debut_planifie else None,} "
-                f"à {t.heure_fin_planifie.strftime('%d/%m %H:%M') if t.heure_fin_planifie else None,}."
+                f"'{_nom_ressource(t)}' de {t.heure_debut_planifie.strftime('%d/%m %H:%M') if t.heure_debut_planifie else '?'} "
+                f"à {t.heure_fin_planifie.strftime('%d/%m %H:%M') if t.heure_fin_planifie else '?'}."
             )
     return True, ""
 
@@ -560,7 +560,7 @@ def get_fenetre_mois(annee: int= None, mois: int= None) -> tuple: # type: ignore
     
     return debut_mois, fin_mois    
     
-def analyser_mois(planning: Planning, user) -> dict:
+def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
     """
     Analyse les chevauchements entre TOUS les travaux qui touchent
     le mois demandé:
