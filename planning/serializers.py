@@ -183,14 +183,15 @@ class TravailSerializer(serializers.ModelSerializer):
 
 
 class PropositionAlignementSerializer(serializers.ModelSerializer):
-    
+
     travail_a_modifier_ref = serializers.SerializerMethodField()
     travail_reference_ref = serializers.SerializerMethodField()
     cree_par_nom = serializers.CharField(source='cree_par.get_full_name', read_only=True)
-    
+    planning = serializers.SerializerMethodField()
+
     class Meta:
         model = PropositionAlignement
-        
+
         fields = [
              'id', 'type_proposition', 'statut',
             'priorite_travail','type_travaux_reference',
@@ -200,18 +201,23 @@ class PropositionAlignementSerializer(serializers.ModelSerializer):
             'raison','conflit_charge_consignation',
             'detail_conflit','travail_a_modifier',
             'travail_a_modifier_ref','travail_reference',
-            'travail_reference_ref','cree_par_nom', 'created_at'
+            'travail_reference_ref','cree_par_nom', 'created_at',
+            'planning',
         ]
         
         
     def get_travail_a_modifier_ref(self, obj):
         if obj.travail_a_modifier and obj.travail_a_modifier.reference:
             return obj.travail_a_modifier.reference.valeur
-        return str(obj.travail_a_modifier.id) 
-    
-    
+        return str(obj.travail_a_modifier.id)
+
     def get_travail_reference_ref(self, obj):
         if obj.travail_reference and obj.travail_reference.reference:
             return obj.travail_reference.reference.valeur
         return str(obj.travail_reference.id) if obj.travail_reference else None
+
+    def get_planning(self, obj):
+        if obj.travail_a_modifier and obj.travail_a_modifier.planning_id:
+            return str(obj.travail_a_modifier.planning_id)
+        return None
     
