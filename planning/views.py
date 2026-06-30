@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
 from .models import Planning, Travail, TypeActivite, PropositionAlignement
-from .serializers import PlanningSerializer, TravailSerializer, TravailListSerializer, TypeActiviteSerializer, PropositionAlignementSerializer
+from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer, PropositionAlignementSerializer
 from pilotage.models import Workflow, WorkflowStep
 from .alignement_service import analyser_et_proposer, analyser_mois
 
