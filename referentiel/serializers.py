@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Centrale, TypeReferentiel, Reference, ReferentielItem
+from .models import Centrale, TypeReferentiel, Reference, ReferentielItem, Region
 from user.models import EntiteMetier
 
 
@@ -43,3 +43,9 @@ class ReferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reference
         fields = ['id', 'valeur', 'entite_metier', 'entite_metier_id', 'items']
+
+
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = ['code']

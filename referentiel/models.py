@@ -3,9 +3,21 @@ from django.utils.translation import gettext as _
 import uuid
 
 
+class Region(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    code = models.CharField(max_length=20, unique=True)
+    
+    def __str__(self):
+        return self.code
+
 class Centrale(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     valeur = models.CharField(max_length=255)
+    region = models.ForeignKey(
+        Region, on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='centrales'
+    )
 
     def __str__(self):
         return self.valeur
@@ -26,6 +38,10 @@ class Reference(models.Model):
         'user.EntiteMetier', on_delete=models.PROTECT,
         null=True, blank=True, related_name='references'
     )
+    region = models.ForeignKey(
+        Region, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='references'
+    )
 
     def __str__(self):
         return self.valeur
@@ -39,3 +55,4 @@ class ReferentielItem(models.Model):
 
     def __str__(self):
         return f"{self.type.nom}: {self.valeur}"
+

@@ -53,7 +53,7 @@ class PlanningViewSet(ModelViewSet):
         # Il ne peut y avoir qu'un seul workflow actif à la fois.
         # On le récupère et on initialise le planning sur son premier step
         
-        workflow_actif = Workflow.objects.filter(is_active=True).first()
+        workflow_actif = Workflow.objects.filter(code='TRAVAUX_PROGRAMMES',is_active=True).first()
 
         first_step = None
         if workflow_actif:
@@ -141,7 +141,7 @@ class PlanningViewSet(ModelViewSet):
         planning = self.get_object()
         statut_filtre = request.query_params.get('statut')
         pa = PropositionAlignement.objects.filter(planning=planning).select_related(
-            'travail_a_modifier', 'travail-reference', 'cree_par'
+            'travail_a_modifier', 'travail_reference', 'cree_par'
         )
         if statut_filtre:
             pa = pa.filter(statut=statut_filtre)
@@ -203,13 +203,14 @@ class PlanningViewSet(ModelViewSet):
     # ─────────────────────────────────────────────────────────────────────────
     # ROUTE : GET /plannings/<id>/travaux/
     #
-    # Pourquoi cette route existe ici et pas dans TravailViewSet ?
-    #   TravailViewSet est un router indépendant (/travaux/).
-    #   Le frontend a besoin de récupérer les travaux D'UN planning précis
-    #   via une URL contextuelle : /plannings/<id>/travaux/.
-    #   On ajoute donc une action imbriquée dans PlanningViewSet sans
-    #   modifier les routes existantes de TravailViewSet.
-    #
+    # ROUTE : GET /plannings/<id>/travaux
+    # Pourquoi cette route existe ici  et pas dans TravailViewSet?
+    # TravailViewSet est une route independante(/travaux/)
+    # Le frontend a besoin de recuperer les travaux d'un id precis via une URL
+    # contextuelle : /plannings/<id>/travaux/
+    # On ajoute donc une action imbriqué dans PlanningViewSet sans modifier les
+    # routes presentes dans TravailViewset.
+    
     # Ajouté pour corriger : BUG-004 (voir bug_all_planning.md)
     # ─────────────────────────────────────────────────────────────────────────
     @extend_schema(
@@ -222,18 +223,16 @@ class PlanningViewSet(ModelViewSet):
         planning = self.get_object()
 
         # On filtre les travaux sur le planning courant.
-        # select_related évite les requêtes N+1 sur les ForeignKey fréquemment affichées.
+        
         travaux = Travail.objects.filter(planning=planning).order_by('-date_creation').select_related(
             'type_travaux__entite_metier',   # couvre TypeActiviteSerializer.entite_metier
             'unite_demanderesse',
             'reference',
             'charge_consignation',
             'entite_metier',
-            'centrale_thermique_sollicitee',
-        ).prefetch_related('reference__items__type')
-
-        # TravailListSerializer exclut le champ 'planning' pour éviter ~6×N requêtes SQL.
-        serializer = TravailListSerializer(travaux, many=True)
+        )
+        
+        serializer = TravailSerializer(travaux, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -267,7 +266,6 @@ class PlanningViewSet(ModelViewSet):
             "proposition": PropositionAlignementSerializer(proposition).data
         }, status=status.HTTP_200_OK)
 
-                       
 @extend_schema_view(
     list=extend_schema(tags=["Travail"]),
     create=extend_schema(tags=["Travail"]),
@@ -313,7 +311,7 @@ class TravailViewSet(ModelViewSet):
     def perform_update(self, serializer):
         # Si le planning change lors d'une mise à jour et qu'aucune entité
         # n'est fournie explicitement, on synchronise entite_metier avec
-        # celle du nouveau planning.
+        # celle du nouveau planning
         extra = {'modifie_par': self.request.user}
         planning = serializer.validated_data.get('planning')
         entite_explicite = serializer.validated_data.get('entite_metier')
@@ -456,5 +454,5 @@ class TravailViewSet(ModelViewSet):
                 ids_en_conflit.add(str(t1.id))
         return Response({"conflits": list(ids_en_conflit)})
 
-
-
+    
+    

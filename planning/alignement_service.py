@@ -4,6 +4,13 @@ from .models import Travail, Planning, PropositionAlignement
 
 # HELPERS DE BASE
 
+ALIGNEMENT_COMPATIBLE = {
+    'TRANSPORT': ['TRANSPORT', 'DISTRIBUTION_POSTE_SOURCE', 'DISTRIBUTION_LIGNE', 'PRODUCTION'],
+    'DISTRIBUTION_POSTE_SOURCE': ['DISTRIBUTION_POSTE_SOURCE', 'DISTRIBUTION_LIGNE'],
+    'DISTRIBUTION_LIGNE': ['DISTRIBUTION_LIGNE'],
+    'PRODUCTION': ['TRANSPORT', 'PRODUCTION'],
+}
+
 def _periodes_se_chevauchent(debut_a, fin_a, debut_b, fin_b) -> bool:
     """
     Deux périodes se chevauchent si :
@@ -13,83 +20,108 @@ def _periodes_se_chevauchent(debut_a, fin_a, debut_b, fin_b) -> bool:
         return False
     return debut_a < fin_b and fin_a > debut_b
 
+# Trouver la region elecrique d'un travail à partir de sa référence
+def _get_region(travail: Travail) -> str| None:
+    if not travail.reference or not travail.reference.region:
+        return None
+    return travail.reference.region.code
 
-def _partage_ressource(travail_a: Travail, travail_b: Travail) -> bool:
-    """
-    Deux travaux partagent une ressource si :
-    1. Même Reference exacte (le cas le plus simple)
-    2. OU ils partagent un ReferentielItem commun de type
-       POSTE, TRONCON ou OUVRAGE
-    """
-    
-    if not travail_a.reference or not travail_b.reference:
-        return False
-    
-    # cas 1: meme référence
-    if travail_a.reference == travail_b.reference:
+# Trouver le poste d'un travail à partir de sa référence
+def _get_poste(travail: Travail) -> str| None:
+    if not travail.reference:
+        return None
+    item = travail.reference.items.filter(type__nom='POSTE').first() # type: ignore[attr-defined]
+    return item.valeur if item else None
+
+# Trouver la rame d'un travail à partir de sa référence
+def _get_rame(travail: Travail) -> str| None:
+    if not travail.reference:
+        return None
+    item = travail.reference.items.filter(type__nom='RAME').first() # type: ignore[attr-defined]
+    return item.valeur if item else None
+
+# Trouver la region elecrique d'un travail à partir de sa référence
+def _get_depart(travail: Travail) -> str| None:
+    if not travail.reference:
+        return None 
+    item = travail.reference.items.filter(type__nom='DEPART').first() # type: ignore[attr-defined]
+    return item.valeur if item else None
+
+def _est_coupure_au_poste(travail: Travail) -> bool:
+    """travaux transport coupe toujours au niveau du poste, quel que soit le champ niveau_coupure."""
+    if travail.segment == 'TRANSPORT':
         return True
-    
-    #cas 2: items communs(poste, ouvrage, tronçon)
-    TYPES_PARTAGES = [ 'POSTE', 'OUVRAGE', 'TRONCON', 'SEGMENT']
-    
-    items_a = set(
-        travail_a.reference.items.filter( # type: ignore[attr-defined]
-            type__nom__in=TYPES_PARTAGES
-        ).values_lsit('valeur', 'type__nom')
-    ) 
-    
-    items_b = set(
-        travail_a.reference.items.filter( # type: ignore[attr-defined]
-            type__nom__in=TYPES_PARTAGES
-        ).values_lsit('valeur', 'type__nom')
-    ) 
-    
-    # si il y a au moins un item en commun
-    
-    return bool(items_a & items_b)
+    return travail.niveau_coupure == 'POSTE' # type: ignore[attr-defined]
 
-def _ressources_communes(travail_a: Travail, travail_b: Travail) -> list:
-    """
-    Retourne la liste des ressources communes entre deux travaux.
-    Utile pour afficher dans la proposition pourquoi ils sont en conflit.
-    """
-    if not travail_a.reference or not travail_b.reference:
-        return []
 
-    TYPES_PARTAGES = ['POSTE', 'TRONCON', 'OUVRAGE', 'SEGMENT']
-
-    items_a = set(
-        travail_a.reference.items.filter( # type: ignore[attr-defined]
-            type__nom__in=TYPES_PARTAGES
-        ).values_list('valeur', 'type__nom')
-    )
-    items_b = set(
-        travail_b.reference.items.filter( # type: ignore[attr-defined]
-            type__nom__in=TYPES_PARTAGES
-        ).values_list('valeur', 'type__nom')
-    )
-
-    communs = items_a & items_b
-    return [f"{type_nom} : {valeur}" for valeur, type_nom in communs]
-
-   
 
 def _nom_ressource(travail: Travail) -> str:
     """Retourne le nom lisible de la ressource."""
-    if travail.reference:
-        return travail.reference.valeur  # ou le champ qui contient le nom
-    return "Référence inconnue"
+    
+    poste = _get_poste(travail)
+    rame = _get_rame(travail)
+    depart = _get_depart(travail)
+    if depart:
+         return f"{poste} / {rame or ''} / {depart}".replace(' / / ', ' / ')
+    if rame : 
+         return f"{poste} / {rame}"  
+    return poste or (travail.reference.valeur if travail.reference else str(travail.id))
 
 
-# PRIORITÉ
 
-PRIORITE_ORDRE = {
-    'TRANSPORT': 0,
-    'P1': 1,
-    'P2': 2,
-    'P3': 3,
-    None: 4,
-}
+def _partage_ressource(travail_a: Travail, travail_b: Travail) -> bool:
+    """
+    Implémente les 3 cas d'alignement :
+    1. Coupure poste ↔ n'importe quoi sur ce poste → compatible
+    2. Coupure rame ↔ rame identique ou départ de cette rame → compatible
+    3. Coupure départ ↔ exactement le même départ → compatible
+    Toujours après vérification région + poste identiques.
+    La Production est exclue de l'alignement pour le moment.
+    """
+    # on exclut la production pour le moment
+    if travail_a.type_alignement == 'PRODUCTION' or travail_b.type_alignement == 'PRODUCTION':
+        return False
+    
+    # on recupere les regions et postes des deux travaux
+    region_a = _get_region(travail_a)
+    region_b = _get_region(travail_b)
+    # Si l'une des references n'a pas de région connue, pas d'alignement possible.
+    if not region_a or not region_b or region_a != region_b:
+        return False
+    
+    poste_a = _get_poste(travail_a)
+    poste_b = _get_poste(travail_b)
+    if not poste_a or not poste_b or poste_a != poste_b:
+        return False
+    
+    # Cas 1 : l'un des deux coupe tout le poste
+    if _est_coupure_au_poste(travail_a) or _est_coupure_au_poste(travail_b):
+        return True
+    
+    rame_a = _get_rame(travail_a)
+    rame_b = _get_rame(travail_b)
+    depart_a = _get_depart(travail_a)
+    depart_b = _get_depart(travail_b)
+    
+    coupure_a = travail_a.niveau_coupure # type: ignore[attr-defined]
+    coupure_b = travail_b.niveau_coupure # type: ignore[attr-defined]
+    
+     # Cas 2 : coupure rame → compatible si même rame ou même départ de rame
+    if coupure_a == 'RAME' and coupure_b == 'RAME':
+        return bool(rame_a) and rame_a == rame_b
+    if coupure_a == 'RAME' and coupure_b == 'DEPART':
+        return bool(rame_a) and rame_a == rame_b
+    if coupure_b == 'RAME' and coupure_a == 'DEPART':
+        return bool(rame_b) and rame_a == rame_b
+    
+    # cas 3 : coupure départ → compatible si même départ
+    if coupure_a == 'DEPART' and coupure_b == 'DEPART':
+        return bool(depart_a) and depart_a == depart_b
+    
+    return False 
+
+ # PRIORITÉ
+PRIORITE_ORDRE = {'TRANSPORT': 0,'P1': 1,'P2': 2,'P3': 3,None: 4,}
 
 
 def _peut_bouger(travail: Travail) -> bool:
@@ -101,18 +133,69 @@ def _peut_bouger(travail: Travail) -> bool:
     """
     if travail.segment == 'TRANSPORT':
         return False
-    if hasattr(travail, 'priorite') and travail.priorite == 'P1':
+    if travail.priorite == 'P1': # type: ignore[attr-defined]
         return False
     return True
 
-
 def _score_priorite(travail: Travail) -> int:
-    """Score pour trier : plus bas = plus prioritaire = référence."""
+    """retourne un score numérique pour la priorité d'un travail, plus bas = plus prioritaire"""
     if travail.segment == 'TRANSPORT':
         return PRIORITE_ORDRE['TRANSPORT']
-    priorite = getattr(travail, 'priorite', None)
-    return PRIORITE_ORDRE.get(priorite, 4)
+    return PRIORITE_ORDRE.get(travail.priorite, 4) #type: ignore[attr-defined]
 
+# CHARGE DE CONSIGNATION
+def _charge_disponible(charge, nouveau_debut, nouvelle_fin, exclure_id=None) -> tuple:
+    """
+    Vérifie si le charge de consignation est libre sur la nouvelle période.
+
+    Logique :
+    - On cherche tous ses autres travaux
+    - Si l'un d'eux chevauche la nouvelle période → BLOQUÉ
+    """
+    if not charge:
+        return True, ""
+
+    autres_travaux = Travail.objects.filter(
+        charge_consignation=charge,
+        heure_debut_planifie__isnull=False,
+        heure_fin_planifie__isnull=False,
+    ).exclude(id=exclure_id)
+
+    for t in autres_travaux:
+        if _periodes_se_chevauchent(nouveau_debut, nouvelle_fin,
+                                    t.heure_debut_planifie, t.heure_fin_planifie):
+            return False, (
+                f"{charge.get_full_name()} est déjà affecté au travail "
+                f"'{_nom_ressource(t)}' de {t.heure_debut_planifie.strftime('%d/%m %H:%M') if t.heure_debut_planifie else None,} "
+                f"à {t.heure_fin_planifie.strftime('%d/%m %H:%M') if t.heure_fin_planifie else None,}."
+            )
+    return True, ""
+
+
+def _ressources_communes(travail_a: Travail, travail_b: Travail) -> list:
+    """
+    Retourne la liste des ressources communes entre deux travaux.
+    """
+    if not travail_a.reference or not travail_b.reference:
+        return []
+
+    TYPES_CONTROLES = ['POSTE', 'TRONCON', 'OUVRAGE', 'SEGMENT']
+
+    items_a = set(
+        travail_a.reference.items  # type: ignore[attr-defined]
+        .filter(type__nom__in=TYPES_CONTROLES
+        ).values_list('valeur', 'type__nom')
+    )
+    items_b = set(
+        travail_b.reference.items # type: ignore[attr-defined]
+        .filter(type__nom__in=TYPES_CONTROLES
+        ).values_list('valeur', 'type__nom')
+    )
+
+    communs = items_a & items_b
+    return [f"{type_nom} : {valeur}" for valeur, type_nom in communs]
+
+   
 
 # COMPATIBILITÉ DES TYPES
 
@@ -153,81 +236,54 @@ def _analyser_compatibilite(type_a: str, type_b: str) -> dict:
     return {"niveau": "OK", "note": f"'{type_a}' + '{type_b}' : alignement possible."}
 
 
-# CHARGE DE CONSIGNATION
-
-def _charge_disponible(charge, nouveau_debut, nouvelle_fin, exclure_id=None) -> tuple:
-    """
-    Vérifie si le charge de consignation est libre sur la nouvelle période.
-
-    Logique :
-    - On cherche tous ses autres travaux
-    - Si l'un d'eux chevauche la nouvelle période → BLOQUÉ
-    """
-    if not charge:
-        return True, ""
-
-    autres_travaux = Travail.objects.filter(
-        charge_consignation=charge,
-        heure_debut_planifie__isnull=False,
-        heure_fin_planifie__isnull=False,
-    ).exclude(id=exclure_id)
-
-    for t in autres_travaux:
-        if _periodes_se_chevauchent(nouveau_debut, nouvelle_fin,
-                                    t.heure_debut_planifie, t.heure_fin_planifie):
-            return False, (
-                f"{charge.get_full_name()} est déjà affecté au travail "
-                f"'{_nom_ressource(t)}' de "
-                f"{t.heure_debut_planifie.strftime('%d/%m %H:%M')if t.heure_debut_planifie else None,} "
-                f"à {t.heure_fin_planifie.strftime('%d/%m %H:%M')if t.heure_fin_planifie else None,}."
-            )
-    return True, ""
 
 
 # DÉTECTION DES GROUPES
-
 def _detecter_groupes(travaux: list) -> list:
     """
-    Regroupe les travaux qui :
-    1. Partagent la même référence réseau
-    2. Ont des périodes qui se chevauchent
-
-    Raisonnement :
-    On parcourt tous les travaux. Pour chaque travail non encore visité,
-    on cherche tous les autres qui chevauchent avec lui.
-    Le résultat est une liste de groupes.
+    Détecte les composantes connexes : si A-B sont liés et B-C sont liés,
+    les trois forment un seul groupe même si A et C ne sont pas directement
+    liés. C'est volontaire : déplacer B pour le caler sur A peut recréer
+    un conflit avec C, donc les trois doivent être traités ensemble pour
+    qu'une seule proposition cohérente en sorte.
     """
-    visites = set()
-    groupes = []
+    n = len(travaux)
+    parent = list(range(n))
 
-    for i, t_a in enumerate(travaux):
-        if t_a.id in visites:
-            continue
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(x, y):
+        rx, ry = find(x), find(y)
+        if rx != ry:
+            parent[rx] = ry
+
+    for i in range(n):
+        t_a = travaux[i]
         if not t_a.heure_debut_planifie or not t_a.heure_fin_planifie:
             continue
-
-        groupe = [t_a]
-        visites.add(t_a.id)
-
-        for j, t_b in enumerate(travaux):
-            if i == j or t_b.id in visites:
-                continue
+        for j in range(i + 1, n):
+            t_b = travaux[j]
             if not t_b.heure_debut_planifie or not t_b.heure_fin_planifie:
                 continue
-
             if (_partage_ressource(t_a, t_b) and
                 _periodes_se_chevauchent(
                     t_a.heure_debut_planifie, t_a.heure_fin_planifie,
                     t_b.heure_debut_planifie, t_b.heure_fin_planifie
                 )):
-                groupe.append(t_b)
-                visites.add(t_b.id)
+                union(i, j)
 
-        if len(groupe) > 1:
-            groupes.append(groupe)
+    groupes_par_racine = {}
+    for i, t in enumerate(travaux):
+        if not t.heure_debut_planifie or not t.heure_fin_planifie:
+            continue
+        racine = find(i)
+        groupes_par_racine.setdefault(racine, []).append(t)
 
-    return groupes
-
+    return [g for g in groupes_par_racine.values() if len(g) > 1]
 
 def _trouver_reference(groupe: list) -> Travail:
     """
@@ -241,25 +297,46 @@ def _trouver_reference(groupe: list) -> Travail:
     ))
 
 
+def _duree_en_heures(travail: Travail) -> timedelta:
+    
+    """
+    Calcule la durée du travail en timedelta.
+    Gère heures, jours et semaines.
+    """
+    #cas où les heures de début et de fin sont définies
+    if travail.heure_debut_planifie and travail.heure_fin_planifie:
+        duree = travail.heure_fin_planifie - travail.heure_debut_planifie
+        
+        # au cas du passage de minuit
+        if duree.total_seconds() < 0:
+            duree += timedelta(days=1)
+        
+        return duree
+    
+    #Fallback sur le champ duree + unite_duree
+    if travail.duree is None:
+        return timedelta(hours=4) # durée par defaut
+    
+    if travail.unite_duree == 'HEURES':
+        return timedelta(hours=travail.duree)
+    elif travail.unite_duree == 'JOURS':
+        return timedelta(days=travail.duree)
+    elif travail.unite_duree == 'SEMAINES':
+        return timedelta(weeks=travail.duree)
+    return timedelta(hours=travail.duree)
+    
+
 def _calculer_nouvel_horaire(travail: Travail, reference: Travail) -> tuple:
     """
-    Calcule le nouvel horaire pour aligner le travail sur la référence.
+    Aligne un travail sur une fenêtre de référence tout en conservant sa durée.
 
-    Raisonnement :
-    - On conserve la durée du travail
-    - On essaie de le caler au début de la fenêtre de la référence
-    - Si ça dépasse la fin de la référence, on recule pour tenir dans la fenêtre
     """
+    if not travail.heure_debut_planifie or not travail.heure_fin_planifie:
+        return reference.heure_debut_planifie, reference.heure_fin_planifie
+    if not reference.heure_debut_planifie or not reference.heure_fin_planifie:
+        return travail.heure_debut_planifie, travail.heure_fin_planifie
     
-    if (
-        travail.heure_fin_planifie is None or
-        travail.heure_debut_planifie is None or
-        reference.heure_debut_planifie is None or
-        reference.heure_fin_planifie is None
-    ):
-        raise ValueError("les horaires doivent etres definis.")
-    
-    duree: timedelta = travail.heure_fin_planifie - travail.heure_debut_planifie
+    duree: timedelta = _duree_en_heures(travail)
     nouveau_debut: datetime = reference.heure_debut_planifie
     nouvelle_fin: datetime = nouveau_debut + duree
 
@@ -275,7 +352,10 @@ def _calculer_nouvel_horaire(travail: Travail, reference: Travail) -> tuple:
     return nouveau_debut, nouvelle_fin
 
 
+
+# ======================================================================
 # FONCTION PRINCIPALE
+#=======================================================================
 
 def analyser_et_proposer(planning: Planning, user) -> dict:
     """
@@ -298,7 +378,7 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
     # Récupérer les travaux avec horaires
     travaux = list(
         Travail.objects.filter(planning=planning).select_related(
-            'reference', 'charge_consignation', 'type_travaux'
+            'reference', 'reference__region','charge_consignation', 'type_travaux'
         ).filter(
             heure_debut_planifie__isnull=False,
             heure_fin_planifie__isnull=False
@@ -364,7 +444,7 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
         for travail in autres:
             type_travail = travail.type_travaux.libelle if travail.type_travaux else ""
 
-            # Travail ne peut pas bouger → signaler sans proposer de déplacement
+            # Travail ne peut pas bouger -> signaler sans proposer de déplacement
             if not _peut_bouger(travail):
                 proposition = PropositionAlignement.objects.create(
                     planning=planning,
@@ -375,18 +455,13 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
                         else PropositionAlignement.TypeProposition.ALIGNEMENT_TRAVAUX,
                     type_travaux_reference=type_ref,
                     type_travaux_a_modifier=type_travail,
-                    priorite_travail=getattr(travail, 'priorite', '') or '',
+                    priorite_travail=travail.priorite or '',
                     ancien_debut=travail.heure_debut_planifie,
                     ancienne_fin=travail.heure_fin_planifie,
                     nouveau_debut=travail.heure_debut_planifie,
                     nouvelle_fin=travail.heure_fin_planifie,
-                    raison=(
-                        f"Travail '{_nom_ressource(travail)}' ({travail.segment} - "
-                        f"{getattr(travail, 'priorite', 'N/A')}) ne peut pas être déplacé. "
-                        f"Chevauchement avec '{_nom_ressource(reference)}'. "
-                        f"Résolution manuelle requise."
-                    ),
-                    statut=PropositionAlignement.Statut.BLOQUEE,
+                    raison=f"'{_nom_ressource(travail)}' ne peut pas être déplacé (priorité {travail.priorite}). Conflit avec '{_nom_ressource(reference)}' Résolution manuelle requise.",
+                    statut=PropositionAlignement.Statut.BLOQUEE, 
                     cree_par=user
                 )
                 propositions_creees.append(proposition)
@@ -396,7 +471,7 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
             # Calculer le nouvel horaire
             nouveau_debut, nouvelle_fin = _calculer_nouvel_horaire(travail, reference)
 
-            # Analyser la compatibilité des types
+            # Analyser la compatibilité des types de travaux 
             compatibilite = _analyser_compatibilite(type_ref, type_travail)
 
             # Vérifier la disponibilité du charge de consignation
@@ -405,25 +480,21 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
                 nouveau_debut, nouvelle_fin,
                 exclure_id=travail.id
             )
+            
             ressources = _ressources_communes(reference, travail)
             ressources_str = ", ".join(ressources) if ressources else _nom_ressource(reference)
             raison = (
                 f"Chevauchement détecté sur {ressources_str}. "
                 f"Référence : '{_nom_ressource(reference)}' ({reference.segment}) "
-                f"de {reference.heure_debut_planifie.strftime('%d/%m/%Y %H:%M')if reference.heure_debut_planifie else None,} "
-                f"à {reference.heure_fin_planifie.strftime('%d/%m/%Y %H:%M')if reference.heure_fin_planifie else None,}. "
+                f"de {reference.heure_debut_planifie.strftime('%d/%m/%Y %H:%M')if reference.heure_debut_planifie else None} "
+                f"à {reference.heure_fin_planifie.strftime('%d/%m/%Y %H:%M')if reference.heure_fin_planifie else None}. "
                 f"Proposition : déplacer de "
-                f"{travail.heure_debut_planifie.strftime('%d/%m/%Y %H:%M')} "
-                f"-> {nouveau_debut.strftime('%d/%m/%Y %H:%M')}."
+                f"{travail.heure_debut_planifie.strftime('%d/%m/%Y %H:%M')} -> {nouveau_debut.strftime('%d/%m/%Y %H:%M')}."
             )
             if not disponible:
                 raison += f" CONFLIT CHARGE : {detail_conflit}"
 
-            statut_final = (
-                PropositionAlignement.Statut.BLOQUEE
-                if not disponible
-                else PropositionAlignement.Statut.EN_ATTENTE
-            )
+            statut_final = (PropositionAlignement.Statut.BLOQUEE if not disponible else PropositionAlignement.Statut.EN_ATTENTE)
             if not disponible:
                 nb_bloquees += 1
 
@@ -469,3 +540,10 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
             "propositions_libres": nb_libres,
         }
     }
+    
+    
+    
+    
+    
+    
+ 
