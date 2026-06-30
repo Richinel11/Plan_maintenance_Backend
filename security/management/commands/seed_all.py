@@ -557,113 +557,77 @@ class Command(BaseCommand):
     # 8. WORKFLOW
     # ─────────────────────────────────────────
     def _seed_workflow(self):
+        from pilotage.management.commands.seed_workflow import STEPS_DATA, TRANSITIONS_DATA
         from pilotage.models import (
-            Workflow, WorkflowStep, WorkflowTransition,
-            WorkflowValidation
+            Workflow, WorkflowStep, WorkflowTransition, WorkflowValidation
         )
         from security.models import Role
 
         admin = User.objects.get(username='admin')
 
-        workflow, _ = Workflow.objects.get_or_create(
+        workflow, wf_created = Workflow.objects.get_or_create(
             code="TRAVAUX_PROGRAMMES",
             defaults={
-                "name": "Workflow Travaux Programmés",
-                "description": "Process complet des travaux programmés",
+                "name": "Travaux Programmés",
+                "description": (
+                    "Cycle de vie d'un planning de travaux programmés : "
+                    "du dépôt par l'opérateur jusqu'à la clôture finale."
+                ),
                 "is_active": True,
-                "created_by": admin
+                "created_by": admin,
             }
         )
 
+        # Nettoyage si le workflow existait déjà avec d'anciens steps
+        if not wf_created:
+            WorkflowTransition.objects.filter(workflow=workflow).delete()
+            WorkflowStep.objects.filter(workflow=workflow).delete()
+
         # ── Steps ──
-        steps_data = [
-            {"number": 1,  "code": "CREATED",           "name": "Créé",              "is_terminal": False},
-            {"number": 2,  "code": "SUBMITTED",          "name": "Soumis",            "is_terminal": False},
-            {"number": 3,  "code": "ANALYZED",           "name": "Analysé",           "is_terminal": False},
-            {"number": 4,  "code": "PLANNED_VALIDATED",  "name": "Planning validé",   "is_terminal": False},
-            {"number": 5,  "code": "DDR_GENERATED",      "name": "DDR générée",       "is_terminal": False},
-            {"number": 6,  "code": "CCR_APPROVED",       "name": "Approuvé CCR",      "is_terminal": False},
-            {"number": 7,  "code": "CCR_REJECTED",       "name": "Refusé CCR",        "is_terminal": False},
-            {"number": 8,  "code": "CCR_POSTPONED",      "name": "Reporté CCR",       "is_terminal": False},
-            {"number": 9,  "code": "NAPT_GENERATED",     "name": "NAPT générée",      "is_terminal": False},
-            {"number": 10, "code": "DIFFUSED",           "name": "Diffusé",           "is_terminal": False},
-            {"number": 11, "code": "IN_PROGRESS",        "name": "En cours",          "is_terminal": False},
-            {"number": 12, "code": "COMPLETED",          "name": "Terminé",           "is_terminal": False},
-            {"number": 13, "code": "CLOSED",             "name": "Clôturé",           "is_terminal": True},
-            {"number": 14, "code": "CANCELLED",          "name": "Annulé",            "is_terminal": True},
-        ]
-
         steps = {}
-        for s in steps_data:
-            step, _ = WorkflowStep.objects.get_or_create(
-                workflow=workflow, number=s['number'],
-                defaults={"code": s['code'], "name": s['name'],
-                          "is_terminal": s['is_terminal']}
-            )
-            steps[s['code']] = step
-
-        # ── Transitions ──
-        transitions_data = [
-            {"name": "Soumettre",         "from": "CREATED",          "to": "SUBMITTED",         "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Analyser",          "from": "SUBMITTED",        "to": "ANALYZED",          "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Valider planning",  "from": "ANALYZED",         "to": "PLANNED_VALIDATED", "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Générer DDR",       "from": "PLANNED_VALIDATED","to": "DDR_GENERATED",     "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Approuver CCR",     "from": "DDR_GENERATED",    "to": "CCR_APPROVED",      "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Refuser CCR",       "from": "DDR_GENERATED",    "to": "CCR_REJECTED",      "can_go_back": True,  "comment_required": True,  "go_back_to": "SUBMITTED"},
-            {"name": "Reporter CCR",      "from": "DDR_GENERATED",    "to": "CCR_POSTPONED",     "can_go_back": True,  "comment_required": True,  "go_back_to": "SUBMITTED"},
-            {"name": "Générer NAPT",      "from": "CCR_APPROVED",     "to": "NAPT_GENERATED",    "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Diffuser",          "from": "NAPT_GENERATED",   "to": "DIFFUSED",          "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Démarrer",          "from": "DIFFUSED",         "to": "IN_PROGRESS",       "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Terminer",          "from": "IN_PROGRESS",      "to": "COMPLETED",         "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Clôturer",          "from": "COMPLETED",        "to": "CLOSED",            "can_go_back": False, "comment_required": False, "go_back_to": None},
-            {"name": "Annuler",           "from": "CREATED",          "to": "CANCELLED",         "can_go_back": False, "comment_required": True,  "go_back_to": None},
-            {"name": "Retour soumission", "from": "CCR_REJECTED",     "to": "SUBMITTED",         "can_go_back": True,  "comment_required": True,  "go_back_to": "SUBMITTED"},
-            {"name": "Retour soumission", "from": "CCR_POSTPONED",    "to": "SUBMITTED",         "can_go_back": True,  "comment_required": True,  "go_back_to": "SUBMITTED"},
-        ]
-
-        transitions = {}
-        for t in transitions_data:
-            go_back_step = steps[t['go_back_to']] if t['go_back_to'] else None
-            transition, _ = WorkflowTransition.objects.get_or_create(
+        for s in STEPS_DATA:
+            step = WorkflowStep.objects.create(
                 workflow=workflow,
-                from_step=steps[t['from']],
-                to_step=steps[t['to']],
-                defaults={
-                    "name": t['name'],
-                    "can_go_back": t['can_go_back'],
-                    "comment_required": t['comment_required'],
-                    "go_back_to": go_back_step,
-                    "is_active": True
-                }
+                number=s["number"],
+                code=s["code"],
+                name=s["name"],
+                is_terminal=s["is_terminal"],
+                description=s["description"],
             )
-            transitions[f"{t['from']}__{t['to']}"] = transition
+            steps[s["code"]] = step
 
-        # ── Validations (rôles requis) ──
-        role_gestionnaire = Role.objects.get(code_role="GESTIONNAIRE")
-        role_responsable  = Role.objects.get(code_role="RESPONSABLE")
-        role_ccr          = Role.objects.get(code_role="CCR")
+        # ── Transitions + Validations (rôles) ──
+        for t in TRANSITIONS_DATA:
+            transition = WorkflowTransition.objects.create(
+                workflow=workflow,
+                name=t["name"],
+                from_step=steps[t["from"]],
+                to_step=steps[t["to"]],
+                can_go_back=t["can_go_back"],
+                comment_required=t["comment_required"],
+                is_active=True,
+            )
+            if t["role_code"]:
+                try:
+                    role = Role.objects.get(code_role=t["role_code"])
+                    WorkflowValidation.objects.create(
+                        transition=transition,
+                        role=role,
+                        step=steps[t["from"]],
+                    )
+                except Role.DoesNotExist:
+                    pass
 
-        validations_data = [
-            {"transition": "SUBMITTED__ANALYZED",            "role": role_gestionnaire},
-            {"transition": "ANALYZED__PLANNED_VALIDATED",    "role": role_responsable},
-            {"transition": "PLANNED_VALIDATED__DDR_GENERATED","role": role_responsable},
-            {"transition": "DDR_GENERATED__CCR_APPROVED",    "role": role_ccr},
-            {"transition": "DDR_GENERATED__CCR_REJECTED",    "role": role_ccr},
-            {"transition": "DDR_GENERATED__CCR_POSTPONED",   "role": role_ccr},
-            {"transition": "NAPT_GENERATED__DIFFUSED",       "role": role_gestionnaire},
-            {"transition": "COMPLETED__CLOSED",              "role": role_responsable},
-        ]
+        # Réparer les plannings orphelins (current_step mis à NULL par la
+        # suppression/recréation des steps, FK on_delete=SET_NULL).
+        from planning.models import Planning
+        nb = Planning.objects.filter(
+            workflow=workflow, current_step__isnull=True
+        ).update(current_step=steps["CREER"])
+        if nb:
+            self.stdout.write(f"   {nb} planning(s) orphelin(s) reinitialise(s) a CREER")
 
-        for v in validations_data:
-            key = v['transition']
-            if key in transitions:
-                WorkflowValidation.objects.get_or_create(
-                    transition=transitions[key],
-                    role=v['role'],
-                    step=transitions[key].from_step,
-                )
-
-        self.stdout.write("✅ Workflow créé (steps + transitions + validations)")
+        self.stdout.write("✅ Workflow créé (5 steps + 5 transitions)")
 
     # ─────────────────────────────────────────
     # 9. PLANNINGS ET TRAVAUX DE TEST
@@ -684,7 +648,7 @@ class Command(BaseCommand):
         prod  = EntiteMetier.objects.get(name="Production")
 
         workflow   = Workflow.objects.get(code="TRAVAUX_PROGRAMMES")
-        step_init  = WorkflowStep.objects.get(workflow=workflow, code="CREATED")
+        step_init  = WorkflowStep.objects.get(workflow=workflow, code="CREER")
 
         unite_dist  = UniteDemanderesse.objects.filter(entite_metier=dist).first()
         unite_trans = UniteDemanderesse.objects.filter(entite_metier=trans).first()
@@ -707,8 +671,17 @@ class Command(BaseCommand):
                 ref.region = region_brgm
                 ref.save()
 
+        # get_or_create tolérant aux doublons : la base peut déjà contenir
+        # plusieurs plannings du même nom (imports répétés), ce qui ferait
+        # planter un get_or_create classique (MultipleObjectsReturned).
+        def _planning(nom, defaults):
+            p = Planning.objects.filter(nom=nom).first()
+            if p:
+                return p, False
+            return Planning.objects.create(nom=nom, **defaults), True
+
         # ── Planning DISTRIBUTION ──
-        planning_dist, _ = Planning.objects.get_or_create(
+        planning_dist, _ = _planning(
             nom="Planning Distribution Juillet 2026",
             defaults={
                 "entite_metier": dist,
@@ -792,7 +765,7 @@ class Command(BaseCommand):
             )
 
         # ── Planning TRANSPORT ──
-        planning_trans, _ = Planning.objects.get_or_create(
+        planning_trans, _ = _planning(
             nom="Planning Transport Juillet 2026",
             defaults={
                 "entite_metier": trans,
@@ -825,7 +798,7 @@ class Command(BaseCommand):
         )
 
         # ── Planning PRODUCTION ──
-        planning_prod, _ = Planning.objects.get_or_create(
+        planning_prod, _ = _planning(
             nom="Planning Production Juillet 2026",
             defaults={
                 "entite_metier": prod,

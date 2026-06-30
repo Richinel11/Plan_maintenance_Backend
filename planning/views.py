@@ -75,6 +75,23 @@ class PlanningViewSet(ModelViewSet):
         kwargs['partial'] = True
         return super().update(request, *args, **kwargs)
 
+    def destroy(self, request, *args, **kwargs):
+        # Un planning ne peut être supprimé que tant qu'il est à l'étape de départ.
+        # Dès qu'il est validé par le gestionnaire (EN_ATTENTE ou au-delà), la
+        # suppression est interdite : le planning est déjà engagé dans le workflow.
+        planning = self.get_object()
+        step = planning.current_step
+        if step and step.code != 'CREER':
+            return Response(
+                {"error": (
+                    f"Suppression impossible : le planning est déjà à l'étape "
+                    f"« {step.name} ». Seuls les plannings à l'étape « Créer » "
+                    f"peuvent être supprimés."
+                )},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().destroy(request, *args, **kwargs)
+
     @extend_schema(
         request=inline_serializer('AssignerWorkflowSerializer', fields={
             'workflow_id': drf_serializers.UUIDField()

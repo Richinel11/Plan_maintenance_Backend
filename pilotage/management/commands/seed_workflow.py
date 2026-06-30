@@ -1,136 +1,229 @@
 from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
 from pilotage.models import Workflow, WorkflowStep, WorkflowTransition, WorkflowValidation
 from security.models import Role
-from django.contrib.auth import get_user_model
+
+
+STEPS_DATA = [
+    {
+        "number": 1,
+        "code": "CREER",
+        "name": "Créer",
+        "is_terminal": False,
+        "description": (
+            "Planning créé ou importé par l'opérateur de saisie. "
+            "Le gestionnaire de planification peut harmoniser les travaux avant de valider."
+        ),
+    },
+    {
+        "number": 2,
+        "code": "EN_ATTENTE",
+        "name": "En attente",
+        "is_terminal": False,
+        "description": (
+            "Planning validé par le gestionnaire. Le responsable génère les DDR "
+            "pour les travaux concernés. Avance automatiquement quand toutes les DDR "
+            "générées sont à l'état COMPLÉTÉE."
+        ),
+    },
+    {
+        "number": 3,
+        "code": "COMPLETE",
+        "name": "Complété",
+        "is_terminal": False,
+        "description": (
+            "Toutes les DDR du planning sont complètes. Le CCR traite les DDR "
+            "et génère les NAPT. Avance automatiquement quand toutes les NAPT "
+            "générées sont à l'état DIFFUSÉE."
+        ),
+    },
+    {
+        "number": 4,
+        "code": "VALIDE",
+        "name": "Validé",
+        "is_terminal": False,
+        "description": (
+            "Toutes les NAPT du planning sont diffusées. Les travaux peuvent démarrer "
+            "sur le terrain. Un utilisateur marque manuellement le planning comme terminé."
+        ),
+    },
+    {
+        "number": 5,
+        "code": "TERMINE",
+        "name": "Terminé",
+        "is_terminal": True,
+        "description": "Tous les travaux du planning sont terminés. Planning clôturé — état final.",
+    },
+]
+
+TRANSITIONS_DATA = [
+    {
+        "name": "Valider",
+        "from": "CREER",
+        "to": "EN_ATTENTE",
+        "can_go_back": False,
+        "comment_required": False,
+        "role_code": "GESTIONNAIRE",
+    },
+    {
+        "name": "Retourner pour correction",
+        "from": "EN_ATTENTE",
+        "to": "CREER",
+        "can_go_back": True,
+        "comment_required": True,
+        "role_code": "GESTIONNAIRE",
+    },
+    {
+        # Déclenchée automatiquement quand toutes les DDR
+        # du planning sont à l'état COMPLÉTÉE
+        "name": "DDR complètes (auto)",
+        "from": "EN_ATTENTE",
+        "to": "COMPLETE",
+        "can_go_back": False,
+        "comment_required": False,
+        "role_code": None,
+    },
+    {
+        # Déclenchée automatiquement quand toutes les NAPT
+        # du planning sont à l'état DIFFUSÉE
+        "name": "NAPT diffusées (auto)",
+        "from": "COMPLETE",
+        "to": "VALIDE",
+        "can_go_back": False,
+        "comment_required": False,
+        "role_code": None,
+    },
+    {
+        "name": "Terminer",
+        "from": "VALIDE",
+        "to": "TERMINE",
+        "can_go_back": False,
+        "comment_required": False,
+        "role_code": "RESPONSABLE",
+    },
+]
+
 
 class Command(BaseCommand):
-    help = 'Seed workflow data'
+    help = "Seed le workflow TRAVAUX_PROGRAMMES (5 étapes, niveau planning)"
 
     def handle(self, *args, **kwargs):
 
-        # ──  ROLES ──
-        role_operateur, _ = Role.objects.get_or_create(
-            code_role="OPERATEUR",
-            defaults={"nom": "Opérateur de saisie"})
-        role_gestionnaire, _ = Role.objects.get_or_create(
-            code_role="GESTIONNAIRE",
-            defaults={"nom": "Gestionnaire planification"})
-        role_responsable, _ = Role.objects.get_or_create(
-            code_role="RESPONSABLE",
-            defaults={"nom": "Responsable exploitation"})
-        role_ccr, _ = Role.objects.get_or_create(
-            code_role="CCR",
-            defaults={"nom": "Centre de Conduite des Réseaux"})
-
-        self.stdout.write(" Roles créés")
-
-        # ──  WORKFLOW ──
-       
+        # ── SUPERUTILISATEUR requis par Workflow.created_by ──────────
         User = get_user_model()
         admin = User.objects.filter(is_superuser=True).first()
+        if not admin:
+            self.stderr.write(self.style.ERROR(
+                "[ERREUR] Aucun superutilisateur trouve. "
+                "Creez-en un avec `createsuperuser` d'abord."
+            ))
+            return
 
-        workflow, _ = Workflow.objects.get_or_create(
+        # ── WORKFLOW ─────────────────────────────────────────────────
+        workflow, wf_created = Workflow.objects.get_or_create(
             code="TRAVAUX_PROGRAMMES",
             defaults={
-                "name": "Workflow Travaux Programmés",
-                "description": "Process complet des travaux programmés",
+                "name": "Travaux Programmés",
+                "description": (
+                    "Cycle de vie d'un planning de travaux programmés : "
+                    "du dépôt par l'opérateur jusqu'à la clôture finale."
+                ),
                 "is_active": True,
-                "created_by": admin
+                "created_by": admin,
             }
         )
+        self._log(wf_created, f"Workflow : {workflow.name} (code={workflow.code})")
 
-        self.stdout.write("Workflow créé")
+        # ── NETTOYAGE des anciennes transitions et steps ─────────────
+        # Nécessaire si le workflow existait déjà avec d'anciens steps
+        if not wf_created:
+            old_transitions = WorkflowTransition.objects.filter(workflow=workflow).count()
+            old_steps = WorkflowStep.objects.filter(workflow=workflow).count()
+            WorkflowTransition.objects.filter(workflow=workflow).delete()
+            WorkflowStep.objects.filter(workflow=workflow).delete()
+            self.stdout.write(
+                f"  [nettoyage] Supprime : {old_transitions} transition(s) et {old_steps} step(s) anciens"
+            )
 
-        # ── STEPS ──
-        steps_data = [
-            {"number": 1,  "code": "CREATED",           "name": "Créé",                "is_terminal": False},
-            {"number": 2,  "code": "SUBMITTED",          "name": "Soumis",              "is_terminal": False},
-            {"number": 3,  "code": "ANALYZED",           "name": "Analysé",             "is_terminal": False},
-            {"number": 4,  "code": "PLANNED_VALIDATED",  "name": "Planning validé",     "is_terminal": False},
-            {"number": 5,  "code": "DDR_GENERATED",      "name": "DDR générée",         "is_terminal": False},
-            {"number": 6,  "code": "CCR_APPROVED",       "name": "Approuvé CCR",        "is_terminal": False},
-            {"number": 7,  "code": "CCR_REJECTED",       "name": "Refusé CCR",          "is_terminal": False},
-            {"number": 8,  "code": "CCR_POSTPONED",      "name": "Reporté CCR",         "is_terminal": False},
-            {"number": 9,  "code": "NAPT_GENERATED",     "name": "NAPT générée",        "is_terminal": False},
-            {"number": 10, "code": "DIFFUSED",           "name": "Diffusé",             "is_terminal": False},
-            {"number": 11, "code": "IN_PROGRESS",        "name": "En cours",            "is_terminal": False},
-            {"number": 12, "code": "COMPLETED",          "name": "Terminé",             "is_terminal": False},
-            {"number": 13, "code": "CLOSED",             "name": "Clôturé",             "is_terminal": True},
-            {"number": 14, "code": "CANCELLED",          "name": "Annulé",              "is_terminal": True},
-        ]
-
+        # ── STEPS ────────────────────────────────────────────────────
         steps = {}
-        for s in steps_data:
-            step, _ = WorkflowStep.objects.get_or_create(
+        for s in STEPS_DATA:
+            step = WorkflowStep.objects.create(
                 workflow=workflow,
-                number=s['number'],
-                defaults={
-                    "code": s['code'],
-                    "name": s['name'],
-                    "is_terminal": s['is_terminal']
-                }
+                number=s["number"],
+                code=s["code"],
+                name=s["name"],
+                is_terminal=s["is_terminal"],
+                description=s["description"],
             )
-            steps[s['code']] = step
+            steps[s["code"]] = step
+            self.stdout.write(
+                self.style.SUCCESS(f"  [+] Step {s['number']} : {s['name']} ({s['code']})")
+            )
 
-        self.stdout.write(" Steps créés")
-
-        # ──  TRANSITIONS ──
-        transitions_data = [
-            {"name": "Soumettre",        "from": "CREATED",          "to": "SUBMITTED",         "can_go_back": False, "comment_required": False},
-            {"name": "Analyser",         "from": "SUBMITTED",        "to": "ANALYZED",          "can_go_back": False, "comment_required": False},
-            {"name": "Valider planning", "from": "ANALYZED",         "to": "PLANNED_VALIDATED", "can_go_back": False, "comment_required": False},
-            {"name": "Générer DDR",      "from": "PLANNED_VALIDATED","to": "DDR_GENERATED",     "can_go_back": False, "comment_required": False},
-            {"name": "Approuver CCR",    "from": "DDR_GENERATED",    "to": "CCR_APPROVED",      "can_go_back": False, "comment_required": False},
-            {"name": "Refuser CCR",      "from": "DDR_GENERATED",    "to": "CCR_REJECTED",      "can_go_back": True,  "comment_required": True},
-            {"name": "Reporter CCR",     "from": "DDR_GENERATED",    "to": "CCR_POSTPONED",     "can_go_back": True,  "comment_required": True},
-            {"name": "Générer NAPT",     "from": "CCR_APPROVED",     "to": "NAPT_GENERATED",    "can_go_back": False, "comment_required": False},
-            {"name": "Diffuser",         "from": "NAPT_GENERATED",   "to": "DIFFUSED",          "can_go_back": False, "comment_required": False},
-            {"name": "Démarrer",         "from": "DIFFUSED",         "to": "IN_PROGRESS",       "can_go_back": False, "comment_required": False},
-            {"name": "Terminer",         "from": "IN_PROGRESS",      "to": "COMPLETED",         "can_go_back": False, "comment_required": False},
-            {"name": "Clôturer",         "from": "COMPLETED",        "to": "CLOSED",            "can_go_back": False, "comment_required": False},
-            {"name": "Annuler",          "from": "CREATED",          "to": "CANCELLED",         "can_go_back": False, "comment_required": True},
-            # Retours arrière
-            {"name": "Retour soumission","from": "CCR_REJECTED",     "to": "SUBMITTED",         "can_go_back": True,  "comment_required": True},
-            {"name": "Retour soumission","from": "CCR_POSTPONED",    "to": "SUBMITTED",         "can_go_back": True,  "comment_required": True},
-        ]
-
-        transitions = {}
-        for t in transitions_data:
-            transition, _ = WorkflowTransition.objects.get_or_create(
+        # ── TRANSITIONS ──────────────────────────────────────────────
+        for t in TRANSITIONS_DATA:
+            transition = WorkflowTransition.objects.create(
                 workflow=workflow,
-                from_step=steps[t['from']],
-                to_step=steps[t['to']],
-                defaults={
-                    "name": t['name'],
-                    "can_go_back": t['can_go_back'],
-                    "comment_required": t['comment_required'],
-                    "is_active": True
-                }
+                name=t["name"],
+                from_step=steps[t["from"]],
+                to_step=steps[t["to"]],
+                can_go_back=t["can_go_back"],
+                comment_required=t["comment_required"],
+                is_active=True,
             )
-            transitions[f"{t['from']}__{t['to']}"] = transition
-
-        self.stdout.write(" Transitions créées")
-
-        # ──  VALIDATIONS (roles requis par transition) ──
-        validations_data = [
-            {"transition": "SUBMITTED__ANALYZED",           "role": role_gestionnaire},
-            {"transition": "ANALYZED__PLANNED_VALIDATED",   "role": role_responsable},
-            {"transition": "PLANNED_VALIDATED__DDR_GENERATED", "role": role_responsable},
-            {"transition": "DDR_GENERATED__CCR_APPROVED",   "role": role_ccr},
-            {"transition": "DDR_GENERATED__CCR_REJECTED",   "role": role_ccr},
-            {"transition": "DDR_GENERATED__CCR_POSTPONED",  "role": role_ccr},
-            {"transition": "NAPT_GENERATED__DIFFUSED",      "role": role_gestionnaire},
-            {"transition": "COMPLETED__CLOSED",             "role": role_responsable},
-        ]
-
-        for v in validations_data:
-            key = v['transition']
-            if key in transitions:
-                WorkflowValidation.objects.get_or_create(
-                    transition=transitions[key],
-                    role=v['role'],
-                    step=transitions[key].from_step,
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"  [+] Transition : {t['from']} -> {t['to']}  ({t['name']})"
                 )
+            )
 
-        self.stdout.write(" Validations créées")
-        self.stdout.write(self.style.SUCCESS(" Seed terminé avec succès !"))
+            # Associer le rôle requis via WorkflowValidation
+            if t["role_code"]:
+                try:
+                    role = Role.objects.get(code_role=t["role_code"])
+                    WorkflowValidation.objects.create(
+                        transition=transition,
+                        role=role,
+                        step=steps[t["from"]],
+                    )
+                    self.stdout.write(f"        -> Role requis : {role.nom}")
+                except Role.DoesNotExist:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"        [!] Role '{t['role_code']}' introuvable — "
+                            "lancez seed_all d'abord."
+                        )
+                    )
+
+        # ── RÉPARATION des plannings orphelins ───────────────────────
+        # Supprimer puis recréer les steps met current_step à NULL
+        # (FK on_delete=SET_NULL). On réinitialise donc tout planning
+        # rattaché à ce workflow mais sans étape → étape de départ CREER.
+        from planning.models import Planning
+        orphelins = Planning.objects.filter(
+            workflow=workflow, current_step__isnull=True
+        )
+        nb_repares = orphelins.update(current_step=steps["CREER"])
+        if nb_repares:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"  [repare] {nb_repares} planning(s) orphelin(s) reinitialise(s) a l'etape CREER"
+                )
+            )
+
+        self.stdout.write("")
+        self.stdout.write(self.style.SUCCESS("[OK] Seed workflow termine."))
+        self.stdout.write("")
+        self.stdout.write("Recapitulatif TRAVAUX_PROGRAMMES :")
+        self.stdout.write("  [1] CREER       --(Gestionnaire valide)----> [2] EN_ATTENTE")
+        self.stdout.write("  [2] EN_ATTENTE  --(DDR completes, auto)----> [3] COMPLETE")
+        self.stdout.write("  [3] COMPLETE    --(NAPT diffusees, auto)---> [4] VALIDE")
+        self.stdout.write("  [4] VALIDE      --(Terminer, manuel)-------> [5] TERMINE")
+        self.stdout.write("  [2] EN_ATTENTE  --(Retourner, motif requis)> [1] CREER")
+
+    def _log(self, created, label):
+        if created:
+            self.stdout.write(self.style.SUCCESS(f"  [+] {label}"))
+        else:
+            self.stdout.write(f"  [ ] {label} (deja existant, nettoyage en cours...)")

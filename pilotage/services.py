@@ -160,3 +160,54 @@ def get_planning_history(planning: Planning):
     Retourne l'historique complet des transitions d'un planning
     """
     return WorkflowHistory.objects.filter(planning=planning).select_related('from_step', 'to_step', 'performed_by', 'transition')
+
+
+#  TRANSITION AUTOMATIQUE (DÉCLENCHÉE PAR LE SYSTÈME)
+
+def execute_auto_transition(planning: Planning, from_code: str, to_code: str, user=None) -> dict:
+    """
+    Avance automatiquement un planning d'une étape `from_code` vers `to_code`,
+    sans contrôle de rôle (transition déclenchée par le système, pas par un clic).
+
+    Utilisée par les signaux exploitation (DDR/NAPT) pour faire suivre le workflow
+    aux plannings sans intervention manuelle.
+
+    - Ne fait rien si le planning n'est pas exactement à l'étape `from_code`
+      (idempotent : un signal qui se redéclenche ne provoque pas de double saut).
+    - Enregistre l'avancement dans WorkflowHistory avec performed_by = user (None = système).
+    """
+    if not planning.workflow or not planning.current_step:
+        return {"success": False, "error": "Planning sans workflow ou sans étape actuelle"}
+
+    # Idempotence : on n'avance que si le planning est bien à l'étape de départ attendue
+    if planning.current_step.code != from_code:
+        return {"success": False, "error": "skip", "current": planning.current_step.code}
+
+    transition = WorkflowTransition.objects.filter(
+        workflow=planning.workflow,
+        from_step__code=from_code,
+        to_step__code=to_code,
+        is_active=True,
+    ).select_related('from_step', 'to_step').first()
+
+    if not transition:
+        return {"success": False, "error": f"Transition {from_code} → {to_code} introuvable"}
+
+    old_step = planning.current_step
+    planning.current_step = transition.to_step
+    planning.save(update_fields=['current_step'])
+
+    WorkflowHistory.objects.create(
+        planning=planning,
+        transition=transition,
+        from_step=old_step,
+        to_step=transition.to_step,
+        performed_by=user,
+        comment="Transition automatique du système",
+    )
+
+    return {
+        "success": True,
+        "from_step": old_step.code,
+        "to_step": transition.to_step.code,
+    }

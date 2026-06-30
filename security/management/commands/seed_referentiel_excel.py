@@ -39,6 +39,7 @@ def extraire_region_code(segment):
     return code if code in REGIONS_VALIDES else None
 
 
+
 def extraire_numero_rame(texte):
     """'TRANSFO N°1 90/15kV' ou 'RAME 15kV N°1' -> '1'"""
     match = re.search(r'N\s*[°ºo]\s*(\d+)', texte, re.IGNORECASE)
