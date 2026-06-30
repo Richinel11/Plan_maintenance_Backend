@@ -4,8 +4,9 @@ from rest_framework import serializers
 from security.models import UserRole
 from security.serializers import RoleSerializer
 from .models import Utilisateur, EntiteMetier, UniteDemanderesse
+from referentiel.serializers import RegionSerializer
 from django.contrib.auth.hashers import make_password, check_password
-from utils import LDAP_connect 
+from utils import LDAP_connect
 from rest_framework_simplejwt.tokens import RefreshToken
 import logging
 
@@ -32,6 +33,7 @@ class UniteDemanderesseSerializer(serializers.ModelSerializer):
 class UtilisateurSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
     entite_metier = EntiteMetierSerializer(read_only=True)
+    region = RegionSerializer(read_only=True)
 
     class Meta:
         model = Utilisateur
@@ -129,7 +131,7 @@ class CreateUserSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8, write_only=True)
     is_ldap = serializers.BooleanField(default=False)
     code_role = serializers.CharField(max_length=100)
-    region = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    region = serializers.UUIDField(required=False, allow_null=True)
     entite_metier = serializers.UUIDField(required=False, allow_null=True)
 
 

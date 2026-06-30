@@ -48,4 +48,4 @@ class ReferenceSerializer(serializers.ModelSerializer):
 class RegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Region
-        fields = ['code']
+        fields = ['id', 'code']
