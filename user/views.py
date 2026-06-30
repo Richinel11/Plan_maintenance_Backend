@@ -50,7 +50,7 @@ def create_user(request):
             password = request.data['password'],
             first_connection = True,
             is_ldap = request.data['is_ldap'],
-            region = request.data.get('region', None),
+            region_id=request.data.get('region'), # correction ajoutée on recupere l'id de region.
             entite_metier = EntiteMetier.objects.get(id=request.data['entite_metier']) if request.data.get('entite_metier') else None
         )
         UserRole.objects.create(
@@ -427,4 +427,4 @@ def get_charges_consignation(request):
     user_roles = UserRole.objects.filter(role__code_role="CHARGE_CONSIGNATION").select_related('user')
     users = [ur.user for ur in user_roles if ur.user.is_active and not ur.user.is_deleted]
     serializer = UtilisateurSerializer(users, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data)

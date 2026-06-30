@@ -273,6 +273,31 @@ class Command(BaseCommand):
                 "role": "CHARGE_CONSIGNATION",
                 "entite": trans,
             },
+            # ── Chargés de consignation des plannings ──
+            {"username": "abena.justin",      "first_name": "Justin",      "last_name": "ABENA",    "email": "abena.justin@maintenance.cm",      "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "abouna.christophe", "first_name": "Christophe",  "last_name": "ABOUNA",   "email": "abouna.christophe@maintenance.cm", "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "ateba.serge",       "first_name": "Serge",       "last_name": "ATEBA",    "email": "ateba.serge@maintenance.cm",       "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "beyala.francois",   "first_name": "François",    "last_name": "BEYALA",   "email": "beyala.francois@maintenance.cm",   "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "djomo.gustave",     "first_name": "Gustave",     "last_name": "DJOMO",    "email": "djomo.gustave@maintenance.cm",     "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "eboumbou.marcel",   "first_name": "Marcel",      "last_name": "EBOUMBOU", "email": "eboumbou.marcel@maintenance.cm",   "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "essomba.paul",      "first_name": "Paul",        "last_name": "ESSOMBA",  "email": "essomba.paul@maintenance.cm",      "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "eyinga.leopold",    "first_name": "Léopold",     "last_name": "EYINGA",   "email": "eyinga.leopold@maintenance.cm",    "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "fogue.henri",       "first_name": "Henri",       "last_name": "FOGUE",    "email": "fogue.henri@maintenance.cm",       "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "fouda.emmanuel",    "first_name": "Emmanuel",    "last_name": "FOUDA",    "email": "fouda.emmanuel@maintenance.cm",    "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "kollo.rene",        "first_name": "René",        "last_name": "KOLLO",    "email": "kollo.rene@maintenance.cm",        "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": trans},
+            {"username": "mbarga.theodore",   "first_name": "Théodore",    "last_name": "MBARGA",   "email": "mbarga.theodore@maintenance.cm",   "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": trans},
+            {"username": "mbia.jean-pierre",  "first_name": "Jean-Pierre", "last_name": "MBIA",     "email": "mbia.jean-pierre@maintenance.cm",  "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "mekongo.dieudonne", "first_name": "Dieudonné",   "last_name": "MEKONGO",  "email": "mekongo.dieudonne@maintenance.cm", "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "mvondo.andre",      "first_name": "André",       "last_name": "MVONDO",   "email": "mvondo.andre@maintenance.cm",      "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "ndjock.herman",     "first_name": "Herman",      "last_name": "NDJOCK",   "email": "ndjock.herman@maintenance.cm",     "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": trans},
+            {"username": "ngamba.sylvestre",  "first_name": "Sylvestre",   "last_name": "NGAMBA",   "email": "ngamba.sylvestre@maintenance.cm",  "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "ngono.albert",      "first_name": "Albert",      "last_name": "NGONO",    "email": "ngono.albert@maintenance.cm",      "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "nkeng.robert",      "first_name": "Robert",      "last_name": "NKENG",    "email": "nkeng.robert@maintenance.cm",      "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "nkoa.patrick",      "first_name": "Patrick",     "last_name": "NKOA",     "email": "nkoa.patrick@maintenance.cm",      "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "nlend.gaston",      "first_name": "Gaston",      "last_name": "NLEND",    "email": "nlend.gaston@maintenance.cm",      "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "onana.clement",     "first_name": "Clément",     "last_name": "ONANA",    "email": "onana.clement@maintenance.cm",     "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "samba.theophile",   "first_name": "Théophile",   "last_name": "SAMBA",    "email": "samba.theophile@maintenance.cm",   "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
+            {"username": "tamo.pierre",       "first_name": "Pierre",      "last_name": "TAMO",     "email": "tamo.pierre@maintenance.cm",       "password": "Charge@1234", "role": "CHARGE_CONSIGNATION", "entite": dist},
         ]
 
         for u in users_data:
@@ -646,7 +671,7 @@ class Command(BaseCommand):
     def _seed_plannings_et_travaux(self):
         from planning.models import Planning, Travail, TypeActivite
         from pilotage.models import Workflow, WorkflowStep
-        from referentiel.models import Reference
+        from referentiel.models import Reference, Region
         from user.models import EntiteMetier, UniteDemanderesse
 
         operateur1 = User.objects.get(username='operateur1')
@@ -670,14 +695,21 @@ class Command(BaseCommand):
         type_inspection   = TypeActivite.objects.get(libelle="INSPECTION")
         type_entretien    = TypeActivite.objects.get(libelle="Entretien")
 
-        ref_dist1 = Reference.objects.get(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D11")
-        ref_dist2 = Reference.objects.get(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D12")
-        ref_trans = Reference.objects.get(valeur__startswith="TRANSPORT-CSE_BRGM_POSTE SOURCE_HTB_AT N°1")
-        ref_prod  = Reference.objects.get(valeur__startswith="PRODUCTION - EDEA_DCP_Groupe 01")
+        ref_dist1 = Reference.objects.filter(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D11").first()
+        ref_dist2 = Reference.objects.filter(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D12").first()
+        ref_trans = Reference.objects.filter(valeur__startswith="TRANSPORT-CSE_BRGM_POSTE SOURCE_HTB_AT N°1").first()
+        ref_prod  = Reference.objects.filter(valeur__startswith="PRODUCTION - EDEA_DCP_Groupe 01").first()
+
+        # Région de test nécessaire pour que _partage_ressource puisse comparer les régions
+        region_brgm, _ = Region.objects.get_or_create(code='BRGM')
+        for ref in [ref_dist1, ref_dist2, ref_trans]:
+            if ref and ref.region is None:
+                ref.region = region_brgm
+                ref.save()
 
         # ── Planning DISTRIBUTION ──
         planning_dist, _ = Planning.objects.get_or_create(
-            nom="Planning Distribution Mai 2026",
+            nom="Planning Distribution Juillet 2026",
             defaults={
                 "entite_metier": dist,
                 "workflow": workflow,
@@ -697,10 +729,10 @@ class Command(BaseCommand):
                 "unite_demanderesse": unite_dist,
                 "consistance_travaux": "Maintenance préventive transformateur BRGM",
                 "heure_debut_planifie": timezone.make_aware(
-                    timezone.datetime(2026, 5, 19, 8, 0)
+                    timezone.datetime(2026, 7, 19, 8, 0)
                 ),
                 "duree": 4, "unite_duree": "HEURES",
-                "date_programmee": timezone.datetime(2026, 5, 14).date(),
+                "date_programmee": timezone.datetime(2026, 7, 14).date(),
                 "charge_consignation": charge1,
                 "type_reseau": "HTA",
             },
@@ -712,10 +744,10 @@ class Command(BaseCommand):
                 "unite_demanderesse": unite_dist,
                 "consistance_travaux": "Inspection câbles BRGM",
                 "heure_debut_planifie": timezone.make_aware(
-                    timezone.datetime(2026, 5, 19, 10, 0)  # chevauchement avec le 1er
+                    timezone.datetime(2026, 7, 19, 10, 0)  # chevauchement avec le 1er
                 ),
                 "duree": 3, "unite_duree": "HEURES",
-                "date_programmee": timezone.datetime(2026, 5, 14).date(),
+                "date_programmee": timezone.datetime(2026, 7, 14).date(),
                 "charge_consignation": charge1,
                 "type_reseau": "HTA",
             },
@@ -727,10 +759,10 @@ class Command(BaseCommand):
                 "unite_demanderesse": unite_dist,
                 "consistance_travaux": "Remplacement fusibles BRGM MESSA",
                 "heure_debut_planifie": timezone.make_aware(
-                    timezone.datetime(2026, 5, 19, 9, 0)
+                    timezone.datetime(2026, 7, 19, 9, 0)
                 ),
                 "duree": 2, "unite_duree": "HEURES",
-                "date_programmee": timezone.datetime(2026, 5, 14).date(),
+                "date_programmee": timezone.datetime(2026, 7, 14).date(),
                 "charge_consignation": charge1,
                 "type_reseau": "HTA",
             },
@@ -752,6 +784,7 @@ class Command(BaseCommand):
                     "date_programmee": t['date_programmee'],
                     "charge_consignation": t.get('charge_consignation'),
                     "type_reseau": t.get('type_reseau'),
+                    "niveau_coupure": "POSTE",
                     "entite_metier": dist,
                     "cree_par": operateur1,
                     "modifie_par": operateur1,
@@ -760,7 +793,7 @@ class Command(BaseCommand):
 
         # ── Planning TRANSPORT ──
         planning_trans, _ = Planning.objects.get_or_create(
-            nom="Planning Transport Mai 2026",
+            nom="Planning Transport Juillet 2026",
             defaults={
                 "entite_metier": trans,
                 "workflow": workflow,
@@ -774,7 +807,7 @@ class Command(BaseCommand):
             planning=planning_trans,
             reference=ref_trans,
             heure_debut_planifie=timezone.make_aware(
-                timezone.datetime(2026, 5, 19, 8, 0)
+                timezone.datetime(2026, 7, 19, 8, 0)
             ),
             defaults={
                 "segment": "TRANSPORT",
@@ -783,7 +816,7 @@ class Command(BaseCommand):
                 "unite_demanderesse": unite_trans,
                 "consistance_travaux": "Entretien autotransformateur BRGM HTB",
                 "duree": 8, "unite_duree": "HEURES",
-                "date_programmee": timezone.datetime(2026, 5, 14).date(),
+                "date_programmee": timezone.datetime(2026, 7, 14).date(),
                 "charge_consignation": charge2,
                 "entite_metier": trans,
                 "cree_par": operateur2,
@@ -793,7 +826,7 @@ class Command(BaseCommand):
 
         # ── Planning PRODUCTION ──
         planning_prod, _ = Planning.objects.get_or_create(
-            nom="Planning Production Mai 2026",
+            nom="Planning Production Juillet 2026",
             defaults={
                 "entite_metier": prod,
                 "workflow": workflow,
@@ -811,7 +844,7 @@ class Command(BaseCommand):
             planning=planning_prod,
             reference=ref_prod,
             heure_debut_planifie=timezone.make_aware(
-                timezone.datetime(2026, 5, 20, 6, 0)
+                timezone.datetime(2026, 7, 20, 6, 0)
             ),
             defaults={
                 "segment": "PRODUCTION",
@@ -820,7 +853,7 @@ class Command(BaseCommand):
                 "unite_demanderesse": unite_prod,
                 "consistance_travaux": "Révision groupe 01 centrale EDEA",
                 "duree": 6, "unite_duree": "HEURES",
-                "date_programmee": timezone.datetime(2026, 5, 15).date(),
+                "date_programmee": timezone.datetime(2026, 7, 15).date(),
                 "disponibilite_mecanique_mw": 120.00,
                 "prevision_puissance_sollicitee": 100.00,
                 "prevision_puissance_interrompue": 20.00,

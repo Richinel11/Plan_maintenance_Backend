@@ -27,5 +27,8 @@ urlpatterns = [
     path('planning/<uuid:planning_id>/transition/reject/', views.reject_workflow_transition, name='reject_transition'),
     path('planning/<uuid:planning_id>/history/', views.planning_workflow_history, name='workflow_history'),
     path('planning/<uuid:planning_id>/current-step/', views.planning_current_step, name='current_step'),
+    
+    # retourne les plannings d'un workflow spécifique
+    path('workflows/<uuid:workflow_id>/plannings/', views.workflow_plannings, name='workflows_plannings')
 
 ]

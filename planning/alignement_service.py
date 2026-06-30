@@ -1,3 +1,5 @@
+from django.utils import timezone
+import calendar
 from datetime import timedelta, datetime
 from .models import Travail, Planning, PropositionAlignement
 
@@ -166,8 +168,8 @@ def _charge_disponible(charge, nouveau_debut, nouvelle_fin, exclure_id=None) -> 
                                     t.heure_debut_planifie, t.heure_fin_planifie):
             return False, (
                 f"{charge.get_full_name()} est déjà affecté au travail "
-                f"'{_nom_ressource(t)}' de {t.heure_debut_planifie.strftime('%d/%m %H:%M') if t.heure_debut_planifie else None,} "
-                f"à {t.heure_fin_planifie.strftime('%d/%m %H:%M') if t.heure_fin_planifie else None,}."
+                f"'{_nom_ressource(t)}' de {t.heure_debut_planifie.strftime('%d/%m %H:%M') if t.heure_debut_planifie else '?'} "
+                f"à {t.heure_fin_planifie.strftime('%d/%m %H:%M') if t.heure_fin_planifie else '?'}."
             )
     return True, ""
 
@@ -351,8 +353,6 @@ def _calculer_nouvel_horaire(travail: Travail, reference: Travail) -> tuple:
 
     return nouveau_debut, nouvelle_fin
 
-
-
 # ======================================================================
 # FONCTION PRINCIPALE
 #=======================================================================
@@ -488,7 +488,7 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
                 f"Référence : '{_nom_ressource(reference)}' ({reference.segment}) "
                 f"de {reference.heure_debut_planifie.strftime('%d/%m/%Y %H:%M')if reference.heure_debut_planifie else None} "
                 f"à {reference.heure_fin_planifie.strftime('%d/%m/%Y %H:%M')if reference.heure_fin_planifie else None}. "
-                f"Proposition : déplacer de "
+                f"Proposition : déplacer l'heure de début de "
                 f"{travail.heure_debut_planifie.strftime('%d/%m/%Y %H:%M')} -> {nouveau_debut.strftime('%d/%m/%Y %H:%M')}."
             )
             if not disponible:
@@ -541,9 +541,226 @@ def analyser_et_proposer(planning: Planning, user) -> dict:
         }
     }
     
+ #=======================================   
+ # FONCTIONS POUR L'ALIGNEMENT PAR MOIS
+ #=======================================   
     
+def get_fenetre_mois(annee: int= None, mois: int= None) -> tuple: # type: ignore[attr-defined]
+    """
+    Retourne le début et la fin du mois demandé.
+    Par défaut : mois en cours.
+    """
+    now = timezone.now()
+    annee = annee or now.year
+    mois = mois or now.month
     
+    debut_mois = timezone.make_aware(datetime(annee, mois, 1,0,0,0))
+    dernier_jour = calendar.monthrange(annee, mois)[1]
+    fin_mois =  timezone.make_aware(datetime(annee, mois, dernier_jour, 23,59,59))
     
+    return debut_mois, fin_mois    
     
+def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
+    """
+    Analyse les chevauchements entre TOUS les travaux qui touchent
+    le mois demandé:
+    heure_debut_planifie <= fin_du_mois
+     heure_fin_planifie  >= debut_du_mois
+
+    Cela capture les travaux qui :
+    - commencent et finissent dans le mois
+    - commencent avant le mois mais finissent dedans
+    - commencent dans le mois mais finissent après
+    - commencent avant et finissent après (chevauchent tout le mois)
+    """
+
+    debut_mois, fin_mois = get_fenetre_mois(annee, mois)  # type: ignore[attr-defined]
+
+    # tout travail qui touche le mois courant
+    travaux = list(
+        Travail.objects.filter(
+            heure_debut_planifie__isnull=False,
+            heure_fin_planifie__isnull=False,
+            heure_debut_planifie__lte=fin_mois,    # commence avant la fin du mois
+            heure_fin_planifie__gte=debut_mois,    # finit après le début du mois
+        ).select_related(
+            'reference', 'reference__region',
+            'charge_consignation', 'type_travaux', 'planning'
+        )
+    )
     
- 
+    nb_travaux = len(travaux)
+    periode = f"{debut_mois.strftime('%d/%m/%Y')} jusqu'au -> {fin_mois.strftime('%d/%m/%Y')}"
+
+    if nb_travaux < 2:
+        return {
+            "message": f"Pas assez de travaux sur la période {periode}.",
+            "periode": periode,
+            "chevauchements": [], "propositions": [],
+            "resume": {
+                "periode": periode,
+                "total_travaux_analyses": nb_travaux,
+                "total_chevauchements": 0,
+                "total_propositions": 0,
+                "propositions_bloquees": 0,
+                "propositions_libres": 0,
+            }
+        }
+
+    groupes = _detecter_groupes(travaux)
+
+    if not groupes:
+        return {
+            "message": f"Aucun chevauchement détecté sur la période {periode}.",
+            "periode": periode,
+            "chevauchements": [], "propositions": [],
+            "resume": {
+                "periode": periode,
+                "total_travaux_analyses": nb_travaux,
+                "total_chevauchements": 0,
+                "total_propositions": 0,
+                "propositions_bloquees": 0,
+                "propositions_libres": 0,
+            }
+        }
+
+    propositions_creees = []
+    chevauchements_detectes = []
+    nb_bloquees = 0
+
+    for groupe in groupes:
+        reference = _trouver_reference(groupe)
+        autres = [t for t in groupe if t.id != reference.id]
+        type_ref = reference.type_travaux.libelle if reference.type_travaux else "Non défini"
+
+        chevauchements_detectes.append({
+            "reference": {
+                "id": str(reference.id),
+                "planning_nom": reference.planning.nom,
+                "ressource": _nom_ressource(reference),
+                "segment": reference.segment,
+                "priorite": reference.priorite,
+                "type_travaux": type_ref,
+                "debut": reference.heure_debut_planifie.strftime('%d/%m/%Y %H:%M') if reference.heure_debut_planifie else None,
+                "fin": reference.heure_fin_planifie.strftime('%d/%m/%Y %H:%M') if reference.heure_fin_planifie else None,
+                "peut_bouger": _peut_bouger(reference),
+            },
+            "travaux_en_conflit": [{
+                "id": str(t.id),
+                "planning_nom": t.planning.nom,
+                "ressource": _nom_ressource(t),
+                "segment": t.segment,
+                "priorite": t.priorite,
+                "debut": t.heure_debut_planifie.strftime('%d/%m/%Y %H:%M'),
+                "fin": t.heure_fin_planifie.strftime('%d/%m/%Y %H:%M'),
+                "peut_bouger": _peut_bouger(t),
+            } for t in autres]
+        })
+
+        for travail in autres:
+            type_travail = travail.type_travaux.libelle if travail.type_travaux else ""
+
+            if not _peut_bouger(travail):
+                proposition = PropositionAlignement.objects.create(
+                    planning=travail.planning,
+                    travail_a_modifier=travail,
+                    travail_reference=reference,
+                    type_proposition=(
+                        PropositionAlignement.TypeProposition.ALIGNEMENT_TRANSPORT
+                        if reference.segment == 'TRANSPORT'
+                        else PropositionAlignement.TypeProposition.ALIGNEMENT_TRAVAUX
+                    ),
+                    type_travaux_reference=type_ref,
+                    type_travaux_a_modifier=type_travail,
+                    priorite_travail=travail.priorite or '',
+                    ancien_debut=travail.heure_debut_planifie,
+                    ancienne_fin=travail.heure_fin_planifie,
+                    nouveau_debut=travail.heure_debut_planifie,
+                    nouvelle_fin=travail.heure_fin_planifie,
+                    raison=(
+                        f"Travail '{_nom_ressource(travail)}' ({travail.segment} - "
+                        f"{travail.priorite}) ne peut pas être déplacé. "
+                        f"Conflit avec '{_nom_ressource(reference)}' "
+                        f"(planning : {reference.planning.nom}). "
+                        f"Résolution manuelle requise."
+                    ),
+                    statut=PropositionAlignement.Statut.BLOQUEE,
+                    cree_par=user
+                )
+                propositions_creees.append(proposition)
+                nb_bloquees += 1
+                continue
+
+            nouveau_debut, nouvelle_fin = _calculer_nouvel_horaire(travail, reference)
+            disponible, detail_conflit = _charge_disponible(
+                travail.charge_consignation,
+                nouveau_debut, nouvelle_fin,
+                exclure_id=travail.id
+            )
+
+            raison = (
+                f"Chevauchement sur {_nom_ressource(reference)}. "
+                f"Période analysée : {periode}. "
+                f"Référence : '{_nom_ressource(reference)}' "
+                f"(planning : {reference.planning.nom}, {reference.segment}) "
+                f"de {reference.heure_debut_planifie.strftime('%d/%m %H:%M') if reference.heure_debut_planifie else None} "
+                f"à {reference.heure_fin_planifie.strftime('%d/%m %H:%M')if reference.heure_fin_planifie else None}. "
+                f"Proposition : {travail.heure_debut_planifie.strftime('%d/%m %H:%M')} "
+                f"→ {nouveau_debut.strftime('%d/%m %H:%M')}."
+            )
+            if not disponible:
+                raison += f" ⚠️ CONFLIT CHARGE : {detail_conflit}"
+
+            statut_final = (
+                PropositionAlignement.Statut.BLOQUEE
+                if not disponible
+                else PropositionAlignement.Statut.EN_ATTENTE
+            )
+            if not disponible:
+                nb_bloquees += 1
+
+            proposition = PropositionAlignement.objects.create(
+                planning=travail.planning,
+                travail_a_modifier=travail,
+                travail_reference=reference,
+                type_proposition=(
+                    PropositionAlignement.TypeProposition.ALIGNEMENT_TRANSPORT
+                    if reference.segment == 'TRANSPORT'
+                    else PropositionAlignement.TypeProposition.ALIGNEMENT_TRAVAUX
+                ),
+                type_travaux_reference=type_ref,
+                type_travaux_a_modifier=type_travail,
+                priorite_travail=travail.priorite or '',
+                ancien_debut=travail.heure_debut_planifie,
+                ancienne_fin=travail.heure_fin_planifie,
+                nouveau_debut=nouveau_debut,
+                nouvelle_fin=nouvelle_fin,
+                raison=raison,
+                conflit_charge_consignation=not disponible,
+                detail_conflit=detail_conflit,
+                statut=statut_final,
+                cree_par=user
+            )
+            propositions_creees.append(proposition)
+
+    nb_libres = len(propositions_creees) - nb_bloquees
+
+    return {
+        "message": (
+            f"{nb_travaux} travaux analysés sur {periode}. "
+            f"{len(groupes)} chevauchement(s) détecté(s). "
+            f"{len(propositions_creees)} proposition(s) : "
+            f"{nb_libres} libre(s), {nb_bloquees} bloquée(s)."
+        ),
+        "periode": periode,
+        "chevauchements": chevauchements_detectes,
+        "propositions": propositions_creees,
+        "resume": {
+            "periode": periode,
+            "total_travaux_analyses": nb_travaux,
+            "total_chevauchements": len(groupes),
+            "total_propositions": len(propositions_creees),
+            "propositions_bloquees": nb_bloquees,
+            "propositions_libres": nb_libres,
+        }
+    }

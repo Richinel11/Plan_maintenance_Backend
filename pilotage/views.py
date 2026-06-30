@@ -18,6 +18,7 @@ from .serializers import (
     WorkflowHistorySerializer,
     ExecuteTransitionSerializer, RejectTransitionSerializer,
 )
+from planning.serializers import PlanningSerializer
 from planning.models import Planning
 from .models import WorkflowTransition,Workflow,WorkflowHistory,WorkflowStep,WorkflowValidation
 
@@ -403,3 +404,21 @@ def planning_current_step(request, planning_id):
             "number": planning.current_step.number if planning.current_step else None,
         }
     }, status=status.HTTP_200_OK)
+    
+    
+# plannings d'un workflow
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def workflow_plannings(request, workflow_id):
+    try:
+        workflow = Workflow.objects.get(id=workflow_id)
+    except Workflow.DoesNotExist:
+           return Response(
+            {"error": "Workflow introuvable"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    planning = Planning.objects.filter(workflow=workflow)
+    serializer = PlanningSerializer(planning, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
