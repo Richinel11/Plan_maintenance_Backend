@@ -1,10 +1,19 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
-from .models import Centrale, TypeReferentiel, Reference, ReferentielItem, Region
+from .kpi_service import _get_poste_from_travail
+from planning.models import Planning, Travail, PropositionAlignement
+from .models import (
+    Centrale,
+    TypeReferentiel,
+    Reference,
+    ReferentielItem,
+    Region
+)
 from .serializers import(
     CentraleSerializer, TypeReferentielSerializer,
     ReferenceSerializer, ReferentielItemSerializer,
@@ -28,8 +37,192 @@ class CentraleViewSet(viewsets.ModelViewSet):
 
 @extend_schema_view(**_TAG)
 class RegionViewset(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset= Region.objects.all().order_by('code')
     serializer_class= RegionSerializer
+    
+    @extend_schema(
+        tags=["KPI - Regions"],
+        description=(
+            "Retourne les plannings groupés par région électrique. "
+            "Paramètre optionnel : ?region=DRY pour filtrer une région précise."
+            )
+    )
+    @action(detail=False, methods=["GET"],  url_path='plannings')
+    def plannings_par_region(self, request):
+        """
+        Retourne pour chaque région :
+        - Le nombre de plannings
+        - Le détail des plannings avec leur statut workflow courant
+        """
+        region_code = request.query_params.get('region')
+        if region_code:
+            self.queryset = self.queryset.filter(code=region_code)
+        
+        resultat = []
+        
+        for region in self.queryset:
+            #Récupérer les plannings via les références de cette région
+            planning_ids = Travail.objects.filter(
+             reference__region=region
+            ).values_list('planning_id', flat=True).distinct()
+            
+            plannings = Planning.objects.filter(
+                id__in=planning_ids
+            ).select_related('current_step', 'entite_metier', 'cree_par')
+            
+            resultat.append({
+                "region": region.code,
+                "total_plannings": plannings.count(),
+                "plannings":[
+                    {
+                        "id": str(p.id),
+                        "code": p.code,
+                        "nom": p.nom,
+                        "entite_metier": p.entite_metier.name if p.entite_metier else None,
+                        "statut_workflow": p.current_step.name if p.current_step else None,
+                        "step_code": p.current_step.code if p.current_step else None,
+                        "date_creation": p.date_creation,
+                    }
+                    for p in plannings
+                ]
+            })
+       
+        return Response({
+            "total_regions": len(resultat),
+            "regions": resultat,
+        }, status=status.HTTP_200_OK) 
+    
+    @extend_schema(
+        tags=["KPI - Régions"],
+        description=(
+            "Retourne les propositions d'alignement groupées par type "
+            "(DISTRIBUTION-DISTRIBUTION, TRANSPORT-TRANSPORT, DISTRIBUTION_POSTE_SOURCE) "
+            "et par ouvrage. "
+            "Paramètre optionnel : ?region=DRY"
+        )
+    )
+    
+    
+    @action(detail=False, methods=['GET'], url_path='alignements')
+    def alignements_par_type_et_ouvrage(self, request):
+        """
+        Trois catégories d'alignement :
+        1. TRANSPORT ↔ TRANSPORT
+        2. DISTRIBUTION ↔ DISTRIBUTION (lignes)
+        3. DISTRIBUTION_POSTE_SOURCE ↔ autres
+        Groupées par ouvrage (POSTE).
+        """
+        region_code = request.query_params.get('region')
+        
+        #Récupérer toutes les propositions ACCEPTEES ou EN_ATTENTE
+        
+        propositions = PropositionAlignement.objects.filter(
+            statut__in=[
+                 PropositionAlignement.Statut.EN_ATTENTE,
+                PropositionAlignement.Statut.ACCEPTEE,
+            ]
+        ).select_related(
+            'travail_a_modifier__reference__region',
+            'travail_reference__reference__region',
+            'travail_a_modifier__reference',
+            'travail_reference__reference', 
+        )
+        
+       # Filtrer par région si demandé
+        if region_code:
+            propositions = propositions.filter(
+                travail_a_modifier__reference__region__code=region_code
+            ) 
+            
+        # Initialiser les 3 catégories
+        transport_transport = {}
+        distribution_distribution = {}
+        distribution_poste_source = {}
+    
+
+        for prop in propositions:
+            t_ref = prop.travail_reference
+            t_mod = prop.travail_a_modifier
+
+            if not t_ref or not t_mod:
+                continue
+
+            # Récupérer le poste (ouvrage) commun
+            poste_ref = _get_poste_from_travail(t_ref)
+            region_ref = t_ref.reference.region.code if t_ref.reference and t_ref.reference.region else "Inconnue"
+
+            # Construire la clé de regroupement
+            cle = f"{poste_ref} ({region_ref})"
+
+            prop_data = {
+                "id": str(prop.id),
+                "statut": prop.statut,
+                "type_proposition": prop.type_proposition,
+                "travail_reference": {
+                    "id": str(t_ref.id),
+                    "ressource": t_ref.reference.valeur if t_ref.reference else "",
+                    "segment": t_ref.segment,
+                    "type_alignement": t_ref.type_alignement,
+                    "debut": t_ref.heure_debut_planifie.strftime('%d/%m/%Y %H:%M') if t_ref.heure_debut_planifie else None,
+                    "fin": t_ref.heure_fin_planifie.strftime('%d/%m/%Y %H:%M') if t_ref.heure_fin_planifie else None,
+                },
+                "travail_a_modifier": {
+                    "id": str(t_mod.id),
+                    "ressource": t_mod.reference.valeur if t_mod.reference else "",
+                    "segment": t_mod.segment,
+                    "type_alignement": t_mod.type_alignement,
+                    "ancien_debut": prop.ancien_debut.strftime('%d/%m/%Y %H:%M'),
+                    "nouveau_debut": prop.nouveau_debut.strftime('%d/%m/%Y %H:%M'),
+                },
+            }
+            
+            # Catégorie 1 : TRANSPORT ↔ TRANSPORT
+            if (t_ref.type_alignement == 'TRANSPORT' and
+                    t_mod.type_alignement == 'TRANSPORT'):
+                transport_transport.setdefault(cle, []).append(prop_data)
+
+            # Catégorie 2 : DISTRIBUTION_LIGNE ↔ DISTRIBUTION_LIGNE
+            elif (t_ref.type_alignement == 'DISTRIBUTION_LIGNE' and
+                    t_mod.type_alignement in ['DISTRIBUTION_LIGNE', 'DISTRIBUTION_POSTE_SOURCE']):
+                distribution_distribution.setdefault(cle, []).append(prop_data)
+
+            # Catégorie 3 : DISTRIBUTION_POSTE_SOURCE comme référence
+            elif t_ref.type_alignement == 'DISTRIBUTION_POSTE_SOURCE':
+                distribution_poste_source.setdefault(cle, []).append(prop_data)
+
+            # Catégorie 2 aussi : TRANSPORT → DISTRIBUTION (alignement standard)
+            elif (t_ref.type_alignement == 'TRANSPORT' and
+                    t_mod.type_alignement in ['DISTRIBUTION_LIGNE', 'DISTRIBUTION_POSTE_SOURCE']):
+                distribution_distribution.setdefault(cle, []).append(prop_data)
+
+        return Response({
+            "alignements_transport_transport": {
+                "total": sum(len(v) for v in transport_transport.values()),
+                "par_ouvrage": [
+                    {"ouvrage": k, "propositions": v}
+                    for k, v in transport_transport.items()
+                ]
+            },
+            "alignements_distribution_distribution": {
+                "total": sum(len(v) for v in distribution_distribution.values()),
+                "par_ouvrage": [
+                    {"ouvrage": k, "propositions": v}
+                    for k, v in distribution_distribution.items()
+                ]
+            },
+            "alignements_distribution_poste_source": {
+                "total": sum(len(v) for v in distribution_poste_source.values()),
+                "par_ouvrage": [
+                    {"ouvrage": k, "propositions": v}
+                    for k, v in distribution_poste_source.items()
+                ]
+            },
+        })
+    
+
+
+
 @extend_schema_view(**_TAG)
 class TypeReferentielViewSet(viewsets.ModelViewSet):
     queryset = TypeReferentiel.objects.all().order_by('nom')
@@ -109,5 +302,4 @@ class ReferentielItemViewSet(viewsets.ModelViewSet):
         if type_id:
             qs = qs.filter(type_id=type_id)
         return qs
-
 

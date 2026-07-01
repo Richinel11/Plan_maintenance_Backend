@@ -51,3 +51,9 @@ urlpatterns = [
 # GET         /travaux/par_segment/?segment=XXX       filtrer par segment
 #
 # GET/POST    /types-activite/                        types d'activité
+
+
+# GET  travaux/par-statut/                      Tous les statuts 
+# GET  travaux/par-statut/?statut=BROUILLON     Seulement les brouillons 
+# GET  travaux/par-statut/?segment=TRANSPORT    Travaux Transport par statut 
+# GET  travaux/par-statut/?planning_id=uuid     Travaux d'un planning par statut

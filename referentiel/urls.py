@@ -16,3 +16,13 @@ router.register(r'regions', RegionViewset, basename='regions')
 urlpatterns = [
     path('', include(router.urls)),
 ]
+
+
+#================================
+# ROUTES POUR LES KPI
+#================================
+
+# GET regions/plannings/               Plannings par région
+# GET regions/plannings/?region=DRY    Plannings de la région DRY
+# GET regions/alignements/             Alignements par type et ouvrage
+# GET regions/alignements/?region=DRD  Alignements de la région DRD
