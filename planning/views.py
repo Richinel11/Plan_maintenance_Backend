@@ -484,9 +484,10 @@ class TravailViewSet(ModelViewSet):
     @action(detail=True, methods=['POST'])
     def terminer(self, request, pk=None):
         travail = self.get_object()
-        if travail.statut_travaux != 'EN_COURS':
+        napt = getattr(travail, 'note_arret', None)
+        if napt is None or napt.statut != 'DIFFUSEE':
             return Response(
-                {"error": "Le travail doit être EN_COURS pour être terminé."},
+                {"error": "La NAPT du travail doit être diffusée pour pouvoir le terminer."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         travail.statut_travaux = 'TERMINE'

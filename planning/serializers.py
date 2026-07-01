@@ -86,6 +86,10 @@ class TravailSerializer(serializers.ModelSerializer):
     reference = ReferenceSerializer(read_only=True)
     charge_consignation = UtilisateurShortSerializer(read_only=True)
     centrale_thermique_sollicitee = CentraleSerializer(read_only=True)
+    # Relations inverses OneToOne (DDR / NAPT) — nécessaires pour l'affichage
+    # du verrou DDR et du bouton "Terminer" (NAPT diffusée) côté frontend.
+    demande_retrait = serializers.SerializerMethodField()
+    note_arret = serializers.SerializerMethodField()
 
     # WRITE
     planning_id = serializers.PrimaryKeyRelatedField(
@@ -145,6 +149,7 @@ class TravailSerializer(serializers.ModelSerializer):
             'planning', 'type_travaux', 'cree_par', 'modifie_par',
             'entite_metier', 'unite_demanderesse', 'reference',
             'charge_consignation', 'centrale_thermique_sollicitee',
+            'demande_retrait', 'note_arret',
 
             # WRITE
             'planning_id', 'type_travaux_id', 'entite_metier_id',
@@ -156,6 +161,27 @@ class TravailSerializer(serializers.ModelSerializer):
             'prevision_enf_mwh', 'date_creation', 'date_modification',
             'type_alignement'   #  calculé automatiquement
             ]
+
+    def get_demande_retrait(self, obj):
+        ddr = getattr(obj, 'demande_retrait', None)
+        if not ddr:
+            return None
+        return {
+            'id': str(ddr.id),
+            'reference': ddr.reference,
+            'statut': ddr.statut,
+        }
+
+    def get_note_arret(self, obj):
+        napt = getattr(obj, 'note_arret', None)
+        if not napt:
+            return None
+        return {
+            'id': str(napt.id),
+            'reference': napt.reference,
+            'numero_NAPT': napt.numero_NAPT,
+            'statut': napt.statut,
+        }
 
     def validate(self, attrs):
         segment = attrs.get('segment')
