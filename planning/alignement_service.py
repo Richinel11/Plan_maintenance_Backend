@@ -33,7 +33,6 @@ def _get_poste(travail: Travail) -> str| None:
     if not travail.reference:
         return None
     item = travail.reference.items.filter(type__nom='POSTE').first() # type: ignore[attr-defined]
-    return item.valeur if item else None
 
 # Trouver la rame d'un travail à partir de sa référence
 def _get_rame(travail: Travail) -> str| None:
@@ -709,7 +708,7 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 f"→ {nouveau_debut.strftime('%d/%m %H:%M')}."
             )
             if not disponible:
-                raison += f" ⚠️ CONFLIT CHARGE : {detail_conflit}"
+                raison += f" CONFLIT CHARGE : {detail_conflit}"
 
             statut_final = (
                 PropositionAlignement.Statut.BLOQUEE

@@ -336,6 +336,7 @@ class PlanningViewSet(ModelViewSet):
             "message": "Proposition refusée. Aucun changement appliqué.",
             "proposition": PropositionAlignementSerializer(proposition).data
         }, status=status.HTTP_200_OK)
+    
 
 @extend_schema_view(
     list=extend_schema(tags=["Travail"]),
@@ -526,5 +527,88 @@ class TravailViewSet(ModelViewSet):
                 ids_en_conflit.add(str(t1.id))
         return Response({"conflits": list(ids_en_conflit)})
 
-    
-    
+    @extend_schema(
+        tags=["KPI - Travaux"],
+        description=(
+            "Retourne les travaux groupés par statut. "
+            "Paramètres optionnels : "
+            "?statut=BROUILLON (filtrer un statut précis), "
+            "?planning_id=uuid (filtrer par planning), "
+            "?segment=DISTRIBUTION (filtrer par segment)."
+        )
+    )
+    @action(detail=False, methods=['GET'], url_path='par-statut')
+    def travaux_par_statut(self, request):
+        """
+        Retourne les travaux groupés par statut avec compteurs.
+
+        Statuts possibles :
+        - BROUILLON  : créé, pas encore soumis
+        - SOUMIS     : soumis pour validation
+        - VALIDE     : validé par le responsable
+        - EN_COURS   : travaux en cours d'exécution
+        - TERMINE    : travaux terminés
+        - REPORTE    : travaux reportés
+        """
+        # Filtres optionnels
+        statut_filtre   = request.query_params.get('statut')
+        planning_filtre = request.query_params.get('planning_id')
+        segment_filtre  = request.query_params.get('segment')
+
+        qs = self.get_queryset()
+
+        if planning_filtre:
+            qs = qs.filter(planning_id=planning_filtre)
+        if segment_filtre:
+            qs = qs.filter(segment=segment_filtre)
+
+        # Si un statut précis est demandé, retourner juste ce statut
+        if statut_filtre:
+            statuts_valides = dict(Travail.STATUT_TRAVAUX)
+            if statut_filtre not in statuts_valides:
+                return Response(
+                    {
+                        "error": f"Statut invalide.",
+                        "statuts_valides": list(statuts_valides.keys())
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            travaux = qs.filter(statut_travaux=statut_filtre)
+            return Response({
+                "statut": statut_filtre,
+                "libelle": statuts_valides[statut_filtre],
+                "total": travaux.count(),
+                "travaux": self.get_serializer(travaux, many=True).data
+            })
+
+        # Sinon on retourne tous les statuts avec leurs travaux
+        STATUTS = [
+            ('BROUILLON', 'Brouillon'),
+            ('SOUMIS',    'Soumis'),
+            ('VALIDE',    'Validé'),
+            ('EN_COURS',  'En cours'),
+            ('TERMINE',   'Terminé'),
+            ('REPORTE',   'Reporté'),
+        ]
+
+        resultat = []
+        total_global = 0
+
+        for code, libelle in STATUTS:
+            travaux = qs.filter(statut_travaux=code)
+            count = travaux.count()
+            total_global += count
+            resultat.append({
+                "statut": code,
+                "libelle": libelle,
+                "total": count,
+                "travaux": self.get_serializer(travaux, many=True).data
+            })
+
+        return Response({
+            "total_global": total_global,
+            "par_statut": resultat
+        })
+
+        
+        
