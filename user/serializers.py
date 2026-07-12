@@ -130,7 +130,7 @@ class CreateUserSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(min_length=8, write_only=True)
     is_ldap = serializers.BooleanField(default=False)
-    code_role = serializers.CharField(max_length=100)
+    code_roles = serializers.ListField(child=serializers.CharField(max_length=100), allow_empty=False)
     region = serializers.UUIDField(required=False, allow_null=True)
     entite_metier = serializers.UUIDField(required=False, allow_null=True)
 

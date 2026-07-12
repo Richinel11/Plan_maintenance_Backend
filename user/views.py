@@ -34,14 +34,27 @@ from rest_framework_simplejwt.tokens import RefreshToken
 def create_user(request):
     
     try:
-        try: 
-            role = Role.objects.get(code_role = request.data['code_role'])
-        except Role.DoesNotExist: 
+        code_roles = request.data.get('code_roles') or []
+        if isinstance(code_roles, str):
+            code_roles = [code_roles]
+        code_roles = list(dict.fromkeys(code_roles))  # dédoublonnage en préservant l'ordre
+
+        if not code_roles:
             return Response({
-                'error-fr':'Role non existant',
-                'error-en': 'this Role do not exist'},
+                'error-fr': 'Au moins un rôle est requis',
+                'error-en': 'At least one role is required'},
                             status=status.HTTP_400_BAD_REQUEST)
-        
+
+        roles = []
+        for code_role in code_roles:
+            try:
+                roles.append(Role.objects.get(code_role=code_role))
+            except Role.DoesNotExist:
+                return Response({
+                    'error-fr': f"Le rôle '{code_role}' n'existe pas",
+                    'error-en': f"Role '{code_role}' does not exist"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
         user = Utilisateur.objects.create_user(
             username = request.data['username'],
             first_name = request.data['first_name'],
@@ -53,11 +66,10 @@ def create_user(request):
             region_id=request.data.get('region'), # correction ajoutée on recupere l'id de region.
             entite_metier = EntiteMetier.objects.get(id=request.data['entite_metier']) if request.data.get('entite_metier') else None
         )
-        UserRole.objects.create(
-            user = user,
-            role = role
-        )
-        
+        UserRole.objects.bulk_create([
+            UserRole(user=user, role=role) for role in roles
+        ])
+
         return Response({
             "error-en" :"User created",
             "error-fr":'Utilisateur crée'},

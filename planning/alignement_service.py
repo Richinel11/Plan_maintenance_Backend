@@ -33,6 +33,7 @@ def _get_poste(travail: Travail) -> str| None:
     if not travail.reference:
         return None
     item = travail.reference.items.filter(type__nom='POSTE').first() # type: ignore[attr-defined]
+    return item.valeur if item else None
 
 # Trouver la rame d'un travail à partir de sa référence
 def _get_rame(travail: Travail) -> str| None:
@@ -44,15 +45,21 @@ def _get_rame(travail: Travail) -> str| None:
 # Trouver la region elecrique d'un travail à partir de sa référence
 def _get_depart(travail: Travail) -> str| None:
     if not travail.reference:
-        return None 
+        return None
     item = travail.reference.items.filter(type__nom='DEPART').first() # type: ignore[attr-defined]
     return item.valeur if item else None
+
+# Valeurs tolérées pour chaque niveau de coupure : le modèle Travail.NiveauCoupure
+# déclare POSTES/DEPARTS (pluriel) mais des lignes existantes en base utilisent
+# encore l'ancien singulier POSTE/DEPART (CharField choices non imposé en BDD).
+NIVEAU_COUPURE_POSTE = ('POSTE', 'POSTES')
+NIVEAU_COUPURE_DEPART = ('DEPART', 'DEPARTS')
 
 def _est_coupure_au_poste(travail: Travail) -> bool:
     """travaux transport coupe toujours au niveau du poste, quel que soit le champ niveau_coupure."""
     if travail.segment == 'TRANSPORT':
         return True
-    return travail.niveau_coupure == 'POSTE' # type: ignore[attr-defined]
+    return travail.niveau_coupure in NIVEAU_COUPURE_POSTE # type: ignore[attr-defined]
 
 
 
@@ -110,13 +117,13 @@ def _partage_ressource(travail_a: Travail, travail_b: Travail) -> bool:
      # Cas 2 : coupure rame → compatible si même rame ou même départ de rame
     if coupure_a == 'RAME' and coupure_b == 'RAME':
         return bool(rame_a) and rame_a == rame_b
-    if coupure_a == 'RAME' and coupure_b == 'DEPART':
+    if coupure_a == 'RAME' and coupure_b in NIVEAU_COUPURE_DEPART:
         return bool(rame_a) and rame_a == rame_b
-    if coupure_b == 'RAME' and coupure_a == 'DEPART':
+    if coupure_b == 'RAME' and coupure_a in NIVEAU_COUPURE_DEPART:
         return bool(rame_b) and rame_a == rame_b
-    
+
     # cas 3 : coupure départ → compatible si même départ
-    if coupure_a == 'DEPART' and coupure_b == 'DEPART':
+    if coupure_a in NIVEAU_COUPURE_DEPART and coupure_b in NIVEAU_COUPURE_DEPART:
         return bool(depart_a) and depart_a == depart_b
     
     return False 
@@ -627,6 +634,16 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
     chevauchements_detectes = []
     nb_bloquees = 0
 
+    # Propositions déjà existantes pour ces travaux (tous statuts confondus) :
+    # on les réutilise au lieu d'en recréer, pour ne pas dupliquer en base
+    # à chaque nouvel appel de l'analyse (rechargement de page, clic "Analyser"...).
+    propositions_existantes = {
+        (p.travail_a_modifier_id, p.travail_reference_id): p
+        for p in PropositionAlignement.objects.filter(
+            travail_a_modifier_id__in=[t.id for t in travaux]
+        )
+    }
+
     for groupe in groupes:
         reference = _trouver_reference(groupe)
         autres = [t for t in groupe if t.id != reference.id]
@@ -658,6 +675,14 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
 
         for travail in autres:
             type_travail = travail.type_travaux.libelle if travail.type_travaux else ""
+            cle_existante = (travail.id, reference.id)
+            proposition_existante = propositions_existantes.get(cle_existante)
+
+            if proposition_existante:
+                propositions_creees.append(proposition_existante)
+                if proposition_existante.statut == PropositionAlignement.Statut.BLOQUEE:
+                    nb_bloquees += 1
+                continue
 
             if not _peut_bouger(travail):
                 proposition = PropositionAlignement.objects.create(
@@ -686,6 +711,7 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                     statut=PropositionAlignement.Statut.BLOQUEE,
                     cree_par=user
                 )
+                propositions_existantes[cle_existante] = proposition
                 propositions_creees.append(proposition)
                 nb_bloquees += 1
                 continue
@@ -740,6 +766,7 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 statut=statut_final,
                 cree_par=user
             )
+            propositions_existantes[cle_existante] = proposition
             propositions_creees.append(proposition)
 
     nb_libres = len(propositions_creees) - nb_bloquees

@@ -28,7 +28,6 @@ urlpatterns = [
 #POST         /plannings/analyser-mois/ + body {"mois": 7}           Juillet mois en cours
 #POST         /plannings/analyser-mois/                            Mois en cours
 
-# POST        /plannings/{id}/analyser-chevauchements/   
 # GET         /plannings/{id}/propositions/?statut=EN_ATTENTE
 # POST        /plannings/{id}/appliquer-proposition/      appliquer les propositions
 # POST        /plannings/{id}/refuser-proposition/        refuser les propositions
@@ -47,7 +46,6 @@ urlpatterns = [
 # POST        /travaux/<id>/valider/                  valider
 # POST        /travaux/<id>/demarrer/                 démarrer
 # POST        /travaux/<id>/terminer/                 terminer
-# GET         /travaux/conflits/                      voir les conflits
 # GET         /travaux/par_segment/?segment=XXX       filtrer par segment
 #
 # GET/POST    /types-activite/                        types d'activité

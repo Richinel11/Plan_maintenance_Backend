@@ -8,7 +8,7 @@ from rest_framework import serializers as drf_serializers
 from .models import Planning, Travail, TypeActivite, PropositionAlignement
 from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer, PropositionAlignementSerializer
 from pilotage.models import Workflow, WorkflowStep
-from .alignement_service import analyser_et_proposer, analyser_mois
+from .alignement_service import analyser_mois
 
 
 @extend_schema_view(
@@ -133,25 +133,8 @@ class PlanningViewSet(ModelViewSet):
         serializer = self.get_serializer(planning)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    @extend_schema(tags=["Planning - Alignement"])
-    @action(detail=True, methods=['POST'], url_path='analyser-chevauchements')
-    def analyser_chevauchements(self, request, pk=None):
-        """analyser les travaux et propose des reprogrammations"""
-        planning = self.get_object()
-        result = analyser_et_proposer(planning, request.user)
-        propositions_data = PropositionAlignementSerializer(
-            result['propositions'], many=True
-        ).data
-        
-        return Response({
-        "message": result['message'],
-        "resume": result['resume'],
-        "chevauchements": result['chevauchements'],
-        "propositions": propositions_data 
-        }, status=status.HTTP_200_OK)
-      
-    # FONCTION POUR ALIGNER LES TRAVAUX SUR LE UN MOIS DONNEE  
-        
+    # FONCTION POUR ALIGNER LES TRAVAUX SUR LE UN MOIS DONNEE
+
     @extend_schema(
         tags=["Planning - Alignement"],
         description=(
@@ -352,7 +335,6 @@ class PlanningViewSet(ModelViewSet):
     demarrer=extend_schema(tags=["Travail"]),
     terminer=extend_schema(tags=["Travail"]),
     par_segment=extend_schema(tags=["Travail"]),
-    conflits=extend_schema(tags=["Travail"]),
 )
 class TravailViewSet(ModelViewSet):
     queryset = Travail.objects.all().order_by('-date_creation').select_related(
@@ -507,25 +489,6 @@ class TravailViewSet(ModelViewSet):
             )
         travaux = self.get_queryset().filter(segment=segment)
         return Response(self.get_serializer(travaux, many=True).data)
-
-    @action(detail=False, methods=['GET'])
-    def conflits(self, request):
-        """Retourne les travaux dont les périodes se chevauchent sur la même référence"""
-        travaux = self.get_queryset().filter(
-            heure_debut_planifie__isnull=False,
-            heure_fin_planifie__isnull=False,
-            reference__isnull=False,
-        )
-        ids_en_conflit = set()
-        for t1 in travaux:
-            en_conflit = travaux.filter(
-                reference=t1.reference,
-                heure_debut_planifie__lte=t1.heure_fin_planifie,
-                heure_fin_planifie__gte=t1.heure_debut_planifie,
-            ).exclude(id=t1.id)
-            if en_conflit.exists():
-                ids_en_conflit.add(str(t1.id))
-        return Response({"conflits": list(ids_en_conflit)})
 
     @extend_schema(
         tags=["KPI - Travaux"],
