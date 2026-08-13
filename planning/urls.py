@@ -51,7 +51,12 @@ urlpatterns = [
 # GET/POST    /types-activite/                        types d'activité
 
 
-# GET  travaux/par-statut/                      Tous les statuts 
-# GET  travaux/par-statut/?statut=BROUILLON     Seulement les brouillons 
-# GET  travaux/par-statut/?segment=TRANSPORT    Travaux Transport par statut 
+# GET  travaux/par-statut/                      Tous les statuts
+# GET  travaux/par-statut/?statut=BROUILLON     Seulement les brouillons
+# GET  travaux/par-statut/?segment=TRANSPORT    Travaux Transport par statut
 # GET  travaux/par-statut/?planning_id=uuid     Travaux d'un planning par statut
+
+# GET  travaux/kpi-resume/                      Programmés / exécutés / non exécutés
+# GET  travaux/harmonises/                      Nombre de travaux harmonisés (alignements ACCEPTEE)
+# GET  travaux/par-ouvrage/                     Travaux programmés par ouvrage
+# GET  travaux/centrales-ipp-interne/           Travaux Production : centrales IPP vs internes

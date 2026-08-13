@@ -340,7 +340,8 @@ class Command(BaseCommand):
         dist  = EntiteMetier.objects.get(name="Distribution")
 
         # ── Types de référentiel ──
-        types = ['SEGMENT', 'POSTE', 'OUVRAGE', 'DEPART', 'TRONCON']
+        # NB: TRONCON n'en fait plus partie — il a sa propre table (referentiel.Troncon).
+        types = ['SEGMENT', 'POSTE', 'OUVRAGE', 'DEPART']
         type_objs = {}
         for t in types:
             obj, _ = TypeReferentiel.objects.get_or_create(nom=t)
@@ -623,11 +624,11 @@ class Command(BaseCommand):
         from planning.models import Planning
         nb = Planning.objects.filter(
             workflow=workflow, current_step__isnull=True
-        ).update(current_step=steps["CREER"])
+        ).update(current_step=steps["EN_ATTENTE"])
         if nb:
             self.stdout.write(f"   {nb} planning(s) orphelin(s) reinitialise(s) a CREER")
 
-        self.stdout.write("✅ Workflow créé (5 steps + 5 transitions)")
+        self.stdout.write("✅ Workflow créé (4 steps + 3 transitions)")
 
     # ─────────────────────────────────────────
     # 9. PLANNINGS ET TRAVAUX DE TEST
@@ -648,7 +649,7 @@ class Command(BaseCommand):
         prod  = EntiteMetier.objects.get(name="Production")
 
         workflow   = Workflow.objects.get(code="TRAVAUX_PROGRAMMES")
-        step_init  = WorkflowStep.objects.get(workflow=workflow, code="CREER")
+        step_init  = WorkflowStep.objects.get(workflow=workflow, code="EN_ATTENTE")
 
         unite_dist  = UniteDemanderesse.objects.filter(entite_metier=dist).first()
         unite_trans = UniteDemanderesse.objects.filter(entite_metier=trans).first()

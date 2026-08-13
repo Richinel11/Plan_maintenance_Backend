@@ -12,12 +12,13 @@ from .models import (
     TypeReferentiel,
     Reference,
     ReferentielItem,
-    Region
+    Region,
+    Troncon
 )
 from .serializers import(
     CentraleSerializer, TypeReferentielSerializer,
     ReferenceSerializer, ReferentielItemSerializer,
-    RegionSerializer
+    RegionSerializer, TronconSerializer
 )
 
 _TAG = dict(
@@ -32,7 +33,7 @@ _TAG = dict(
 
 @extend_schema_view(**_TAG)
 class CentraleViewSet(viewsets.ModelViewSet):
-    queryset = Centrale.objects.all().order_by('valeur')
+    queryset = Centrale.objects.all().order_by('-date_creation')
     serializer_class = CentraleSerializer
 
 @extend_schema_view(**_TAG)
@@ -262,7 +263,7 @@ _REFERENCE_TAG = dict(
 
 @extend_schema_view(**_REFERENCE_TAG)
 class ReferenceViewSet(viewsets.ModelViewSet):
-    queryset = Reference.objects.select_related('entite_metier').prefetch_related('items__type').all()
+    queryset = Reference.objects.select_related('entite_metier').prefetch_related('items__type').all().order_by('-date_creation')
     serializer_class = ReferenceSerializer
 
     def get_queryset(self):
@@ -292,16 +293,29 @@ class ReferenceViewSet(viewsets.ModelViewSet):
 
 @extend_schema_view(**_TAG)
 class ReferentielItemViewSet(viewsets.ModelViewSet):
-    queryset = ReferentielItem.objects.select_related('type', 'reference').all()
+    queryset = ReferentielItem.objects.select_related('type', 'reference').all().order_by('-date_creation')
     serializer_class = ReferentielItemSerializer
 
     def get_queryset(self):
         qs = super().get_queryset()
         reference_id = self.request.query_params.get('reference_id')
         type_id = self.request.query_params.get('type_id')
+        # ReferentielItem n'a pas de champ entite_metier direct : il est lié
+        # à une Reference, elle-même liée à une EntiteMetier. On remonte donc
+        # cette chaîne (item -> reference -> entite_metier) pour filtrer.
+        entite_metier_id = self.request.query_params.get('entite_metier_id')
+        VALEURS_INVALIDES = {'undefined', 'null', ''}
         if reference_id:
             qs = qs.filter(reference_id=reference_id)
         if type_id:
             qs = qs.filter(type_id=type_id)
+        if entite_metier_id and entite_metier_id not in VALEURS_INVALIDES:
+            qs = qs.filter(reference__entite_metier_id=entite_metier_id)
         return qs
+
+
+@extend_schema_view(**_TAG)
+class TronconViewSet(viewsets.ModelViewSet):
+    queryset = Troncon.objects.all().order_by('-date_creation')
+    serializer_class = TronconSerializer
 

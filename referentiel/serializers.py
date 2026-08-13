@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Centrale, TypeReferentiel, Reference, ReferentielItem, Region
+from .models import Centrale, TypeReferentiel, Reference, ReferentielItem, Region, Troncon
 from user.models import EntiteMetier
 
 
@@ -12,7 +12,7 @@ class EntiteMetierShortSerializer(serializers.ModelSerializer):
 class CentraleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Centrale
-        fields = ['id', 'valeur']
+        fields = ['id', 'valeur', 'date_creation']
 
 
 class TypeReferentielSerializer(serializers.ModelSerializer):
@@ -29,7 +29,7 @@ class ReferentielItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReferentielItem
-        fields = ['id', 'valeur', 'reference', 'type', 'type_id']
+        fields = ['id', 'valeur', 'reference', 'type', 'type_id', 'date_creation']
 
 
 class ReferenceSerializer(serializers.ModelSerializer):
@@ -42,10 +42,16 @@ class ReferenceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reference
-        fields = ['id', 'valeur', 'entite_metier', 'entite_metier_id', 'items']
+        fields = ['id', 'valeur', 'entite_metier', 'entite_metier_id', 'items', 'date_creation']
 
 
 class RegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Region
         fields = ['id', 'code']
+
+
+class TronconSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Troncon
+        fields = ['id', 'valeur', 'date_creation']

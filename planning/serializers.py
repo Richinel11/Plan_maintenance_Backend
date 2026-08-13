@@ -49,27 +49,18 @@ class PlanningSerializer(serializers.ModelSerializer):
         queryset=EntiteMetier.objects.all(), source='entite_metier',
         write_only=True, allow_null=True, required=False
     )
-    workflow_id = serializers.PrimaryKeyRelatedField(
-        queryset=Workflow.objects.all(), source='workflow',
-        write_only=True, allow_null=True, required=False
-    )
-    current_step_id = serializers.PrimaryKeyRelatedField(
-        queryset=WorkflowStep.objects.all(), source='current_step',
-        write_only=True, allow_null=True, required=False
-    )
-
     class Meta:
         model = Planning
         fields = [
-            'id', 'nom', 'code',
+            'id', 'nom', 'code', 'transmis_au_responsable', 'date_transmission',
             'date_creation', 'date_modification',
             # READ
             'entite_metier', 'workflow', 'current_step',
             'cree_par', 'modifie_par',
             # WRITE
-            'entite_metier_id', 'workflow_id', 'current_step_id',
+            'entite_metier_id',
         ]
-        read_only_fields = ['code', 'date_creation', 'date_modification']
+        read_only_fields = ['code', 'date_creation', 'date_modification', 'transmis_au_responsable', 'date_transmission']
 
 
 #  Travail
