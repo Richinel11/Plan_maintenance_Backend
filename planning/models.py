@@ -26,6 +26,8 @@ class Planning(models.Model):
     entite_metier = models.ForeignKey(EntiteMetier, on_delete=models.PROTECT, null=True, blank=True, related_name='plannings')
     workflow = models.ForeignKey(Workflow, on_delete=models.SET_NULL, null=True, blank=True)
     current_step = models.ForeignKey(WorkflowStep, on_delete=models.SET_NULL, null=True, blank=True)
+    transmis_au_responsable = models.BooleanField(default=False)
+    date_transmission = models.DateTimeField(null=True, blank=True)
     cree_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name='plannings_crees')
     modifie_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name='plannings_modifies', null=True, blank=True)
     date_creation = models.DateTimeField(auto_now_add=True)

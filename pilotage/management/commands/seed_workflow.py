@@ -7,16 +7,6 @@ from security.models import Role
 STEPS_DATA = [
     {
         "number": 1,
-        "code": "CREER",
-        "name": "Créer",
-        "is_terminal": False,
-        "description": (
-            "Planning créé ou importé par l'opérateur de saisie. "
-            "Le gestionnaire de planification peut harmoniser les travaux avant de valider."
-        ),
-    },
-    {
-        "number": 2,
         "code": "EN_ATTENTE",
         "name": "En attente",
         "is_terminal": False,
@@ -27,7 +17,7 @@ STEPS_DATA = [
         ),
     },
     {
-        "number": 3,
+        "number": 2,
         "code": "COMPLETE",
         "name": "Complété",
         "is_terminal": False,
@@ -38,7 +28,7 @@ STEPS_DATA = [
         ),
     },
     {
-        "number": 4,
+        "number": 3,
         "code": "VALIDE",
         "name": "Validé",
         "is_terminal": False,
@@ -48,7 +38,7 @@ STEPS_DATA = [
         ),
     },
     {
-        "number": 5,
+        "number": 4,
         "code": "TERMINE",
         "name": "Terminé",
         "is_terminal": True,
@@ -57,22 +47,6 @@ STEPS_DATA = [
 ]
 
 TRANSITIONS_DATA = [
-    {
-        "name": "Valider",
-        "from": "CREER",
-        "to": "EN_ATTENTE",
-        "can_go_back": False,
-        "comment_required": False,
-        "role_code": "GESTIONNAIRE",
-    },
-    {
-        "name": "Retourner pour correction",
-        "from": "EN_ATTENTE",
-        "to": "CREER",
-        "can_go_back": True,
-        "comment_required": True,
-        "role_code": "GESTIONNAIRE",
-    },
     {
         # Déclenchée automatiquement quand toutes les DDR
         # du planning sont à l'état COMPLÉTÉE
@@ -199,16 +173,16 @@ class Command(BaseCommand):
         # ── RÉPARATION des plannings orphelins ───────────────────────
         # Supprimer puis recréer les steps met current_step à NULL
         # (FK on_delete=SET_NULL). On réinitialise donc tout planning
-        # rattaché à ce workflow mais sans étape → étape de départ CREER.
+        # rattaché à ce workflow mais sans étape → étape EN_ATTENTE.
         from planning.models import Planning
         orphelins = Planning.objects.filter(
             workflow=workflow, current_step__isnull=True
         )
-        nb_repares = orphelins.update(current_step=steps["CREER"])
+        nb_repares = orphelins.update(current_step=steps["EN_ATTENTE"])
         if nb_repares:
             self.stdout.write(
                 self.style.WARNING(
-                    f"  [repare] {nb_repares} planning(s) orphelin(s) reinitialise(s) a l'etape CREER"
+                    f"  [repare] {nb_repares} planning(s) orphelin(s) reinitialise(s) a l'etape EN_ATTENTE"
                 )
             )
 
@@ -216,11 +190,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("[OK] Seed workflow termine."))
         self.stdout.write("")
         self.stdout.write("Recapitulatif TRAVAUX_PROGRAMMES :")
-        self.stdout.write("  [1] CREER       --(Gestionnaire valide)----> [2] EN_ATTENTE")
-        self.stdout.write("  [2] EN_ATTENTE  --(DDR completes, auto)----> [3] COMPLETE")
-        self.stdout.write("  [3] COMPLETE    --(NAPT diffusees, auto)---> [4] VALIDE")
-        self.stdout.write("  [4] VALIDE      --(Terminer, manuel)-------> [5] TERMINE")
-        self.stdout.write("  [2] EN_ATTENTE  --(Retourner, motif requis)> [1] CREER")
+        self.stdout.write("  [1] EN_ATTENTE  --(DDR completes, auto)----> [2] COMPLETE")
+        self.stdout.write("  [2] COMPLETE    --(NAPT diffusees, auto)---> [3] VALIDE")
+        self.stdout.write("  [3] VALIDE      --(Terminer, manuel)-------> [4] TERMINE")
 
     def _log(self, created, label):
         if created:

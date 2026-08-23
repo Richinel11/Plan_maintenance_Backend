@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
 from django.utils import timezone
@@ -22,7 +23,7 @@ from .alignement_service import analyser_mois, _charge_disponible, _peut_bouger
     destroy=extend_schema(tags=["Planning"]),
 )
 class TypeActiviteViewSet(ModelViewSet):
-    queryset = TypeActivite.objects.select_related('entite_metier').all().order_by('libelle')
+    queryset = TypeActivite.objects.select_related('entite_metier').all().order_by('-date_creation')
     serializer_class = TypeActiviteSerializer
     permission_classes = [IsAuthenticated]
 
@@ -50,6 +51,18 @@ class PlanningViewSet(ModelViewSet):
     serializer_class = PlanningSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if (
+            self.request.user.user_roles.filter(role__code_role='RESPONSABLE').exists()
+            and not self.request.user.is_superuser
+        ):
+            qs = qs.filter(
+                entite_metier=self.request.user.entite_metier,
+                transmis_au_responsable=True,
+            )
+        return qs
+
     def perform_create(self, serializer):
         # Liaison automatique au workflow actif 
         # Il ne peut y avoir qu'un seul workflow actif à la fois.
@@ -60,8 +73,10 @@ class PlanningViewSet(ModelViewSet):
         first_step = None
         if workflow_actif:
             first_step = WorkflowStep.objects.filter(
-                workflow=workflow_actif
-            ).order_by('number').first()
+                workflow=workflow_actif, code='EN_ATTENTE'
+            ).first()
+            if not first_step:
+                first_step = WorkflowStep.objects.filter(workflow=workflow_actif).order_by('number').first()
 
         serializer.save(
             cree_par=self.request.user,
@@ -78,16 +93,17 @@ class PlanningViewSet(ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        # Un planning ne peut être supprimé que tant qu'il est à l'étape de départ.
-        # Dès qu'il est validé par le gestionnaire (EN_ATTENTE ou au-delà), la
-        # suppression est interdite : le planning est déjà engagé dans le workflow.
+        # Un planning ne peut être supprimé que tant qu'il est à son étape de
+        # départ (EN_ATTENTE, le premier step du workflow actif). Dès qu'il
+        # avance au-delà, la suppression est interdite : le planning est déjà
+        # engagé dans le workflow.
         planning = self.get_object()
         step = planning.current_step
-        if step and step.code != 'CREER':
+        if step and step.code != 'EN_ATTENTE':
             return Response(
                 {"error": (
                     f"Suppression impossible : le planning est déjà à l'étape "
-                    f"« {step.name} ». Seuls les plannings à l'étape « Créer » "
+                    f"« {step.name} ». Seuls les plannings à l'étape « En attente » "
                     f"peuvent être supprimés."
                 )},
                 status=status.HTTP_403_FORBIDDEN
@@ -134,6 +150,40 @@ class PlanningViewSet(ModelViewSet):
 
         serializer = self.get_serializer(planning)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'], url_path='transmettre-au-responsable')
+    def transmettre_au_responsable(self, request, pk=None):
+        """Finalise un import et alerte les responsables de la même entité."""
+        planning = self.get_object()
+        if planning.cree_par_id != request.user.id and not request.user.is_superuser:
+            return Response(
+                {"error": "Seul le créateur du planning peut finaliser sa transmission."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if not planning.entite_metier_id:
+            return Response(
+                {"error": "L'entité métier est requise avant la transmission."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not planning.travaux.exists():
+            return Response(
+                {"error": "Un planning sans travaux ne peut pas être transmis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not planning.transmis_au_responsable:
+            from exploitation.notification_service import alerter_responsables_planning_transmis
+
+            planning.transmis_au_responsable = True
+            planning.date_transmission = timezone.now()
+            planning.modifie_par = request.user
+            planning.save(update_fields=[
+                'transmis_au_responsable', 'date_transmission', 'modifie_par',
+                'date_modification',
+            ])
+            alerter_responsables_planning_transmis(planning)
+
+        return Response(self.get_serializer(planning).data, status=status.HTTP_200_OK)
     
     # FONCTION POUR ALIGNER LES TRAVAUX SUR LE UN MOIS DONNEE
 
@@ -692,5 +742,131 @@ class TravailViewSet(ModelViewSet):
             "par_statut": resultat
         })
 
-        
-        
+    def _filtrer_par_mois(self, qs, request):
+        """Filtre un queryset de Travail sur date_programmee__year/month.
+        Paramètres optionnels : ?annee=2026&mois=4"""
+        annee = request.query_params.get('annee')
+        mois  = request.query_params.get('mois')
+        if annee:
+            qs = qs.filter(date_programmee__year=annee)
+        if mois:
+            qs = qs.filter(date_programmee__month=mois)
+        return qs
+
+    @extend_schema(
+        tags=["KPI - Travaux"],
+        description=(
+            "Retourne le nombre de travaux programmés (VALIDE), exécutés (TERMINE) "
+            "et non exécutés (REPORTE). Paramètres optionnels : ?planning_id=uuid, "
+            "?segment=DISTRIBUTION, ?annee=2026&mois=4 (filtre sur date_programmee)."
+        )
+    )
+    @action(detail=False, methods=['GET'], url_path='kpi-resume')
+    def kpi_resume(self, request):
+        planning_filtre = request.query_params.get('planning_id')
+        segment_filtre  = request.query_params.get('segment')
+
+        qs = self.get_queryset()
+        if planning_filtre:
+            qs = qs.filter(planning_id=planning_filtre)
+        if segment_filtre:
+            qs = qs.filter(segment=segment_filtre)
+        qs = self._filtrer_par_mois(qs, request)
+
+        return Response({
+            "programmes": qs.filter(statut_travaux='VALIDE').count(),
+            "executes": qs.filter(statut_travaux='TERMINE').count(),
+            "non_executes": qs.filter(statut_travaux='REPORTE').count(),
+            "total": qs.count(),
+        })
+
+    @extend_schema(
+        tags=["KPI - Travaux"],
+        description=(
+            "Retourne le nombre de travaux harmonisés (travaux distincts ayant au moins "
+            "une proposition d'alignement ACCEPTEE). Paramètres optionnels : ?segment=DISTRIBUTION, "
+            "?annee=2026&mois=4 (filtre sur date_programmee)."
+        )
+    )
+    @action(detail=False, methods=['GET'], url_path='harmonises')
+    def harmonises(self, request):
+        segment_filtre = request.query_params.get('segment')
+
+        travail_ids = PropositionAlignement.objects.filter(
+            statut=PropositionAlignement.Statut.ACCEPTEE
+        ).values_list('travail_a_modifier_id', flat=True).distinct()
+
+        qs = self.get_queryset().filter(id__in=travail_ids)
+        if segment_filtre:
+            qs = qs.filter(segment=segment_filtre)
+        qs = self._filtrer_par_mois(qs, request)
+
+        return Response({
+            "total_harmonises": qs.count(),
+        })
+
+    @extend_schema(
+        tags=["KPI - Travaux"],
+        description=(
+            "Retourne le nombre de travaux programmés regroupés par ouvrage (poste pour "
+            "Distribution/Transport, centrale sollicitée pour Production). Paramètres optionnels : "
+            "?segment=DISTRIBUTION, ?annee=2026&mois=4 (filtre sur date_programmee). "
+            "L'ouvrage est résolu à partir d'un champ texte libre : deux orthographes "
+            "différentes du même ouvrage ne sont pas regroupées ensemble."
+        )
+    )
+    @action(detail=False, methods=['GET'], url_path='par-ouvrage')
+    def par_ouvrage(self, request):
+        from collections import Counter
+        from referentiel.kpi_service import _get_poste_from_travail
+
+        segment_filtre = request.query_params.get('segment')
+        qs = self.get_queryset()
+        if segment_filtre:
+            qs = qs.filter(segment=segment_filtre)
+        qs = self._filtrer_par_mois(qs, request)
+
+        compteur = Counter()
+        for travail in qs:
+            if travail.segment == 'PRODUCTION':
+                ouvrage = travail.centrale_thermique_sollicitee.valeur if travail.centrale_thermique_sollicitee else "Inconnu"
+            else:
+                ouvrage = _get_poste_from_travail(travail)
+            compteur[ouvrage] += 1
+
+        resultat = [
+            {"ouvrage": ouvrage, "total": total}
+            for ouvrage, total in sorted(compteur.items(), key=lambda x: -x[1])
+        ]
+
+        return Response({
+            "total_ouvrages": len(resultat),
+            "par_ouvrage": resultat,
+        })
+
+    @extend_schema(
+        tags=["KPI - Travaux"],
+        description=(
+            "Retourne le nombre de travaux Production regroupés selon que l'unité "
+            "demanderesse est une IPP (nom contenant 'IPP') ou une entité interne ENEO. "
+            "Heuristique basée sur le nom de l'unité demanderesse, faute de champ dédié "
+            "de catégorisation dans le modèle actuel. Paramètre optionnel : ?annee=2026&mois=4."
+        )
+    )
+    @action(detail=False, methods=['GET'], url_path='centrales-ipp-interne')
+    def centrales_ipp_interne(self, request):
+        qs = self.get_queryset().filter(segment='PRODUCTION')
+        qs = self._filtrer_par_mois(qs, request)
+
+        ipp = qs.filter(unite_demanderesse__nom__icontains='IPP').count()
+        non_renseigne = qs.filter(unite_demanderesse__isnull=True).count()
+        interne = qs.exclude(
+            unite_demanderesse__nom__icontains='IPP'
+        ).exclude(unite_demanderesse__isnull=True).count()
+
+        return Response({
+            "total": qs.count(),
+            "ipp": ipp,
+            "interne": interne,
+            "non_renseigne": non_renseigne,
+        })

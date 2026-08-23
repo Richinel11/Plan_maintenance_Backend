@@ -181,7 +181,7 @@ def delete_user(request, user_id):
     try:    
         user = Utilisateur.objects.get(id=user_id)
         user.is_active = False
-        user.is_deleted = False
+        user.is_deleted = True
         user.save()
         return Response({
             "error-en": "User desactivated successfully",
@@ -416,7 +416,7 @@ class EntiteMetierViewSet(ModelViewSet):
     destroy=extend_schema(tags=["Users"]),
 )
 class UniteDemanderesseViewSet(ModelViewSet):
-    queryset = UniteDemanderesse.objects.select_related('entite_metier').all().order_by('nom')
+    queryset = UniteDemanderesse.objects.select_related('entite_metier').all().order_by('-created_at')
     serializer_class = UniteDemanderesseSerializer
 
     def get_queryset(self):
