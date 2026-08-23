@@ -168,6 +168,13 @@ class Travail(models.Model):
     statut_probleme = models.BooleanField(default=False)
     probleme_rencontre = models.TextField(blank=True)
     travail_en_alignement = models.BooleanField(default=False)
+    # Alignement fixé manuellement par un gestionnaire (écran Réajustement) :
+    # le système ne doit plus jamais proposer de déplacer ce travail (même
+    # règle que TRANSPORT/P1, voir alignement_service._peut_bouger), et doit
+    # au contraire s'appuyer dessus comme référence pour aligner les autres
+    # travaux du groupe. Purement manuel : ne se remet jamais à False tout
+    # seul, seul un gestionnaire peut déverrouiller.
+    alignement_verrouille = models.BooleanField(default=False)
     date_report_travaux = models.DateField(null=True, blank=True)
 
     #  Audit

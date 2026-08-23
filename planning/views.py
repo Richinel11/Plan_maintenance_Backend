@@ -5,10 +5,12 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from .models import Planning, Travail, TypeActivite, PropositionAlignement
 from .serializers import PlanningSerializer, TravailSerializer, TypeActiviteSerializer, PropositionAlignementSerializer
 from pilotage.models import Workflow, WorkflowStep
-from .alignement_service import analyser_mois
+from .alignement_service import analyser_mois, _charge_disponible, _peut_bouger
 
 
 @extend_schema_view(
@@ -205,15 +207,16 @@ class PlanningViewSet(ModelViewSet):
     @action(detail=True, methods=['POST'], url_path='appliquer-proposition')
     def appliquer_proposition(self, request, pk=None):
         """Accepter une proposition et appliquer les changements d'horaires"""
+        planning = self.get_object()
         proposition_id = request.data.get('proposition_id')
-        
+
         if not proposition_id:
             return Response({"error": "proposition_id est requis"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try: 
+
+        try:
             proposition = PropositionAlignement.objects.select_related(
                 'travail_a_modifier'
-                ).get(id=proposition_id)
+                ).get(id=proposition_id, planning=planning)
         except PropositionAlignement.DoesNotExist:
             return Response({
                 "error-fr": "Proposition introuvable",
@@ -231,8 +234,32 @@ class PlanningViewSet(ModelViewSet):
             return Response({
                 "error-fr" : f"Proposition déjà '{proposition.statut}'."
             }, status=status.HTTP_400_BAD_REQUEST)
-            
+
         travail = proposition.travail_a_modifier
+
+        # Revalidation à l'application : la disponibilité du chargé de
+        # consignation a été calculée au moment de l'analyse (ou de la
+        # dernière modification) et peut être périmée si, entre-temps, une
+        # autre proposition partageant le même chargé a été appliquée sur un
+        # créneau qui chevauche celui-ci. On ne fait plus confiance à
+        # conflit_charge_consignation stocké : on revérifie à l'instant T.
+        disponible, detail_conflit = _charge_disponible(
+            travail.charge_consignation,
+            proposition.nouveau_debut, proposition.nouvelle_fin,
+            exclure_id=travail.id
+        )
+        if not disponible:
+            proposition.statut = PropositionAlignement.Statut.BLOQUEE
+            proposition.conflit_charge_consignation = True
+            proposition.detail_conflit = detail_conflit
+            proposition.save(update_fields=['statut', 'conflit_charge_consignation', 'detail_conflit', 'updated_at'])
+            return Response({
+                "error-fr": "Le chargé de consignation n'est plus disponible sur ce créneau (probablement suite à l'application d'une autre proposition entre-temps).",
+                "error-en": "The consignment officer is no longer available for this slot.",
+                "detail": detail_conflit,
+                "proposition": PropositionAlignementSerializer(proposition).data,
+            }, status=status.HTTP_409_CONFLICT)
+
         travail.heure_debut_planifie = proposition.nouveau_debut
         travail.heure_fin_planifie = proposition.nouvelle_fin
         travail.travail_en_alignement = True
@@ -294,12 +321,13 @@ class PlanningViewSet(ModelViewSet):
     @action(detail=True, methods=['POST'], url_path='refuser-proposition')
     def refuser_proposition(self, request, pk=None):
         """Refuse une proposition sans modifier le travail."""
+        planning = self.get_object()
         proposition_id = request.data.get('proposition_id')
         if not proposition_id:
             return Response({"error": "proposition_id est requis"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            proposition = PropositionAlignement.objects.get(id=proposition_id)
+            proposition = PropositionAlignement.objects.get(id=proposition_id, planning=planning)
         except PropositionAlignement.DoesNotExist:
             return Response({"error": "Proposition introuvable"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -317,6 +345,97 @@ class PlanningViewSet(ModelViewSet):
 
         return Response({
             "message": "Proposition refusée. Aucun changement appliqué.",
+            "proposition": PropositionAlignementSerializer(proposition).data
+        }, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        tags=["Planning - Alignement"],
+        request=inline_serializer('ModifierPropositionSerializer', fields={
+            'proposition_id': drf_serializers.UUIDField(),
+            'nouveau_debut': drf_serializers.DateTimeField(),
+            'nouvelle_fin': drf_serializers.DateTimeField(),
+        }),
+        description=(
+            "Ajuste la date proposée avant application (le travail n'est pas "
+            "encore modifié). Recalcule la disponibilité du chargé de "
+            "consignation sur le nouveau créneau : la proposition peut passer "
+            "de BLOQUEE à EN_ATTENTE ou inversement."
+        ),
+    )
+    @action(detail=True, methods=['POST'], url_path='modifier-proposition')
+    def modifier_proposition(self, request, pk=None):
+        """Modifie les dates proposées d'une proposition en attente ou bloquée."""
+        planning = self.get_object()
+        proposition_id = request.data.get('proposition_id')
+        nouveau_debut_raw = request.data.get('nouveau_debut')
+        nouvelle_fin_raw = request.data.get('nouvelle_fin')
+
+        if not proposition_id or not nouveau_debut_raw or not nouvelle_fin_raw:
+            return Response({
+                "error": "proposition_id, nouveau_debut et nouvelle_fin sont requis"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        nouveau_debut = parse_datetime(nouveau_debut_raw)
+        nouvelle_fin = parse_datetime(nouvelle_fin_raw)
+        if not nouveau_debut or not nouvelle_fin:
+            return Response({
+                "error": "nouveau_debut/nouvelle_fin doivent être des dates ISO 8601 valides"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if timezone.is_naive(nouveau_debut):
+            nouveau_debut = timezone.make_aware(nouveau_debut)
+        if timezone.is_naive(nouvelle_fin):
+            nouvelle_fin = timezone.make_aware(nouvelle_fin)
+
+        if nouveau_debut >= nouvelle_fin:
+            return Response({
+                "error": "nouveau_debut doit être antérieur à nouvelle_fin"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            proposition = PropositionAlignement.objects.select_related(
+                'travail_a_modifier'
+                ).get(id=proposition_id, planning=planning)
+        except PropositionAlignement.DoesNotExist:
+            return Response({"error": "Proposition introuvable"}, status=status.HTTP_404_NOT_FOUND)
+
+        if proposition.statut not in [
+            PropositionAlignement.Statut.EN_ATTENTE,
+            PropositionAlignement.Statut.BLOQUEE
+        ]:
+            return Response(
+                {"error": f"Proposition déjà '{proposition.statut}', non modifiable."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        travail = proposition.travail_a_modifier
+        if not _peut_bouger(travail):
+            return Response({
+                "error-fr": "Ce travail (TRANSPORT ou P1) ne peut jamais être déplacé : la proposition n'est pas modifiable.",
+                "error-en": "This work (TRANSPORT or P1) can never be moved: the proposal is not editable.",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        disponible, detail_conflit = _charge_disponible(
+            travail.charge_consignation,
+            nouveau_debut, nouvelle_fin,
+            exclure_id=travail.id
+        )
+
+        proposition.nouveau_debut = nouveau_debut
+        proposition.nouvelle_fin = nouvelle_fin
+        proposition.conflit_charge_consignation = not disponible
+        proposition.detail_conflit = detail_conflit
+        proposition.statut = (
+            PropositionAlignement.Statut.BLOQUEE if not disponible
+            else PropositionAlignement.Statut.EN_ATTENTE
+        )
+        proposition.raison = (
+            f"[Modifiée manuellement par {request.user.get_full_name() or request.user.username}] "
+            f"{proposition.raison}"
+        )
+        proposition.save()
+
+        return Response({
+            "message": "Proposition modifiée.",
             "proposition": PropositionAlignementSerializer(proposition).data
         }, status=status.HTTP_200_OK)
     

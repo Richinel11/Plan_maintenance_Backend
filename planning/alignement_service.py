@@ -1,17 +1,10 @@
 from django.utils import timezone
 import calendar
 from datetime import timedelta, datetime
-from .models import Travail, Planning, PropositionAlignement
+from .models import Travail, PropositionAlignement
 
 
 # HELPERS DE BASE
-
-ALIGNEMENT_COMPATIBLE = {
-    'TRANSPORT': ['TRANSPORT', 'DISTRIBUTION_POSTE_SOURCE', 'DISTRIBUTION_LIGNE', 'PRODUCTION'],
-    'DISTRIBUTION_POSTE_SOURCE': ['DISTRIBUTION_POSTE_SOURCE', 'DISTRIBUTION_LIGNE'],
-    'DISTRIBUTION_LIGNE': ['DISTRIBUTION_LIGNE'],
-    'PRODUCTION': ['TRANSPORT', 'PRODUCTION'],
-}
 
 def _periodes_se_chevauchent(debut_a, fin_a, debut_b, fin_b) -> bool:
     """
@@ -129,35 +122,62 @@ def _partage_ressource(travail_a: Travail, travail_b: Travail) -> bool:
     return False 
 
  # PRIORITÉ
-PRIORITE_ORDRE = {'TRANSPORT': 0,'P1': 1,'P2': 2,'P3': 3,None: 4,}
+PRIORITE_ORDRE = {'TRANSPORT': 0, 'VERROUILLE': 1, 'P1': 2, 'P2': 3, 'P3': 4, None: 5}
 
 
 def _peut_bouger(travail: Travail) -> bool:
     """
     Règle métier :
     - TRANSPORT → ne bouge JAMAIS
+    - Alignement verrouillé par un gestionnaire → ne bouge plus (décision
+      manuelle définitive, cf. Travail.alignement_verrouille)
     - P1 → ne bouge pas (urgent)
     - P2, P3 → peut bouger
     """
     if travail.segment == 'TRANSPORT':
         return False
+    if travail.alignement_verrouille: # type: ignore[attr-defined]
+        return False
     if travail.priorite == 'P1': # type: ignore[attr-defined]
         return False
     return True
 
+def _raison_non_deplacable(travail: Travail) -> str:
+    """Explique pourquoi un travail non déplaçable ne bouge pas (cf. _peut_bouger)."""
+    if travail.alignement_verrouille: # type: ignore[attr-defined]
+        return "son alignement a été fixé manuellement par un gestionnaire"
+    if travail.segment == 'TRANSPORT':
+        return "un travail TRANSPORT ne bouge jamais"
+    return f"priorité {travail.priorite} (urgent)"
+
 def _score_priorite(travail: Travail) -> int:
-    """retourne un score numérique pour la priorité d'un travail, plus bas = plus prioritaire"""
+    """
+    Retourne un score numérique pour la priorité d'un travail, plus bas = plus prioritaire.
+    Un alignement verrouillé manuellement passe juste après TRANSPORT : c'est
+    une décision humaine délibérée, elle doit devenir la référence du groupe
+    (les autres s'alignent sur elle) plutôt que l'inverse.
+    """
     if travail.segment == 'TRANSPORT':
         return PRIORITE_ORDRE['TRANSPORT']
-    return PRIORITE_ORDRE.get(travail.priorite, 4) #type: ignore[attr-defined]
+    if travail.alignement_verrouille: # type: ignore[attr-defined]
+        return PRIORITE_ORDRE['VERROUILLE']
+    return PRIORITE_ORDRE.get(travail.priorite, 5) #type: ignore[attr-defined]
 
 # CHARGE DE CONSIGNATION
-def _charge_disponible(charge, nouveau_debut, nouvelle_fin, exclure_id=None) -> tuple:
+def _charge_disponible(charge, nouveau_debut, nouvelle_fin, exclure_id=None, alignements_proposes=None) -> tuple:
     """
     Vérifie si le charge de consignation est libre sur la nouvelle période.
 
     Logique :
-    - On cherche tous ses autres travaux
+    - On cherche tous ses autres travaux déjà enregistrés en base
+    - On vérifie aussi les alignements déjà décidés plus tôt DANS CETTE MÊME
+      analyse (alignements_proposes) : deux travaux d'un même groupe qui
+      partagent le même chargé de consignation et sont tous les deux calés
+      sur la fenêtre du pivot n'apparaissent pas comme en conflit l'un avec
+      l'autre en base (aucun des deux n'a encore été réellement déplacé,
+      seule une proposition existe) — sans ce second passage, les deux
+      propositions ressortiraient EN_ATTENTE alors que les appliquer toutes
+      les deux double-réserverait la même personne sur le même créneau.
     - Si l'un d'eux chevauche la nouvelle période → BLOQUÉ
     """
     if not charge:
@@ -177,6 +197,18 @@ def _charge_disponible(charge, nouveau_debut, nouvelle_fin, exclure_id=None) -> 
                 f"'{_nom_ressource(t)}' de {t.heure_debut_planifie.strftime('%d/%m %H:%M') if t.heure_debut_planifie else '?'} "
                 f"à {t.heure_fin_planifie.strftime('%d/%m %H:%M') if t.heure_fin_planifie else '?'}."
             )
+
+    for alignement in (alignements_proposes or []):
+        if alignement['charge_id'] != charge.id or alignement['travail_id'] == exclure_id:
+            continue
+        if _periodes_se_chevauchent(nouveau_debut, nouvelle_fin,
+                                    alignement['debut'], alignement['fin']):
+            return False, (
+                f"{charge.get_full_name()} est déjà proposé sur le travail "
+                f"'{alignement['ressource']}' de {alignement['debut'].strftime('%d/%m %H:%M')} "
+                f"à {alignement['fin'].strftime('%d/%m %H:%M')} dans cette même analyse."
+            )
+
     return True, ""
 
 
@@ -203,7 +235,6 @@ def _ressources_communes(travail_a: Travail, travail_b: Travail) -> list:
     communs = items_a & items_b
     return [f"{type_nom} : {valeur}" for valeur, type_nom in communs]
 
-   
 
 # COMPATIBILITÉ DES TYPES
 
@@ -242,8 +273,6 @@ def _analyser_compatibilite(type_a: str, type_b: str) -> dict:
                 "note": f"Deux travaux lourds. Coordination précise requise."}
 
     return {"niveau": "OK", "note": f"'{type_a}' + '{type_b}' : alignement possible."}
-
-
 
 
 # DÉTECTION DES GROUPES
@@ -363,194 +392,6 @@ def _calculer_nouvel_horaire(travail: Travail, reference: Travail) -> tuple:
 # FONCTION PRINCIPALE
 #=======================================================================
 
-def analyser_et_proposer(planning: Planning, user) -> dict:
-    """
-    Analyse les chevauchements d'un planning et génère des propositions.
-
-    Étapes :
-    1. Récupérer tous les travaux du planning avec horaires
-    2. Détecter les groupes de chevauchement
-    3. Pour chaque groupe, trouver la référence ensuite proposer des alignements
-    4. Vérifier les contraintes (priorité, charge de consignation)
-    5. Sauvegarder et retourner les propositions
-    """
-
-    # Supprimer les anciennes propositions EN_ATTENTE
-    PropositionAlignement.objects.filter(
-        planning=planning,
-        statut=PropositionAlignement.Statut.EN_ATTENTE
-    ).delete()
-
-    # Récupérer les travaux avec horaires
-    travaux = list(
-        Travail.objects.filter(planning=planning).select_related(
-            'reference', 'reference__region','charge_consignation', 'type_travaux'
-        ).filter(
-            heure_debut_planifie__isnull=False,
-            heure_fin_planifie__isnull=False
-        )
-    )
-
-    if len(travaux) < 2:
-        return {
-            "message": "Pas assez de travaux avec des horaires pour analyser.",
-            "chevauchements": [], "propositions": [],
-            "resume": {"total_chevauchements": 0, "total_propositions": 0,
-                       "propositions_bloquees": 0, "propositions_libres": 0}
-        }
-
-    groupes = _detecter_groupes(travaux)
-
-    if not groupes:
-        return {
-            "message": "Aucun chevauchement détecté.",
-            "chevauchements": [], "propositions": [],
-            "resume": {"total_chevauchements": 0, "total_propositions": 0,
-                       "propositions_bloquees": 0, "propositions_libres": 0}
-        }
-
-    propositions_creees = []
-    chevauchements_detectes = []
-    nb_bloquees = 0
-
-    for groupe in groupes:
-        reference = _trouver_reference(groupe)
-        autres = [t for t in groupe if t.id != reference.id]
-        type_ref = reference.type_travaux.libelle if reference.type_travaux else "Non défini"
-
-        chevauchements_detectes.append({
-            "reference": {
-                "id": str(reference.id),
-                "ressource": _nom_ressource(reference),
-                "segment": reference.segment,
-                "priorite": getattr(reference, 'priorite', None),
-                "type_travaux": type_ref,
-                "debut": reference.heure_debut_planifie.strftime('%d/%m/%Y %H:%M') if reference.heure_debut_planifie else None,
-                "fin": reference.heure_fin_planifie.strftime('%d/%m/%Y %H:%M') if reference.heure_fin_planifie else None,
-                "peut_bouger": _peut_bouger(reference),
-                #detail des composants de la reference
-                "composants": list(
-                    reference.reference.items.values('type__nom', 'valeur') # type: ignore
-                ) if reference.reference else []
-            },
-            "travaux_en_conflit": [{
-                "id": str(t.id),
-                "ressource": _nom_ressource(t),
-                "segment": t.segment,
-                "priorite": getattr(t, 'priorite', None),
-                "type_travaux": t.type_travaux.libelle if t.type_travaux else "Non défini",
-                "debut": t.heure_debut_planifie.strftime('%d/%m/%Y %H:%M'),
-                "fin": t.heure_fin_planifie.strftime('%d/%m/%Y %H:%M'),
-                "peut_bouger": _peut_bouger(t),
-                #Ressources spécifiquement partagées avec la référence
-                "ressources_communes": _ressources_communes(reference, t),
-            } for t in autres]
-        })
-
-        for travail in autres:
-            type_travail = travail.type_travaux.libelle if travail.type_travaux else ""
-
-            # Travail ne peut pas bouger -> signaler sans proposer de déplacement
-            if not _peut_bouger(travail):
-                proposition = PropositionAlignement.objects.create(
-                    planning=planning,
-                    travail_a_modifier=travail,
-                    travail_reference=reference,
-                    type_proposition=PropositionAlignement.TypeProposition.ALIGNEMENT_TRANSPORT
-                        if reference.segment == 'TRANSPORT'
-                        else PropositionAlignement.TypeProposition.ALIGNEMENT_TRAVAUX,
-                    type_travaux_reference=type_ref,
-                    type_travaux_a_modifier=type_travail,
-                    priorite_travail=travail.priorite or '',
-                    ancien_debut=travail.heure_debut_planifie,
-                    ancienne_fin=travail.heure_fin_planifie,
-                    nouveau_debut=travail.heure_debut_planifie,
-                    nouvelle_fin=travail.heure_fin_planifie,
-                    raison=f"'{_nom_ressource(travail)}' ne peut pas être déplacé (priorité {travail.priorite}). Conflit avec '{_nom_ressource(reference)}' Résolution manuelle requise.",
-                    statut=PropositionAlignement.Statut.BLOQUEE, 
-                    cree_par=user
-                )
-                propositions_creees.append(proposition)
-                nb_bloquees += 1
-                continue
-
-            # Calculer le nouvel horaire
-            nouveau_debut, nouvelle_fin = _calculer_nouvel_horaire(travail, reference)
-
-            # Analyser la compatibilité des types de travaux 
-            compatibilite = _analyser_compatibilite(type_ref, type_travail)
-
-            # Vérifier la disponibilité du charge de consignation
-            disponible, detail_conflit = _charge_disponible(
-                travail.charge_consignation,
-                nouveau_debut, nouvelle_fin,
-                exclure_id=travail.id
-            )
-            
-            ressources = _ressources_communes(reference, travail)
-            ressources_str = ", ".join(ressources) if ressources else _nom_ressource(reference)
-            raison = (
-                f"Chevauchement détecté sur {ressources_str}. "
-                f"Référence : '{_nom_ressource(reference)}' ({reference.segment}) "
-                f"de {reference.heure_debut_planifie.strftime('%d/%m/%Y %H:%M')if reference.heure_debut_planifie else None} "
-                f"à {reference.heure_fin_planifie.strftime('%d/%m/%Y %H:%M')if reference.heure_fin_planifie else None}. "
-                f"Proposition : déplacer l'heure de début de "
-                f"{travail.heure_debut_planifie.strftime('%d/%m/%Y %H:%M')} -> {nouveau_debut.strftime('%d/%m/%Y %H:%M')}."
-            )
-            if not disponible:
-                raison += f" CONFLIT CHARGE : {detail_conflit}"
-
-            statut_final = (PropositionAlignement.Statut.BLOQUEE if not disponible else PropositionAlignement.Statut.EN_ATTENTE)
-            if not disponible:
-                nb_bloquees += 1
-
-            proposition = PropositionAlignement.objects.create(
-                planning=planning,
-                travail_a_modifier=travail,
-                travail_reference=reference,
-                type_proposition=(
-                    PropositionAlignement.TypeProposition.ALIGNEMENT_TRANSPORT
-                    if reference.segment == 'TRANSPORT'
-                    else PropositionAlignement.TypeProposition.ALIGNEMENT_TRAVAUX
-                ),
-                type_travaux_reference=type_ref,
-                type_travaux_a_modifier=type_travail,
-                priorite_travail=getattr(travail, 'priorite', '') or '',
-                ancien_debut=travail.heure_debut_planifie,
-                ancienne_fin=travail.heure_fin_planifie,
-                nouveau_debut=nouveau_debut,
-                nouvelle_fin=nouvelle_fin,
-                raison=raison,
-                note_compatibilite_types=f"[{compatibilite['niveau']}] {compatibilite['note']}",
-                conflit_charge_consignation=not disponible,
-                detail_conflit=detail_conflit,
-                statut=statut_final,
-                cree_par=user
-            )
-            propositions_creees.append(proposition)
-
-    nb_libres = len(propositions_creees) - nb_bloquees
-
-    return {
-        "message": (
-            f"{len(groupes)} chevauchement(s) détecté(s). "
-            f"{len(propositions_creees)} proposition(s) : "
-            f"{nb_libres} libre(s), {nb_bloquees} bloquée(s)."
-        ),
-        "chevauchements": chevauchements_detectes,
-        "propositions": propositions_creees,
-        "resume": {
-            "total_chevauchements": len(groupes),
-            "total_propositions": len(propositions_creees),
-            "propositions_bloquees": nb_bloquees,
-            "propositions_libres": nb_libres,
-        }
-    }
-    
- #=======================================   
- # FONCTIONS POUR L'ALIGNEMENT PAR MOIS
- #=======================================   
-    
 def get_fenetre_mois(annee: int= None, mois: int= None) -> tuple: # type: ignore[attr-defined]
     """
     Retourne le début et la fin du mois demandé.
@@ -566,6 +407,36 @@ def get_fenetre_mois(annee: int= None, mois: int= None) -> tuple: # type: ignore
     
     return debut_mois, fin_mois    
     
+def _invalider_propositions_obsoletes(travaux: list, pairs_valides: set) -> None:
+    """
+    Referme (statut REFUSEE) toute proposition EN_ATTENTE/BLOQUEE dont le
+    couple (travail_a_modifier, travail_reference) ne correspond plus à un
+    conflit détecté dans l'analyse en cours.
+
+    Sans ce nettoyage, une proposition dont le conflit a été résolu autrement
+    (réajustement manuel, changement de segment/priorité/référence...) reste
+    EN_ATTENTE indéfiniment avec des dates devenues obsolètes — au risque
+    d'être appliquée plus tard et de recréer un conflit déjà résolu.
+    """
+    en_cours = PropositionAlignement.objects.filter(
+        travail_a_modifier_id__in=[t.id for t in travaux],
+        statut__in=[
+            PropositionAlignement.Statut.EN_ATTENTE,
+            PropositionAlignement.Statut.BLOQUEE,
+        ],
+    )
+    for proposition in en_cours:
+        cle = (proposition.travail_a_modifier_id, proposition.travail_reference_id)
+        if cle in pairs_valides:
+            continue
+        proposition.statut = PropositionAlignement.Statut.REFUSEE
+        proposition.raison = (
+            "[Invalidée automatiquement — conflit résolu autrement] "
+            f"{proposition.raison}"
+        )
+        proposition.save(update_fields=['statut', 'raison', 'updated_at'])
+
+
 def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
     """
     Analyse les chevauchements entre TOUS les travaux qui touchent
@@ -598,6 +469,25 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
     nb_travaux = len(travaux)
     periode = f"{debut_mois.strftime('%d/%m/%Y')} jusqu'au -> {fin_mois.strftime('%d/%m/%Y')}"
 
+    groupes = _detecter_groupes(travaux) if nb_travaux >= 2 else []
+    # Pivot calculé une seule fois par groupe (réutilisé pour le nettoyage et
+    # pour la génération des propositions plus bas).
+    groupes_avec_pivot = [(groupe, _trouver_reference(groupe)) for groupe in groupes]
+
+    # Nettoyage : toute proposition EN_ATTENTE/BLOQUEE dont le couple
+    # (travail_a_modifier, travail_reference) ne fait plus partie d'un
+    # conflit détecté par cette analyse est refermée (voir
+    # _invalider_propositions_obsoletes). Fait avant les retours anticipés
+    # pour que le nettoyage ait bien lieu même si plus aucun conflit
+    # n'est détecté ce mois-ci.
+    if travaux:
+        pairs_valides = {
+            (t.id, reference.id)
+            for groupe, reference in groupes_avec_pivot
+            for t in groupe if t.id != reference.id
+        }
+        _invalider_propositions_obsoletes(travaux, pairs_valides)
+
     if nb_travaux < 2:
         return {
             "message": f"Pas assez de travaux sur la période {periode}.",
@@ -612,8 +502,6 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 "propositions_libres": 0,
             }
         }
-
-    groupes = _detecter_groupes(travaux)
 
     if not groupes:
         return {
@@ -634,24 +522,38 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
     chevauchements_detectes = []
     nb_bloquees = 0
 
-    # Propositions déjà existantes pour ces travaux (tous statuts confondus) :
-    # on les réutilise au lieu d'en recréer, pour ne pas dupliquer en base
-    # à chaque nouvel appel de l'analyse (rechargement de page, clic "Analyser"...).
+    # Propositions actives déjà existantes pour ces travaux : on les réutilise
+    # au lieu d'en recréer, pour ne pas dupliquer en base à chaque nouvel
+    # appel de l'analyse (rechargement de page, clic "Analyser"...).
+    # Seuls EN_ATTENTE/BLOQUEE sont réutilisés : une proposition terminale
+    # (ACCEPTEE/REFUSEE) ne doit jamais bloquer la régénération d'une
+    # proposition fraîche si le même couple redevient conflictuel plus tard.
     propositions_existantes = {
         (p.travail_a_modifier_id, p.travail_reference_id): p
         for p in PropositionAlignement.objects.filter(
-            travail_a_modifier_id__in=[t.id for t in travaux]
+            travail_a_modifier_id__in=[t.id for t in travaux],
+            statut__in=[
+                PropositionAlignement.Statut.EN_ATTENTE,
+                PropositionAlignement.Statut.BLOQUEE,
+            ],
         )
     }
 
-    for groupe in groupes:
-        reference = _trouver_reference(groupe)
+    # Fenêtres déjà proposées EN_ATTENTE dans cette même analyse (tous
+    # groupes confondus) : permet à _charge_disponible de détecter deux
+    # travaux d'un même chargé de consignation alignés au même moment sans
+    # que ni l'un ni l'autre n'apparaisse encore comme déplacé en base (voir
+    # _charge_disponible).
+    alignements_proposes = []
+
+    for groupe, reference in groupes_avec_pivot:
         autres = [t for t in groupe if t.id != reference.id]
         type_ref = reference.type_travaux.libelle if reference.type_travaux else "Non défini"
 
         chevauchements_detectes.append({
             "reference": {
                 "id": str(reference.id),
+                "planning_id": str(reference.planning_id),
                 "planning_nom": reference.planning.nom,
                 "ressource": _nom_ressource(reference),
                 "segment": reference.segment,
@@ -660,9 +562,11 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 "debut": reference.heure_debut_planifie.strftime('%d/%m/%Y %H:%M') if reference.heure_debut_planifie else None,
                 "fin": reference.heure_fin_planifie.strftime('%d/%m/%Y %H:%M') if reference.heure_fin_planifie else None,
                 "peut_bouger": _peut_bouger(reference),
+                "alignement_verrouille": reference.alignement_verrouille,
             },
             "travaux_en_conflit": [{
                 "id": str(t.id),
+                "planning_id": str(t.planning_id),
                 "planning_nom": t.planning.nom,
                 "ressource": _nom_ressource(t),
                 "segment": t.segment,
@@ -670,6 +574,7 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 "debut": t.heure_debut_planifie.strftime('%d/%m/%Y %H:%M'),
                 "fin": t.heure_fin_planifie.strftime('%d/%m/%Y %H:%M'),
                 "peut_bouger": _peut_bouger(t),
+                "alignement_verrouille": t.alignement_verrouille,
             } for t in autres]
         })
 
@@ -682,6 +587,14 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 propositions_creees.append(proposition_existante)
                 if proposition_existante.statut == PropositionAlignement.Statut.BLOQUEE:
                     nb_bloquees += 1
+                elif travail.charge_consignation_id:
+                    alignements_proposes.append({
+                        'charge_id': travail.charge_consignation_id,
+                        'travail_id': travail.id,
+                        'debut': proposition_existante.nouveau_debut,
+                        'fin': proposition_existante.nouvelle_fin,
+                        'ressource': _nom_ressource(travail),
+                    })
                 continue
 
             if not _peut_bouger(travail):
@@ -703,7 +616,8 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                     nouvelle_fin=travail.heure_fin_planifie,
                     raison=(
                         f"Travail '{_nom_ressource(travail)}' ({travail.segment} - "
-                        f"{travail.priorite}) ne peut pas être déplacé. "
+                        f"{travail.priorite}) ne peut pas être déplacé : "
+                        f"{_raison_non_deplacable(travail)}. "
                         f"Conflit avec '{_nom_ressource(reference)}' "
                         f"(planning : {reference.planning.nom}). "
                         f"Résolution manuelle requise."
@@ -717,10 +631,12 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 continue
 
             nouveau_debut, nouvelle_fin = _calculer_nouvel_horaire(travail, reference)
+            compatibilite = _analyser_compatibilite(type_ref, type_travail)
             disponible, detail_conflit = _charge_disponible(
                 travail.charge_consignation,
                 nouveau_debut, nouvelle_fin,
-                exclure_id=travail.id
+                exclure_id=travail.id,
+                alignements_proposes=alignements_proposes,
             )
 
             raison = (
@@ -761,6 +677,7 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 nouveau_debut=nouveau_debut,
                 nouvelle_fin=nouvelle_fin,
                 raison=raison,
+                note_compatibilite_types=f"[{compatibilite['niveau']}] {compatibilite['note']}",
                 conflit_charge_consignation=not disponible,
                 detail_conflit=detail_conflit,
                 statut=statut_final,
@@ -768,6 +685,14 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
             )
             propositions_existantes[cle_existante] = proposition
             propositions_creees.append(proposition)
+            if disponible and travail.charge_consignation_id:
+                alignements_proposes.append({
+                    'charge_id': travail.charge_consignation_id,
+                    'travail_id': travail.id,
+                    'debut': nouveau_debut,
+                    'fin': nouvelle_fin,
+                    'ressource': _nom_ressource(travail),
+                })
 
     nb_libres = len(propositions_creees) - nb_bloquees
 

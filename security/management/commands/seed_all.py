@@ -21,6 +21,7 @@ class Command(BaseCommand):
         self._seed_types_activite()
         self._seed_workflow()
         self._seed_plannings_et_travaux()
+        self._seed_scenarios_harmonisation()
         self.stdout.write(self.style.SUCCESS('\n🎉 Seed complet terminé avec succès !\n'))
         self._print_recap()
 
@@ -183,10 +184,22 @@ class Command(BaseCommand):
         ]
 
         for r in roles_data:
-            role, _ = Role.objects.get_or_create(
-                code_role=r['code_role'],
-                defaults={"nom": r['nom']}
-            )
+            # Le code d'un rôle a pu évoluer dans une base déjà initialisée.
+            # ``nom`` et ``code_role`` sont tous deux uniques : un simple
+            # get_or_create(code_role=...) tente alors de recréer un nom qui
+            # existe déjà, ce qui provoque une erreur d'unicité.
+            role = Role.objects.filter(code_role=r['code_role']).first()
+            if role is None:
+                role = Role.objects.filter(nom=r['nom']).first()
+                if role is None:
+                    role = Role.objects.create(
+                        code_role=r['code_role'], nom=r['nom']
+                    )
+                else:
+                    # On conserve le même rôle (et donc ses utilisateurs et
+                    # permissions), en le mettant au code attendu par le seed.
+                    role.code_role = r['code_role']
+                    role.save(update_fields=['code_role'])
             for code in r['permissions']:
                 try:
                     perm = Permission.objects.get(code=code)
@@ -547,10 +560,15 @@ class Command(BaseCommand):
         ]
 
         for t in types_data:
-            TypeActivite.objects.get_or_create(
-                libelle=t['libelle'],
-                defaults={"entite_metier": t['entite']}
-            )
+            # ``libelle`` n'est pas unique en base. On scope la recherche à
+            # l'entité et on prend le premier résultat si un ancien seed a
+            # déjà créé des doublons.
+            if not TypeActivite.objects.filter(
+                libelle=t['libelle'], entite_metier=t['entite']
+            ).exists():
+                TypeActivite.objects.create(
+                    libelle=t['libelle'], entite_metier=t['entite']
+                )
         self.stdout.write("✅ Types d'activité créés")
 
     # ─────────────────────────────────────────
@@ -654,10 +672,18 @@ class Command(BaseCommand):
         unite_trans = UniteDemanderesse.objects.filter(entite_metier=trans).first()
         unite_prod  = UniteDemanderesse.objects.filter(entite_metier=prod).first()
 
-        type_maintenance  = TypeActivite.objects.get(libelle="MAINTENANCE")
-        type_remplacement = TypeActivite.objects.get(libelle="REMPLACEMENT")
-        type_inspection   = TypeActivite.objects.get(libelle="INSPECTION")
-        type_entretien    = TypeActivite.objects.get(libelle="Entretien")
+        def _type_activite(libelle, entite=None):
+            qs = TypeActivite.objects.filter(libelle=libelle)
+            if entite is not None:
+                type_entite = qs.filter(entite_metier=entite).first()
+                if type_entite:
+                    return type_entite
+            return qs.first()
+
+        type_maintenance  = _type_activite("MAINTENANCE", dist)
+        type_remplacement = _type_activite("REMPLACEMENT", dist)
+        type_inspection   = _type_activite("INSPECTION", dist)
+        type_entretien    = _type_activite("Entretien", trans)
 
         ref_dist1 = Reference.objects.filter(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D11").first()
         ref_dist2 = Reference.objects.filter(valeur__startswith="DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.D12").first()
@@ -822,7 +848,7 @@ class Command(BaseCommand):
             defaults={
                 "segment": "PRODUCTION",
                 "priorite": "P2",
-                "type_travaux": TypeActivite.objects.get(libelle="Révision ciblée"),
+                "type_travaux": _type_activite("Révision ciblée", prod),
                 "unite_demanderesse": unite_prod,
                 "consistance_travaux": "Révision groupe 01 centrale EDEA",
                 "duree": 6, "unite_duree": "HEURES",
@@ -841,6 +867,168 @@ class Command(BaseCommand):
         self.stdout.write(f"  📋 Planning Distribution : {planning_dist.code}")
         self.stdout.write(f"  📋 Planning Transport    : {planning_trans.code}")
         self.stdout.write(f"  📋 Planning Production   : {planning_prod.code}")
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # 10. SCÉNARIOS D'HARMONISATION POSTE → RAME → LIGNE
+    # ─────────────────────────────────────────────────────────────────────────
+    def _seed_scenarios_harmonisation(self):
+        """Crée des jeux de données démontrant la hiérarchie électrique.
+
+        Les items ``POSTE``, ``RAME`` et ``DEPART`` sont volontairement
+        renseignés sur les références. C'est cette structure, et non le texte
+        de la référence, qui est utilisée par l'algorithme d'harmonisation.
+        """
+        from datetime import datetime
+
+        from planning.models import Planning, Travail, TypeActivite, PropositionAlignement
+        from pilotage.models import Workflow, WorkflowStep
+        from referentiel.models import Reference, ReferentielItem, Region, TypeReferentiel
+        from user.models import EntiteMetier, UniteDemanderesse
+
+        distribution = EntiteMetier.objects.get(name="Distribution")
+        operateur = User.objects.get(username='operateur1')
+        charge = User.objects.get(username='charge1')
+        charge_pivot = User.objects.get(username='charge2')
+        workflow = Workflow.objects.get(code="TRAVAUX_PROGRAMMES")
+        step_initial = WorkflowStep.objects.get(workflow=workflow, code="CREER")
+        unite = UniteDemanderesse.objects.filter(entite_metier=distribution).first()
+        maintenance = TypeActivite.objects.filter(
+            libelle="MAINTENANCE", entite_metier=distribution
+        ).first()
+        inspection = TypeActivite.objects.filter(
+            libelle="INSPECTION", entite_metier=distribution
+        ).first()
+        region, _ = Region.objects.get_or_create(code='BRGM')
+
+        type_items = {
+            nom: TypeReferentiel.objects.get_or_create(nom=nom)[0]
+            for nom in ('SEGMENT', 'POSTE', 'RAME', 'DEPART', 'OUVRAGE')
+        }
+
+        def reference(valeur, items):
+            ref, _ = Reference.objects.get_or_create(
+                valeur=valeur,
+                defaults={'entite_metier': distribution, 'region': region},
+            )
+            # Les références peuvent avoir été créées auparavant : on complète
+            # alors leur région et leurs items sans écraser d'autres données.
+            if ref.region_id is None:
+                ref.region = region
+                ref.save(update_fields=['region'])
+            for type_nom, valeur_item in items:
+                ReferentielItem.objects.get_or_create(
+                    reference=ref,
+                    type=type_items[type_nom],
+                    valeur=valeur_item,
+                )
+            return ref
+
+        poste = 'BRGM_POSTE SOURCE_HTA'
+        rame_1 = 'RAME 15kV N°1'
+        rame_2 = 'RAME 15kV N°2'
+        commun_poste = [('SEGMENT', 'DISTRIBUTION-MAINTENANCE POSTES'), ('POSTE', poste)]
+
+        ref_poste = reference(
+            'DEMO_HARMONISATION_BRGM_POSTE_SOURCE_HTA',
+            commun_poste + [('OUVRAGE', 'POSTE SOURCE HTA')],
+        )
+        ref_rame_1 = reference(
+            'DEMO_HARMONISATION_BRGM_TRANSFO_1_RAME_1',
+            commun_poste + [('OUVRAGE', 'TRANSFO 90/15kV N°1'), ('RAME', rame_1)],
+        )
+        ref_ligne_1 = reference(
+            'DEMO_HARMONISATION_BRGM_RAME_1_BRG_D11',
+            commun_poste + [('OUVRAGE', 'TRANSFO 90/15kV N°1'), ('RAME', rame_1), ('DEPART', 'BRG.D11 P4')],
+        )
+        ref_ligne_2 = reference(
+            'DEMO_HARMONISATION_BRGM_RAME_1_BRG_D12',
+            commun_poste + [('OUVRAGE', 'TRANSFO 90/15kV N°1'), ('RAME', rame_1), ('DEPART', 'BRG.D12 MESSA')],
+        )
+        ref_ligne_rame_2 = reference(
+            'DEMO_HARMONISATION_BRGM_RAME_2_BRG_D17',
+            commun_poste + [('OUVRAGE', 'TRANSFO 90/15kV N°2'), ('RAME', rame_2), ('DEPART', 'BRG.D17 PALAIS DES CONGRES')],
+        )
+
+        def planning(nom):
+            plan, _ = Planning.objects.get_or_create(
+                nom=nom,
+                defaults={
+                    'entite_metier': distribution, 'workflow': workflow,
+                    'current_step': step_initial, 'cree_par': operateur,
+                    'modifie_par': operateur,
+                },
+            )
+            return plan
+
+        def moment(jour, heure):
+            return timezone.make_aware(datetime(2026, 8, jour, heure, 0))
+
+        def travail(plan, ref, debut, duree, coupure, priorite, libelle,
+                    aligne=False, charge_consignation=None):
+            obj, _ = Travail.objects.get_or_create(
+                planning=plan, reference=ref, heure_debut_planifie=debut,
+                defaults={
+                    'segment': 'DISTRIBUTION', 'priorite': priorite,
+                    'type_travaux': maintenance if priorite == 'P2' else inspection,
+                    'unite_demanderesse': unite, 'consistance_travaux': libelle,
+                    'duree': duree, 'unite_duree': 'HEURES',
+                    'date_programmee': debut.date(),
+                    'charge_consignation': charge_consignation or charge,
+                    'type_reseau': 'HTA', 'niveau_coupure': coupure,
+                    'entite_metier': distribution, 'travail_en_alignement': aligne,
+                    'cree_par': operateur, 'modifie_par': operateur,
+                },
+            )
+            if aligne and not obj.travail_en_alignement:
+                obj.travail_en_alignement = True
+                obj.modifie_par = operateur
+                obj.save(update_fields=['travail_en_alignement', 'modifie_par', 'date_modification'])
+            return obj
+
+        # Cas 1 : une coupure au poste source doit proposer d'aligner une ligne
+        # de la rame 1 et une ligne de la rame 2 (toutes deux sous ce poste).
+        a_harmoniser = planning('DEMO - Harmonisation BRGM à traiter (août 2026)')
+        travail(a_harmoniser, ref_poste, moment(18, 8), 8, 'POSTES', 'P2',
+                'Maintenance au poste source BRGM : impacte toutes les rames',
+                charge_consignation=charge_pivot)
+        travail(a_harmoniser, ref_ligne_1, moment(18, 10), 3, 'DEPARTS', 'P3',
+                'Inspection ligne BRG.D11 : proposition attendue sur le poste source')
+        travail(a_harmoniser, ref_ligne_rame_2, moment(18, 11), 2, 'DEPARTS', 'P3',
+                'Inspection ligne BRG.D17 : proposition attendue sur le poste source')
+
+        # Cas 2 : une coupure de rame n'impacte que les lignes de cette rame.
+        travail(a_harmoniser, ref_rame_1, moment(20, 8), 6, 'RAME', 'P2',
+                'Maintenance de la rame 1 : impacte uniquement ses départs',
+                charge_consignation=charge_pivot)
+        travail(a_harmoniser, ref_ligne_2, moment(20, 10), 2, 'DEPARTS', 'P3',
+                'Inspection ligne BRG.D12 : proposition attendue sur la rame 1')
+
+        # Cas 3 : travaux déjà alignés ; le marqueur et la proposition acceptée
+        # permettent de les identifier directement dans le calendrier.
+        deja_harmonise = planning('DEMO - Harmonisation BRGM déjà réalisée (août 2026)')
+        pivot = travail(deja_harmonise, ref_poste, moment(25, 8), 6, 'POSTES', 'P2',
+                         'Coupure poste source BRGM déjà coordonnée', aligne=True)
+        cible = travail(deja_harmonise, ref_ligne_1, moment(25, 8), 3, 'DEPARTS', 'P3',
+                         'Ligne BRG.D11 déjà alignée sur la coupure poste', aligne=True)
+        PropositionAlignement.objects.get_or_create(
+            planning=deja_harmonise,
+            travail_a_modifier=cible,
+            travail_reference=pivot,
+            defaults={
+                'type_proposition': PropositionAlignement.TypeProposition.ALIGNEMENT_TRAVAUX,
+                'type_travaux_reference': maintenance.libelle,
+                'type_travaux_a_modifier': inspection.libelle,
+                'priorite_travail': cible.priorite,
+                'ancien_debut': moment(25, 10), 'ancienne_fin': moment(25, 13),
+                'nouveau_debut': cible.heure_debut_planifie,
+                'nouvelle_fin': cible.heure_fin_planifie,
+                'raison': 'Démo : la ligne BRG.D11 a été alignée sur la coupure du poste source BRGM.',
+                'statut': PropositionAlignement.Statut.ACCEPTEE,
+                'cree_par': operateur,
+            },
+        )
+
+        self.stdout.write('✅ Scénarios démonstratifs d’harmonisation BRGM créés (août 2026)')
 
     # ─────────────────────────────────────────
     # RÉCAPITULATIF

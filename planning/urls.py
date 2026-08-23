@@ -31,6 +31,7 @@ urlpatterns = [
 # GET         /plannings/{id}/propositions/?statut=EN_ATTENTE
 # POST        /plannings/{id}/appliquer-proposition/      appliquer les propositions
 # POST        /plannings/{id}/refuser-proposition/        refuser les propositions
+# POST        /plannings/{id}/modifier-proposition/       ajuster nouveau_debut/nouvelle_fin avant application
 #
 # GET/POST    /plannings/                             liste / créer un planning
 # GET/PATCH   /plannings/<id>/                        détail / modifier un planning

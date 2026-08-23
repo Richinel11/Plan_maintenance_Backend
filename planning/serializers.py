@@ -1,5 +1,7 @@
+from datetime import timedelta
 from rest_framework import serializers
 from .models import Planning, Travail, TypeActivite, PropositionAlignement
+from .alignement_service import _charge_disponible
 from user.models import Utilisateur, EntiteMetier
 from referentiel.models import Centrale, Reference
 from referentiel.serializers import CentraleSerializer, ReferenceSerializer
@@ -140,7 +142,8 @@ class TravailSerializer(serializers.ModelSerializer):
             'prevision_puissance_interrompue', 'qte_fuel_sollicitee', 'prevision_enf_mwh',
 
             # Statut
-            'statut_probleme', 'probleme_rencontre', 'travail_en_alignement', 'date_report_travaux',
+            'statut_probleme', 'probleme_rencontre', 'travail_en_alignement',
+            'alignement_verrouille', 'date_report_travaux',
 
             # Audit
             'date_creation', 'date_modification',
@@ -203,7 +206,50 @@ class TravailSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "disponibilite_mecanique_mw": "Requis pour le segment PRODUCTION."
                 })
-        return attrs 
+
+        self._valider_disponibilite_charge(attrs)
+        return attrs
+
+    def _valider_disponibilite_charge(self, attrs):
+        """
+        Vérifie que le chargé de consignation n'est pas déjà occupé sur le
+        nouveau créneau quand début ET durée sont fournis ensemble (c'est le
+        cas de l'écran de réajustement manuel, qui ne passe pas par le
+        système de propositions et n'a donc jamais cette vérification —
+        cf. alignement_service._charge_disponible / analyser_mois).
+        Ignoré si le PATCH ne touche pas les deux à la fois (mise à jour
+        partielle d'un autre champ) : pas assez d'information pour recalculer
+        la nouvelle fenêtre.
+        """
+        debut = attrs.get('heure_debut_planifie')
+        duree = attrs.get('duree')
+        if not debut or not duree:
+            return
+
+        charge = attrs.get(
+            'charge_consignation',
+            self.instance.charge_consignation if self.instance else None
+        )
+        if not charge:
+            return
+
+        unite = attrs.get(
+            'unite_duree',
+            self.instance.unite_duree if self.instance else 'HEURES'
+        )
+        if unite == 'JOURS':
+            fin = debut + timedelta(days=duree)
+        elif unite == 'SEMAINES':
+            fin = debut + timedelta(weeks=duree)
+        else:
+            fin = debut + timedelta(hours=duree)
+
+        exclure_id = self.instance.id if self.instance else None
+        disponible, detail = _charge_disponible(charge, debut, fin, exclure_id=exclure_id)
+        if not disponible:
+            raise serializers.ValidationError({
+                "charge_consignation": f"Chargé de consignation indisponible sur ce créneau : {detail}"
+            })
     
     
 
