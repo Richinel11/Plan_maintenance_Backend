@@ -32,6 +32,12 @@ class ReferentielItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'valeur', 'reference', 'type', 'type_id', 'date_creation']
 
 
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = ['id', 'code']
+
+
 class ReferenceSerializer(serializers.ModelSerializer):
     items = ReferentielItemSerializer(many=True, read_only=True)
     entite_metier = EntiteMetierShortSerializer(read_only=True)
@@ -39,16 +45,15 @@ class ReferenceSerializer(serializers.ModelSerializer):
         queryset=EntiteMetier.objects.all(), source='entite_metier',
         write_only=True, allow_null=True, required=False
     )
+    region = RegionSerializer(read_only=True)
+    region_id = serializers.PrimaryKeyRelatedField(
+        queryset=Region.objects.all(), source='region',
+        write_only=True, allow_null=True, required=False
+    )
 
     class Meta:
         model = Reference
-        fields = ['id', 'valeur', 'entite_metier', 'entite_metier_id', 'items', 'date_creation']
-
-
-class RegionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Region
-        fields = ['id', 'code']
+        fields = ['id', 'valeur', 'entite_metier', 'entite_metier_id', 'region', 'region_id', 'items', 'date_creation']
 
 
 class TronconSerializer(serializers.ModelSerializer):

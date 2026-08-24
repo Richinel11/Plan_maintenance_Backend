@@ -255,7 +255,14 @@ _REFERENCE_TAG = dict(
                     "UUID de l'entité métier. "
                     "Filtre les références associées à cette entité (ex: Production, Transport, Distribution)."
                 ),
-            )
+            ),
+            OpenApiParameter(
+                name='region_id',
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="UUID de la région. Filtre les références associées à cette région.",
+            ),
         ],
     ),
 )
@@ -263,12 +270,13 @@ _REFERENCE_TAG = dict(
 
 @extend_schema_view(**_REFERENCE_TAG)
 class ReferenceViewSet(viewsets.ModelViewSet):
-    queryset = Reference.objects.select_related('entite_metier').prefetch_related('items__type').all().order_by('-date_creation')
+    queryset = Reference.objects.select_related('entite_metier', 'region').prefetch_related('items__type').all().order_by('-date_creation')
     serializer_class = ReferenceSerializer
 
     def get_queryset(self):
         qs = super().get_queryset()
         entite_id = self.request.query_params.get('entite_metier_id')
+        region_id = self.request.query_params.get('region_id')
 
         # Garde défensive : on ignore le paramètre s'il contient les valeurs
         # invalides "undefined" ou "null" (chaînes envoyées par JavaScript quand
@@ -279,6 +287,8 @@ class ReferenceViewSet(viewsets.ModelViewSet):
         VALEURS_INVALIDES = {'undefined', 'null', ''}
         if entite_id and entite_id not in VALEURS_INVALIDES:
             qs = qs.filter(entite_metier_id=entite_id)
+        if region_id and region_id not in VALEURS_INVALIDES:
+            qs = qs.filter(region_id=region_id)
 
         return qs
 
