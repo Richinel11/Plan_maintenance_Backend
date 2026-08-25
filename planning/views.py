@@ -505,11 +505,21 @@ class PlanningViewSet(ModelViewSet):
     par_segment=extend_schema(tags=["Travail"]),
 )
 class TravailViewSet(ModelViewSet):
+    # select_related doit couvrir toute la profondeur des relations imbriquées
+    # sérialisées par TravailSerializer (via PlanningSerializer, ReferenceSerializer,
+    # etc.) : sinon chaque relation manquante déclenche une requête par ligne
+    # (N+1), ce qui a fini par provoquer un WORKER TIMEOUT sur /travaux/ quand
+    # le nombre de travaux a augmenté.
     queryset = Travail.objects.all().order_by('-date_creation').select_related(
-        'planning', 'type_travaux', 'cree_par', 'modifie_par',
-        'entite_metier', 'unite_demanderesse',
-        'reference', 'charge_consignation', 'centrale_thermique_sollicitee',
-    )
+        'planning', 'planning__entite_metier', 'planning__workflow',
+        'planning__current_step', 'planning__cree_par', 'planning__modifie_par',
+        'type_travaux', 'type_travaux__entite_metier',
+        'cree_par', 'modifie_par',
+        'entite_metier', 'unite_demanderesse', 'unite_demanderesse__entite_metier',
+        'reference', 'reference__entite_metier', 'reference__region',
+        'charge_consignation', 'centrale_thermique_sollicitee',
+        'demande_retrait', 'note_arret',
+    ).prefetch_related('reference__items__type')
     serializer_class = TravailSerializer
     permission_classes = [IsAuthenticated]
 
