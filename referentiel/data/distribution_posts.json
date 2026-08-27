@@ -1,0 +1,2318 @@
+{
+  "BRGM_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BRGM_POSTE SOURCE_HTA_TRANSFO 90/15kV N°1_RAME 15kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.PMR A12 ETOUG-EBE",
+            "region": "DRY",
+            "depart": "BRG.PMR A12 ETOUG-EBE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.PMR D13 CITE VERTE",
+            "region": "DRY",
+            "depart": "BRG.PMR D13 CITE VERTE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.PMR D14 SNEC MESSA",
+            "region": "DRY",
+            "depart": "BRG.PMR D14 SNEC MESSA",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.PMR D15 CUSS",
+            "region": "DRY",
+            "depart": "BRG.PMR D15 CUSS",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.PMR D16 HOPITAL CENTRAL",
+            "region": "DRY",
+            "depart": "BRG.PMR D16 HOPITAL CENTRAL",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.PMR D115 BRGM",
+            "region": "DRY",
+            "depart": "BRG.PMR D115 BRGM",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.PMR D112 ASSEMBLEE NATIONALE",
+            "region": "DRY",
+            "depart": "BRG.PMR D112 ASSEMBLEE NATIONALE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°1 90/15kV_BRG.PMR D113 ELOUMDEN",
+            "region": "DRY",
+            "depart": "BRG.PMR D113 ELOUMDEN",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 15kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BRGM_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BRGM_POSTE SOURCE_HTA_TRANSFO 90/15kV N°2_RAME 15kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°2 90/15kV_BRG.D11 P4",
+            "region": "DRY",
+            "depart": "BRG.D11 P4",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°2 90/15kV_BRG.D12 MESSA",
+            "region": "DRY",
+            "depart": "BRG.D12 MESSA",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°2 90/15kV_BRG.D17 PALAIS DES CONGRES",
+            "region": "DRY",
+            "depart": "BRG.D17 PALAIS DES CONGRES",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°2 90/15kV_BRG.D18 P61",
+            "region": "DRY",
+            "depart": "BRG.D18 P61",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°2 90/15kV_BRG.D19 PREFECTURE",
+            "region": "DRY",
+            "depart": "BRG.D19 PREFECTURE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°2 90/15kV_BRG.D117 BRGM",
+            "region": "DRY",
+            "depart": "BRG.D117 BRGM",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°2 90/15kV_BRG.D110 BIYEMASSI",
+            "region": "DRY",
+            "depart": "BRG.D110 BIYEMASSI",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°2 90/15kV_BRG.D111 MELEN",
+            "region": "DRY",
+            "depart": "BRG.D111 MELEN",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_BRGM_TRANSFO N°2 90/15kV_BRG.D31 BRGM",
+            "region": "DRY",
+            "depart": "BRG.D31 BRGM",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "BRGM"
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 15kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BRGM_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "NGOUSSO_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/30kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NGOUSSO_POSTE SOURCE_HTA_TRANSFO 90/30kV N°1_RAME 30kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRC_NGOUSSO_TRANSFO N°1 90/30kV_NGO.D31 MONATELE",
+            "region": "DRC",
+            "depart": "NGO.D31 MONATELE",
+            "segment": "DISTRIBUTION-DRC",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRC_NGOUSSO_TRANSFO N°1 90/30kV_NGO.D32 OBALA",
+            "region": "DRC",
+            "depart": "NGO.D32 OBALA",
+            "segment": "DISTRIBUTION-DRC",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRC_NGOUSSO_TRANSFO N°1 90/30kV_NGO.D34 AKONOLINGA",
+            "region": "DRC",
+            "depart": "NGO.D34 AKONOLINGA",
+            "segment": "DISTRIBUTION-DRC",
+            "ouvrage": "NGOUSSO"
+          }
+        ],
+        "region": "DRC",
+        "depart": "RAME 30kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NGOUSSO_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kVN°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NGOUSSO_POSTE SOURCE_HTA_TRANSFO 90/15kVN°2_RAME 15kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°2 90/15kV _NGOU.D11 P265",
+            "region": "DRY",
+            "depart": "NGOU.D11 P265",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°2 90/15kV _NGOU.D12 PRESIDENCE",
+            "region": "DRY",
+            "depart": "NGOU.D12 PRESIDENCE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°2 90/15kV _NGOU.D13 ESSOS",
+            "region": "DRY",
+            "depart": "NGOU.D13 ESSOS",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°2 90/15kV _NGOU.D14 P135",
+            "region": "DRY",
+            "depart": "NGOU.D14 P135",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°2 90/15kV _NGOU.D15 SAFCA / D115 STADE OLEMBE",
+            "region": "DRY",
+            "depart": "NGOU.D15 SAFCA / D115 STADE OLEMBE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°2 90/15kV _NGOU.D110 P2 SNI",
+            "region": "DRY",
+            "depart": "NGOU.D110 P2 SNI",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°2 90/15kV _NGOU.D116 NGOULMEKONG",
+            "region": "DRY",
+            "depart": "NGOU.D116 NGOULMEKONG",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 15kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NGOUSSO_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°3",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NGOUSSO_POSTE SOURCE_HTA_TRANSFO 90/15kV N°3_RAME 15kV N°3",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°3 90/15kV _NGOU.D16 HOTEL DU PLATEAU",
+            "region": "DRY",
+            "depart": "NGOU.D16 HOTEL DU PLATEAU",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°3 90/15kV _NGOU.D17 HOPITAL GENERAL",
+            "region": "DRY",
+            "depart": "NGOU.D17 HOPITAL GENERAL",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°3 90/15kV _NGOU.D18 SOA",
+            "region": "DRY",
+            "depart": "NGOU.D18 SOA",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°3 90/15kV _NGOU.D19 MANSEL HOTEL / D114 EMANA",
+            "region": "DRY",
+            "depart": "NGOU.D19 MANSEL HOTEL / D114 EMANA",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°3 90/15kV _NGOU.D111 BEAC",
+            "region": "DRY",
+            "depart": "NGOU.D111 BEAC",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°3 90/15kV _NGOU.D112 SNEC NGOUSSO / D113 MVOG EBANDA",
+            "region": "DRY",
+            "depart": "NGOU.D112 SNEC NGOUSSO / D113 MVOG EBANDA",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°3 90/15kV _NGOU.D117 NGOULMEKONG",
+            "region": "DRY",
+            "depart": "NGOU.D117 NGOULMEKONG",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NGOUSSO_TRANSFO N°3 90/15kV _NGOU.D118 HOPITAUX",
+            "region": "DRY",
+            "depart": "NGOU.D118 HOPITAUX",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NGOUSSO"
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 15kV N°3",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NGOUSSO_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "KONDENGUI_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_KONDENGUI_POSTE SOURCE_HTA_TRANSFO 90/15kV_RAME 15kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_KONDENGUI_TRANSFO  90/15kV  _KON.D11 KONDENGUI",
+            "region": "DRY",
+            "depart": "KON.D11 KONDENGUI",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "KONDENGUI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_KONDENGUI_TRANSFO  90/15kV  _KON.D12 ETAM BAFIA",
+            "region": "DRY",
+            "depart": "KON.D12 ETAM BAFIA",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "KONDENGUI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_KONDENGUI_TRANSFO  90/15kV  _KON.D13 P112 CORON",
+            "region": "DRY",
+            "depart": "KON.D13 P112 CORON",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "KONDENGUI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_KONDENGUI_TRANSFO  90/15kV  _KON.D14 P9 MVOG MBI",
+            "region": "DRY",
+            "depart": "KON.D14 P9 MVOG MBI",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "KONDENGUI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_KONDENGUI_TRANSFO  90/15kV  _KON.D15 P15 EKOUNOU",
+            "region": "DRY",
+            "depart": "KON.D15 P15 EKOUNOU",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "KONDENGUI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_KONDENGUI_TRANSFO  90/15kV  _KON.D16 SNEC NKOAYOS",
+            "region": "DRY",
+            "depart": "KON.D16 SNEC NKOAYOS",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "KONDENGUI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_KONDENGUI_TRANSFO  90/15kV  _KON.D17 NKOABANG",
+            "region": "DRY",
+            "depart": "KON.D17 NKOABANG",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "KONDENGUI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_KONDENGUI_TRANSFO  90/15kV  _KON.D112 BRASSERIES",
+            "region": "DRY",
+            "depart": "KON.D112 BRASSERIES",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "KONDENGUI"
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 15kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "KONDENGUI_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "AHALA_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_AHALA_POSTE SOURCE_HTA_TRANSFO 90/15kV_RAME 15kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_AHALA _TRANSFO N°1 90/15kV _AHA.D11 OBAM ONGOLA",
+            "region": "DRY",
+            "depart": "AHA.D11 OBAM ONGOLA",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "AHALA "
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_AHALA _TRANSFO N°1 90/15kV _AHA.D12 BRASSERIES",
+            "region": "DRY",
+            "depart": "AHA.D12 BRASSERIES",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "AHALA "
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_AHALA _TRANSFO N°1 90/15kV _AHA.D13 NSIMEYONG",
+            "region": "DRY",
+            "depart": "AHA.D13 NSIMEYONG",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "AHALA "
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_AHALA _TRANSFO N°1 90/15kV _AHA.D14 MENDONG",
+            "region": "DRY",
+            "depart": "AHA.D14 MENDONG",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "AHALA "
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_AHALA _TRANSFO N°1 90/15kV _AHA.D15 EP AUTOROUTE",
+            "region": "DRY",
+            "depart": "AHA.D15 EP AUTOROUTE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "AHALA "
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_AHALA _TRANSFO N°1 90/15kV _AHA.D16 ODZA",
+            "region": "DRY",
+            "depart": "AHA.D16 ODZA",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "AHALA "
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_AHALA _TRANSFO N°1 90/15kV _AHA.D17 DAMASE",
+            "region": "DRY",
+            "depart": "AHA.D17 DAMASE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "AHALA "
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_AHALA _TRANSFO N°1 90/15kV _AHA.D18 JOUVENCE",
+            "region": "DRY",
+            "depart": "AHA.D18 JOUVENCE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "AHALA "
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 15kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "AHALA_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "NSIMALEN_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NSIMALEN_POSTE SOURCE_HTA_TRANSFO 90/15kV_RAME 15kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_NSIMALEN_TRANSFO N°1 90/15kV   _NSI.D11 AEROGARE",
+            "region": "DRY",
+            "depart": "NSI.D11 AEROGARE",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NSIMALEN"
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 15kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NSIMALEN_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "NOMAYOS_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NOMAYOS_POSTE SOURCE_HTA_TRANSFO 90/30kV_RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_NOMAYOS_TRANSFO  90/30kV_NOM.D31 CIMENCAM",
+            "region": "DRY",
+            "depart": "NOM.D31 CIMENCAM",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NOMAYOS"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NOMAYOS_TRANSFO  90/30kV_NOM.D32 - AHALA II",
+            "region": "DRY",
+            "depart": "NOM.D32 - AHALA II",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NOMAYOS"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NOMAYOS_TRANSFO  90/30kV_NOM.AHALA I",
+            "region": "DRY",
+            "depart": "NOM.AHALA I",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NOMAYOS"
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NOMAYOS_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "OYOMABANG_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_OYOMABANG_POSTE SOURCE_HTA_TRANSFO 90/15kV _RAME 15kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_OYOMABANG_TRANSFO  90/15kV _OYO.D11 OYOMABANG",
+            "region": "DRY",
+            "depart": "OYO.D11 OYOMABANG",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "OYOMABANG"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_OYOMABANG_TRANSFO  90/15kV _OYO.D12 OYOMABANG",
+            "region": "DRY",
+            "depart": "OYO.D12 OYOMABANG",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "OYOMABANG"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_OYOMABANG_TRANSFO  90/15kV _OYO.D13 OYOMABANG",
+            "region": "DRY",
+            "depart": "OYO.D13 OYOMABANG",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "OYOMABANG"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_OYOMABANG_TRANSFO  90/15kV _OYO.D14 OYOMABANG",
+            "region": "DRY",
+            "depart": "OYO.D14 OYOMABANG",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "OYOMABANG"
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 15kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "OYOMABANG_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "NYOM II_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 225/15kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NYOM II_POSTE SOURCE_HTA_TRANSFO 225/15kV _RAME 15kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRY_NYOM_TRANSFO 225/15kV _NYO.D31 NYOM",
+            "region": "DRY",
+            "depart": "NYO.D31 NYOM",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NYOM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NYOM_TRANSFO 225/15kV _NYO.D32 AKAK",
+            "region": "DRY",
+            "depart": "NYO.D32 AKAK",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NYOM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRY_NYOM_TRANSFO 225/15kV _NYO.D33 PAEPYS",
+            "region": "DRY",
+            "depart": "NYO.D33 PAEPYS",
+            "segment": "DISTRIBUTION-DRY",
+            "ouvrage": "NYOM"
+          }
+        ],
+        "region": "DRY",
+        "depart": "RAME 15kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NYOM II_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "KOUMASSI_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_KOUMASSI_POSTE SOURCE_HTA_TRANSFO 90/15kV N°1_RAME 15kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D 122 VALLEE BONANJO",
+            "region": "DRD",
+            "depart": "KOU.D 122 VALLEE BONANJO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D123 KOUMASSI RAIL",
+            "region": "DRD",
+            "depart": "KOU.D123 KOUMASSI RAIL",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D12 AKWA",
+            "region": "DRD",
+            "depart": "KOU.D12 AKWA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D11 SONEL BUREAU",
+            "region": "DRD",
+            "depart": "KOU.D11 SONEL BUREAU",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D13 BK3",
+            "region": "DRD",
+            "depart": "KOU.D13 BK3",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D17 DEIDO",
+            "region": "DRD",
+            "depart": "KOU.D17 DEIDO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D18 LOWE",
+            "region": "DRD",
+            "depart": "KOU.D18 LOWE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D19 LYCEE SAVIO",
+            "region": "DRD",
+            "depart": "KOU.D19 LYCEE SAVIO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D110 LYCEE TECHNIQUE",
+            "region": "DRD",
+            "depart": "KOU.D110 LYCEE TECHNIQUE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D111 NDOUMBE EPEE",
+            "region": "DRD",
+            "depart": "KOU.D111 NDOUMBE EPEE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D113 SERPENTS",
+            "region": "DRD",
+            "depart": "KOU.D113 SERPENTS",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°1 90/15kV _KOU.D117 ST MICHEL",
+            "region": "DRD",
+            "depart": "KOU.D117 ST MICHEL",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "KOUMASSI_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_KOUMASSI_POSTE SOURCE_HTA_TRANSFO 90/15kV N°2_RAME 15kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D14 BK4",
+            "region": "DRD",
+            "depart": "KOU.D14 BK4",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D15 BRASSERIES",
+            "region": "DRD",
+            "depart": "KOU.D15 BRASSERIES",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D16 CNPS",
+            "region": "DRD",
+            "depart": "KOU.D16 CNPS",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D112 NGOLLE",
+            "region": "DRD",
+            "depart": "KOU.D112 NGOLLE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D114 SNCDV",
+            "region": "DRD",
+            "depart": "KOU.D114 SNCDV",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D115 SNEC ASTREINTE",
+            "region": "DRD",
+            "depart": "KOU.D115 SNEC ASTREINTE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D116 AVIATION",
+            "region": "DRD",
+            "depart": "KOU.D116 AVIATION",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D18 KITCHNER",
+            "region": "DRD",
+            "depart": "KOU.D18 KITCHNER",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D119 MEDCEM",
+            "region": "DRD",
+            "depart": "KOU.D119 MEDCEM",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D120 CIMENTERIE MIRA",
+            "region": "DRD",
+            "depart": "KOU.D120 CIMENTERIE MIRA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_KOUMASSI_TRANSFO N°2 90/15kV_KOU.D121 YABASSI",
+            "region": "DRD",
+            "depart": "KOU.D121 YABASSI",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "KOUMASSI"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "KOUMASSI_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "BEKOKO_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/30kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BEKOKO_POSTE SOURCE_HTA_TRANSFO 90/30kV N°1_RAME 30kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°1 90/30kV _BKK.D38BRASAF",
+            "region": "DRD",
+            "depart": "BKK.D38BRASAF",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°1 90/30kV _BKK.D39 ELIM",
+            "region": "DRD",
+            "depart": "BKK.D39 ELIM",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°1 90/30kV _BKK.D310 WFI",
+            "region": "DRD",
+            "depart": "BKK.D310 WFI",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 30kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BEKOKO_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/30kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BEKOKO_POSTE SOURCE_HTA_TRANSFO 90/30kV N°2_RAME 30kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°2 90/30kV _BKK.D31DIBOMBARI",
+            "region": "DRD",
+            "depart": "BKK.D31DIBOMBARI",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°2 90/30kV _BKK.D32BOMONO",
+            "region": "DRD",
+            "depart": "BKK.D32BOMONO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°2 90/30kV _BKK.D33ROUTETIKO",
+            "region": "DRD",
+            "depart": "BKK.D33ROUTETIKO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°2 90/30kV _BKK.D34MINKWELLE",
+            "region": "DRD",
+            "depart": "BKK.D34MINKWELLE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°2 90/30kV _BKK.D35BOADIBO",
+            "region": "DRD",
+            "depart": "BKK.D35BOADIBO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°2 90/30kV _BKK.D36CAMWATER",
+            "region": "DRD",
+            "depart": "BKK.D36CAMWATER",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BEKOKO_TRANSFO N°2 90/30kV _BKK.D37OLAMCAM",
+            "region": "DRD",
+            "depart": "BKK.D37OLAMCAM",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BEKOKO"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 30kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BEKOKO_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "BONABERI_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BONABERI_POSTE SOURCE_HTA_TRANSFO 90/15kV N°1_RAME 15kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°1 90/15kV _BON.D113 ACERO METAL",
+            "region": "DRD",
+            "depart": "BON.D113 ACERO METAL",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°1 90/15kV _BON.D114 MAYA",
+            "region": "DRD",
+            "depart": "BON.D114 MAYA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°1 90/15kV _BON.D13SOCAME",
+            "region": "DRD",
+            "depart": "BON.D13SOCAME",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BONABERI_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BONABERI_POSTE SOURCE_HTA_TRANSFO 90/15kV N°2_RAME 15kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D112 NOVIA",
+            "region": "DRD",
+            "depart": "BON.D112 NOVIA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D11BONABERI VILLE",
+            "region": "DRD",
+            "depart": "BON.D11BONABERI VILLE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D12P1ZI",
+            "region": "DRD",
+            "depart": "BON.D12P1ZI",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D14INSTITUT TONJI",
+            "region": "DRD",
+            "depart": "BON.D14INSTITUT TONJI",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D16 CIMENCAM",
+            "region": "DRD",
+            "depart": "BON.D16 CIMENCAM",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D17MINKWELLE",
+            "region": "DRD",
+            "depart": "BON.D17MINKWELLE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D19CAMWATER",
+            "region": "DRD",
+            "depart": "BON.D19CAMWATER",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D111CIMAF",
+            "region": "DRD",
+            "depart": "BON.D111CIMAF",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D115 ECO GREEN",
+            "region": "DRD",
+            "depart": "BON.D115 ECO GREEN",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D116 OK PLAST",
+            "region": "DRD",
+            "depart": "BON.D116 OK PLAST",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.A12MBOPPI - UIC",
+            "region": "DRD",
+            "depart": "BON.A12MBOPPI - UIC",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D18IYOCK",
+            "region": "DRD",
+            "depart": "BON.D18IYOCK",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D110 HARJAAP / ACERO METAL",
+            "region": "DRD",
+            "depart": "BON.D110 HARJAAP / ACERO METAL",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BONABERI_TRANSFO N°2 90/15kV _BON.D15NANGAH",
+            "region": "DRD",
+            "depart": "BON.D15NANGAH",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BONABERI"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BONABERI_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "DEIDO_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_DEIDO_POSTE SOURCE_HTA_TRANSFO 90/15kV N°1_RAME 15kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°1 90/15kV _DEI.D11MTN",
+            "region": "DRD",
+            "depart": "DEI.D11MTN",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°1 90/15kV _DEI.D12MTN",
+            "region": "DRD",
+            "depart": "DEI.D12MTN",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°1 90/15kV _DEI.D13CDB",
+            "region": "DRD",
+            "depart": "DEI.D13CDB",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°1 90/15kV _DEI.D14MBOPPI",
+            "region": "DRD",
+            "depart": "DEI.D14MBOPPI",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°1 90/15kV _DEI.D18NOUVEL AKWA",
+            "region": "DRD",
+            "depart": "DEI.D18NOUVEL AKWA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "DEIDO_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_DEIDO_POSTE SOURCE_HTA_TRANSFO 90/15kV N°2_RAME 15kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°2 90/15kV _DEI.D15POLANO",
+            "region": "DRD",
+            "depart": "DEI.D15POLANO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°2 90/15kV _DEI.D16SOCOPAO",
+            "region": "DRD",
+            "depart": "DEI.D16SOCOPAO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°2 90/15kV _DEI.D19QUAI",
+            "region": "DRD",
+            "depart": "DEI.D19QUAI",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°2 90/15kV _DEI.D110ANCIEN AKWA",
+            "region": "DRD",
+            "depart": "DEI.D110ANCIEN AKWA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°2 90/15kV _DEI.D112NDOI MAETUR",
+            "region": "DRD",
+            "depart": "DEI.D112NDOI MAETUR",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_DEIDO_TRANSFO N°2 90/15kV _DEI.A12MAKEPE ( D17 BONEWONDA)",
+            "region": "DRD",
+            "depart": "DEI.A12MAKEPE ( D17 BONEWONDA)",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "DEIDO"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "DEIDO_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "MAKEPE_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_MAKEPE_POSTE SOURCE_HTA_TRANSFO 90/15kV N°1_RAME 15kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°1 90/15kV _MAK.D11BONAMOUSSADI 1",
+            "region": "DRD",
+            "depart": "MAK.D11BONAMOUSSADI 1",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°1 90/15kV _MAK.D13DA2",
+            "region": "DRD",
+            "depart": "MAK.D13DA2",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°1 90/15kV _MAK.D15CRAYON D'OR",
+            "region": "DRD",
+            "depart": "MAK.D15CRAYON D'OR",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°1 90/15kV _MAK.D16MALANGUE",
+            "region": "DRD",
+            "depart": "MAK.D16MALANGUE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°1 90/15kV _MAK.D17BUREAUX MAETUR",
+            "region": "DRD",
+            "depart": "MAK.D17BUREAUX MAETUR",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°1 90/15kV _MAK.D18DM2",
+            "region": "DRD",
+            "depart": "MAK.D18DM2",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°1 90/15kV _MAK.D110DISSAKE",
+            "region": "DRD",
+            "depart": "MAK.D110DISSAKE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "MAKEPE_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_MAKEPE_POSTE SOURCE_HTA_TRANSFO 90/15kV N°2_RAME 15kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°2 90/15kV _MAK.D12BONAMOUSSADI 2",
+            "region": "DRD",
+            "depart": "MAK.D12BONAMOUSSADI 2",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°2 90/15kV _MAK.D14CIMB",
+            "region": "DRD",
+            "depart": "MAK.D14CIMB",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°2 90/15kV _MAK.D114ORANGE DATA CENTER",
+            "region": "DRD",
+            "depart": "MAK.D114ORANGE DATA CENTER",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°2 90/15kV _MAK.D111KOTTO NGONGANG",
+            "region": "DRD",
+            "depart": "MAK.D111KOTTO NGONGANG",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°2 90/15kV _MAK.D112MAIRIE 1",
+            "region": "DRD",
+            "depart": "MAK.D112MAIRIE 1",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_MAKEPE_TRANSFO N°2 90/15kV _MAK.D113MAIRIE 2",
+            "region": "DRD",
+            "depart": "MAK.D113MAIRIE 2",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "MAKEPE"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "MAKEPE_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "NGODI BAKOKO_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NGODI BAKOKO_POSTE SOURCE_HTA_TRANSFO 90/15kV N°1_RAME 15kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_NGODI BAKOKO_TRANSFO N°1 90/15kV _NGO.D18 STADE JAPOMA",
+            "region": "DRD",
+            "depart": "NGO.D18 STADE JAPOMA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "NGODI BAKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_NGODI BAKOKO_TRANSFO N°1 90/15kV _NGO.D19 LOGEMENT SOCIAUX",
+            "region": "DRD",
+            "depart": "NGO.D19 LOGEMENT SOCIAUX",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "NGODI BAKOKO"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NGODI BAKOKO_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NGODI BAKOKO_POSTE SOURCE_HTA_TRANSFO 90/15kV N°2_RAME 15kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_NGODI BAKOKO_TRANSFO N°2 90/15kV _NGO.D11FERME AVICOLE",
+            "region": "DRD",
+            "depart": "NGO.D11FERME AVICOLE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "NGODI BAKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_NGODI BAKOKO_TRANSFO N°2 90/15kV _NGO.D12RECASEMENT BILLE",
+            "region": "DRD",
+            "depart": "NGO.D12RECASEMENT BILLE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "NGODI BAKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_NGODI BAKOKO_TRANSFO N°2 90/15kV _NGO.D13TRADEX",
+            "region": "DRD",
+            "depart": "NGO.D13TRADEX",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "NGODI BAKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_NGODI BAKOKO_TRANSFO N°2 90/15kV _NGO.D14LEPROSERIE",
+            "region": "DRD",
+            "depart": "NGO.D14LEPROSERIE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "NGODI BAKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_NGODI BAKOKO_TRANSFO N°2 90/15kV _NGO.D15MBOKO",
+            "region": "DRD",
+            "depart": "NGO.D15MBOKO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "NGODI BAKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_NGODI BAKOKO_TRANSFO N°2 90/15kV _NGO.D16LIVRAISON MAGZI",
+            "region": "DRD",
+            "depart": "NGO.D16LIVRAISON MAGZI",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "NGODI BAKOKO"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_NGODI BAKOKO_TRANSFO N°2 90/15kV _NGO.D17 NKOLBONG",
+            "region": "DRD",
+            "depart": "NGO.D17 NKOLBONG",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "NGODI BAKOKO"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NGODI BAKOKO_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "LOGBABA_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 225/90/15kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_LOGBABA_POSTE SOURCE_HTA_TRANSFO 225/90/15kV _RAME 15kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_LOGBABA_TRANSFO  90/15kV _LBB.D16SNEC",
+            "region": "DRD",
+            "depart": "LBB.D16SNEC",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "LOGBABA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_LOGBABA_TRANSFO  90/15kV _LBB.D11G N  PK17",
+            "region": "DRD",
+            "depart": "LBB.D11G N  PK17",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "LOGBABA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_LOGBABA_TRANSFO  90/15kV _LBB.D17ACIERIE",
+            "region": "DRD",
+            "depart": "LBB.D17ACIERIE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "LOGBABA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_LOGBABA_TRANSFO  90/15kV _LBB.D18METAFRIQUE",
+            "region": "DRD",
+            "depart": "LBB.D18METAFRIQUE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "LOGBABA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_LOGBABA_TRANSFO  90/15kV _LBB.D19PROMAL 3",
+            "region": "DRD",
+            "depart": "LBB.D19PROMAL 3",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "LOGBABA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_LOGBABA_TRANSFO  90/15kV _LBB.D111LBBBABA",
+            "region": "DRD",
+            "depart": "LBB.D111LBBBABA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "LOGBABA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_LOGBABA_TRANSFO  90/15kV _LBB.D114 LBBBABA",
+            "region": "DRD",
+            "depart": "LBB.D114 LBBBABA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "LOGBABA"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "LOGBABA_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "BASSA_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BASSA_POSTE SOURCE_HTA_TRANSFO 90/15kV N°1_RAME 15kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°1 90/15kV_BAS.D118JAPOMA",
+            "region": "DRD",
+            "depart": "BAS.D118JAPOMA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°1 90/15kV_BAS.D11BASSA NORD",
+            "region": "DRD",
+            "depart": "BAS.D11BASSA NORD",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°1 90/15kV_BAS.D16SNEC",
+            "region": "DRD",
+            "depart": "BAS.D16SNEC",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°1 90/15kV_BAS.D17POLANO",
+            "region": "DRD",
+            "depart": "BAS.D17POLANO",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BASSA_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BASSA_POSTE SOURCE_HTA_TRANSFO 90/15kV N°2_RAME 15kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D121 ACIERIES",
+            "region": "DRD",
+            "depart": "BAS.D121 ACIERIES",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D14STADE BEPANDA",
+            "region": "DRD",
+            "depart": "BAS.D14STADE BEPANDA",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D126GRAND MALL",
+            "region": "DRD",
+            "depart": "BAS.D126GRAND MALL",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D127 OYACK MEDUSE",
+            "region": "DRD",
+            "depart": "BAS.D127 OYACK MEDUSE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D12BK3",
+            "region": "DRD",
+            "depart": "BAS.D12BK3",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D13BK4",
+            "region": "DRD",
+            "depart": "BAS.D13BK4",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D18PROFOR",
+            "region": "DRD",
+            "depart": "BAS.D18PROFOR",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D111SCIMPOS",
+            "region": "DRD",
+            "depart": "BAS.D111SCIMPOS",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D116DUMEZ",
+            "region": "DRD",
+            "depart": "BAS.D116DUMEZ",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D124VIETEL",
+            "region": "DRD",
+            "depart": "BAS.D124VIETEL",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°2 90/15kV _BAS.D15ST MICHEL",
+            "region": "DRD",
+            "depart": "BAS.D15ST MICHEL",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BASSA_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°3",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BASSA_POSTE SOURCE_HTA_TRANSFO 90/15kV N°3_RAME 15kV N°3",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°3 90/15kV_BAS.D110GUINNESS",
+            "region": "DRD",
+            "depart": "BAS.D110GUINNESS",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°3 90/15kV_BAS.D115TP",
+            "region": "DRD",
+            "depart": "BAS.D115TP",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°3 90/15kV_BAS.D117MASSOUMBOU",
+            "region": "DRD",
+            "depart": "BAS.D117MASSOUMBOU",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°3 90/15kV_BAS.D122COMAGRI",
+            "region": "DRD",
+            "depart": "BAS.D122COMAGRI",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRD_BASSA_TRANSFO N°3 90/15kV_BAS.D123MALANGUE",
+            "region": "DRD",
+            "depart": "BAS.D123MALANGUE",
+            "segment": "DISTRIBUTION-DRD",
+            "ouvrage": "BASSA"
+          }
+        ],
+        "region": "DRD",
+        "depart": "RAME 15kV N°3",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BASSA_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "MAROUA_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/15kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_MAROUA_POSTE SOURCE_HTA_TRANSFO  90/15kV N°1_RAME 15kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRNEA_MAROUA_TRANSFO N°1 90/15kV_MRA.D11 VILLE",
+            "region": "DRNEA",
+            "depart": "MRA.D11 VILLE",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "MAROUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_MAROUA_TRANSFO N°1 90/15kV_MRA.D12 VILLE",
+            "region": "DRNEA",
+            "depart": "MRA.D12 VILLE",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "MAROUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_MAROUA_TRANSFO N°1 90/15kV_MRA.D13 VILLE",
+            "region": "DRNEA",
+            "depart": "MRA.D13 VILLE",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "MAROUA"
+          }
+        ],
+        "region": "DRNEA",
+        "depart": "RAME 15kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "MAROUA_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_MAROUA_POSTE SOURCE_HTA_TRANSFO  90/30kV N°2_RAME 30kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRNEA_MAROUA_TRANSFO N°2 90/30kV_MRA.D31 MOKOLO",
+            "region": "DRNEA",
+            "depart": "MRA.D31 MOKOLO",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "MAROUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_MAROUA_TRANSFO N°2 90/30kV_MRA.D34 BOGOMAGA",
+            "region": "DRNEA",
+            "depart": "MRA.D34 BOGOMAGA",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "MAROUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_MAROUA_TRANSFO N°2 90/30kV_MRA.D36 MINDIF",
+            "region": "DRNEA",
+            "depart": "MRA.D36 MINDIF",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "MAROUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_MAROUA_TRANSFO N°2 90/30kV_MRA.D32 MERI",
+            "region": "DRNEA",
+            "depart": "MRA.D32 MERI",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "MAROUA"
+          }
+        ],
+        "region": "DRNEA",
+        "depart": "RAME 30kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "MAROUA_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "DJAMBOUTOU_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°1",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_DJAMBOUTOU_POSTE SOURCE_HTA_TRANSFO 90/15kV N°1_RAME 15kV N°1",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°1 90/15kV_DJA.D11 CICAM",
+            "region": "DRNEA",
+            "depart": "DJA.D11 CICAM",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°1 90/15kV_DJA.D13 HUILERIE",
+            "region": "DRNEA",
+            "depart": "DJA.D13 HUILERIE",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°1 90/15kV_DJA.D15 RADIO",
+            "region": "DRNEA",
+            "depart": "DJA.D15 RADIO",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°1 90/15kV_DJA.D17 DEM",
+            "region": "DRNEA",
+            "depart": "DJA.D17 DEM",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°1 90/15kV_DJA D19 SODECOTON",
+            "region": "DRNEA",
+            "depart": "DJA D19 SODECOTON",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°1 90/15kV_DJA.D20 AEROPORT",
+            "region": "DRNEA",
+            "depart": "DJA.D20 AEROPORT",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°1 90/15kV_DJA.D21 STADE ROUMDE-ADJIA",
+            "region": "DRNEA",
+            "depart": "DJA.D21 STADE ROUMDE-ADJIA",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          }
+        ],
+        "region": "DRNEA",
+        "depart": "RAME 15kV N°1",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "DJAMBOUTOU_POSTE SOURCE_HTA"
+      },
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV N°2",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_DJAMBOUTOU_POSTE SOURCE_HTA_TRANSFO 90/15kV N°2_RAME 15kV N°2",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°2 90/15kV_DJA.D12 VILLE",
+            "region": "DRNEA",
+            "depart": "DJA.D12 VILLE",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°2 90/15kV_DJA.D14 CICAM CABLE",
+            "region": "DRNEA",
+            "depart": "DJA.D14 CICAM CABLE",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_DJAMBOUTOU_TRANSFO N°2 90/15kV_DJA.D18 SOCAPROD",
+            "region": "DRNEA",
+            "depart": "DJA.D18 SOCAPROD",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "DJAMBOUTOU"
+          }
+        ],
+        "region": "DRNEA",
+        "depart": "RAME 15kV N°2",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "DJAMBOUTOU_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "GUIDER_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO 90/15kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_GUIDER_POSTE SOURCE_HTA_TRANSFO 90/15kV _RAME 15kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRNEA_GUIDER_TRANSFO 90/15kV_GUI.D32 FIGUIL",
+            "region": "DRNEA",
+            "depart": "GUI.D32 FIGUIL",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "GUIDER"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_GUIDER_TRANSFO 90/15kV_GUI.D33 MAYO OULO",
+            "region": "DRNEA",
+            "depart": "GUI.D33 MAYO OULO",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "GUIDER"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_GUIDER_TRANSFO 90/15kV_GUI.D35 GUIDER",
+            "region": "DRNEA",
+            "depart": "GUI.D35 GUIDER",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "GUIDER"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_GUIDER_TRANSFO 90/15kV_GUI.D36 CIMENCAM",
+            "region": "DRNEA",
+            "depart": "GUI.D36 CIMENCAM",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "GUIDER"
+          }
+        ],
+        "region": "DRNEA",
+        "depart": "RAME 15kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "GUIDER_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "NGAOUNDERE_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  110/15kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NGAOUNDERE_POSTE SOURCE_HTA_TRANSFO  110/15kV _RAME 15kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRNEA_NGAOUNDERE_TRANSFO N°1 90/15kV_NGA.D11 VILLE",
+            "region": "DRNEA",
+            "depart": "NGA.D11 VILLE",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "NGAOUNDERE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_NGAOUNDERE_TRANSFO N°1 90/15kV_NGA.D12 VINA",
+            "region": "DRNEA",
+            "depart": "NGA.D12 VINA",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "NGAOUNDERE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_NGAOUNDERE_TRANSFO N°1 90/15kV_NGA.D13 AEROPORT",
+            "region": "DRNEA",
+            "depart": "NGA.D13 AEROPORT",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "NGAOUNDERE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_NGAOUNDERE_TRANSFO N°1 90/15kV_NGA.D14 ACERO METAL",
+            "region": "DRNEA",
+            "depart": "NGA.D14 ACERO METAL",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "NGAOUNDERE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_NGAOUNDERE_TRANSFO N°2 - 15/30KV_NGA.D31 MEIGANGA",
+            "region": "DRNEA",
+            "depart": "NGA.D31 MEIGANGA",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "NGAOUNDERE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRNEA_NGAOUNDERE_TRANSFO N°2 - 15/30KV_NGA.D33 TCHABAL",
+            "region": "DRNEA",
+            "depart": "NGA.D33 TCHABAL",
+            "segment": "DISTRIBUTION-DRNEA",
+            "ouvrage": "NGAOUNDERE"
+          }
+        ],
+        "region": "DRNEA",
+        "depart": "RAME 15kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NGAOUNDERE_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "DJOB_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_DJOB_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRSM_DJOB_TRANSFO  90/30kV_DJO.D32 EBOLOWA VILLE",
+            "region": "DRSM",
+            "depart": "DJO.D32 EBOLOWA VILLE",
+            "segment": "DISTRIBUTION-DRSM",
+            "ouvrage": "DJOB"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSM_DJOB_TRANSFO  90/30kV_DJO.D34 AMBAM",
+            "region": "DRSM",
+            "depart": "DJO.D34 AMBAM",
+            "segment": "DISTRIBUTION-DRSM",
+            "ouvrage": "DJOB"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSM_DJOB_TRANSFO  90/30kV_DJO.D35 AMBAM I",
+            "region": "DRSM",
+            "depart": "DJO.D35 AMBAM I",
+            "segment": "DISTRIBUTION-DRSM",
+            "ouvrage": "DJOB"
+          }
+        ],
+        "region": "DRSM",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "DJOB_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "EKOMBITIE_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_EKOMBITIE_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRSM_EKOMBITIE_TRANSFO  90/30kV _EKO.D31 LOLODORF (Ex Ebolowa)",
+            "region": "DRSM",
+            "depart": "EKO.D31 LOLODORF (Ex Ebolowa)",
+            "segment": "DISTRIBUTION-DRSM",
+            "ouvrage": "EKOMBITIE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSM_EKOMBITIE_TRANSFO  90/30kV _EKO.D32 SNEC",
+            "region": "DRSM",
+            "depart": "EKO.D32 SNEC",
+            "segment": "DISTRIBUTION-DRSM",
+            "ouvrage": "EKOMBITIE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSM_EKOMBITIE_TRANSFO  90/30kV _EKO.D33 MBALMAYO",
+            "region": "DRSM",
+            "depart": "EKO.D33 MBALMAYO",
+            "segment": "DISTRIBUTION-DRSM",
+            "ouvrage": "EKOMBITIE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSM_EKOMBITIE_TRANSFO  90/30kV _EKO.D34 SANGMELIMA",
+            "region": "DRSM",
+            "depart": "EKO.D34 SANGMELIMA",
+            "segment": "DISTRIBUTION-DRSM",
+            "ouvrage": "EKOMBITIE"
+          }
+        ],
+        "region": "DRSM",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "EKOMBITIE_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "NDJOCK NKONG_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NDJOCK NKONG_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRSANO_NDJOCK NKONG_TRANSFO  90/30kV_NDJ.D31 POUMA",
+            "region": "DRSANO",
+            "depart": "NDJ.D31 POUMA",
+            "segment": "DISTRIBUTION-DRSANO",
+            "ouvrage": "NDJOCK NKONG"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSANO_NDJOCK NKONG_TRANSFO  90/30kV_NDJ.D32BAFIA",
+            "region": "DRSANO",
+            "depart": "NDJ.D32BAFIA",
+            "segment": "DISTRIBUTION-DRSANO",
+            "ouvrage": "NDJOCK NKONG"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSANO_NDJOCK NKONG_TRANSFO  90/30kV_NDJ.D33 MATOMB",
+            "region": "DRSANO",
+            "depart": "NDJ.D33 MATOMB",
+            "segment": "DISTRIBUTION-DRSANO",
+            "ouvrage": "NDJOCK NKONG"
+          }
+        ],
+        "region": "DRSANO",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NDJOCK NKONG_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "NJOMBE_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NJOMBE_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRSOM_NJOMBE_TRANSFO  90/30kV_NJBE.D32 LOUM",
+            "region": "DRSOM",
+            "depart": "NJBE.D32 LOUM",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "NJOMBE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSOM_NJOMBE_TRANSFO  90/30kV_NJBE.D33 MBANGA",
+            "region": "DRSOM",
+            "depart": "NJBE.D33 MBANGA",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "NJOMBE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSOM_NJOMBE_TRANSFO  90/30kV_NJBE.D34 PHP",
+            "region": "DRSOM",
+            "depart": "NJBE.D34 PHP",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "NJOMBE"
+          }
+        ],
+        "region": "DRSOM",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NJOMBE_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "NKONGSAMBA_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_NKONGSAMBA_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRSOM_NKONGSAMBA_TRANSFO  90/30kV_NKS.D11VILLE",
+            "region": "DRSOM",
+            "depart": "NKS.D11VILLE",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "NKONGSAMBA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSOM_NKONGSAMBA_TRANSFO  90/30kV_NKS.D12VILLE",
+            "region": "DRSOM",
+            "depart": "NKS.D12VILLE",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "NKONGSAMBA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSOM_NKONGSAMBA_TRANSFO  90/30kV_NKS.D13VILLE",
+            "region": "DRSOM",
+            "depart": "NKS.D13VILLE",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "NKONGSAMBA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSOM_NKONGSAMBA_TRANSFO  90/30kV_NKS.D31MANJO",
+            "region": "DRSOM",
+            "depart": "NKS.D31MANJO",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "NKONGSAMBA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSOM_NKONGSAMBA_TRANSFO  90/30kV_NKS.D32BAFANG",
+            "region": "DRSOM",
+            "depart": "NKS.D32BAFANG",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "NKONGSAMBA"
+          }
+        ],
+        "region": "DRSOM",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "NKONGSAMBA_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "MILE 2 LIMBE_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_MILE 2 LIMBE_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRSOM_MILE2 LIMBE_TRANSFO  90/30kV_LBE.D31BUEA",
+            "region": "DRSOM",
+            "depart": "LBE.D31BUEA",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "MILE2 LIMBE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSOM_MILE2 LIMBE_TRANSFO  90/30kV_LBE.D32LIMBE",
+            "region": "DRSOM",
+            "depart": "LBE.D32LIMBE",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "MILE2 LIMBE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSOM_MILE2 LIMBE_TRANSFO  90/30kV_LBE.D33TIKO",
+            "region": "DRSOM",
+            "depart": "LBE.D33TIKO",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "MILE2 LIMBE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSOM_MILE2 LIMBE_TRANSFO  90/30kV_LBE.D34SONARA",
+            "region": "DRSOM",
+            "depart": "LBE.D34SONARA",
+            "segment": "DISTRIBUTION-DRSOM",
+            "ouvrage": "MILE2 LIMBE"
+          }
+        ],
+        "region": "DRSOM",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "MILE 2 LIMBE_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "BAFOUSSAM_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BAFOUSSAM_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRONO_BAFOUSSAM_TRANSFO  90/30kV_BFS.D11 VILLE",
+            "region": "DRONO",
+            "depart": "BFS.D11 VILLE",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAFOUSSAM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAFOUSSAM_TRANSFO  90/30kV_BFS.D11 VILLE-BAFOUSSAM",
+            "region": "DRONO",
+            "depart": "BFS.D11 VILLE-BAFOUSSAM",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAFOUSSAM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAFOUSSAM_TRANSFO  90/30kV_BFS.D12 VILLE",
+            "region": "DRONO",
+            "depart": "BFS.D12 VILLE",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAFOUSSAM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAFOUSSAM_TRANSFO  90/30kV_BFS.D13 VILLE",
+            "region": "DRONO",
+            "depart": "BFS.D13 VILLE",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAFOUSSAM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAFOUSSAM_TRANSFO  90/30kV_BFS.D31 MBOUDA",
+            "region": "DRONO",
+            "depart": "BFS.D31 MBOUDA",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAFOUSSAM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAFOUSSAM_TRANSFO  90/30kV_BFS.D32 FOUMBOT",
+            "region": "DRONO",
+            "depart": "BFS.D32 FOUMBOT",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAFOUSSAM"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAFOUSSAM_TRANSFO  90/30kV_BFS.D33 BANGANGTE",
+            "region": "DRONO",
+            "depart": "BFS.D33 BANGANGTE",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAFOUSSAM"
+          }
+        ],
+        "region": "DRONO",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BAFOUSSAM_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "BAMENDA_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BAMENDA_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRONO_BAMENDA_TRANSFO  90/15kV_BDA.D11 VILLE",
+            "region": "DRONO",
+            "depart": "BDA.D11 VILLE",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAMENDA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAMENDA_TRANSFO  90/15kV_BDA.D12 VILLE",
+            "region": "DRONO",
+            "depart": "BDA.D12 VILLE",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAMENDA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAMENDA_TRANSFO  90/15kV_BDA.D13 VILLE",
+            "region": "DRONO",
+            "depart": "BDA.D13 VILLE",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAMENDA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAMENDA_TRANSFO  90/15kV_BDA.D31 MBENGWI",
+            "region": "DRONO",
+            "depart": "BDA.D31 MBENGWI",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAMENDA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAMENDA_TRANSFO  90/15kV_BDA.D32 WUM",
+            "region": "DRONO",
+            "depart": "BDA.D32 WUM",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAMENDA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAMENDA_TRANSFO  90/15kV_BDA.D33 MAMFE",
+            "region": "DRONO",
+            "depart": "BDA.D33 MAMFE",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAMENDA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAMENDA_TRANSFO  90/15kV_BDA.D35 KUMBO",
+            "region": "DRONO",
+            "depart": "BDA.D35 KUMBO",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAMENDA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRONO_BAMENDA_TRANSFO  90/15kV_BDA.D36 MBOUDA",
+            "region": "DRONO",
+            "depart": "BDA.D36 MBOUDA",
+            "segment": "DISTRIBUTION-DRONO",
+            "ouvrage": "BAMENDA"
+          }
+        ],
+        "region": "DRONO",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BAMENDA_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "BERTOUA_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_BERTOUA_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRE_BERTOUA_TRANSFO  90/30kV_BENGBIS.D VILLE",
+            "region": "DRE",
+            "depart": "BENGBIS.D VILLE",
+            "segment": "DISTRIBUTION-DRE",
+            "ouvrage": "BERTOUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRE_BERTOUA_TRANSFO  90/30kV_BER.D11 VILLE",
+            "region": "DRE",
+            "depart": "BER.D11 VILLE",
+            "segment": "DISTRIBUTION-DRE",
+            "ouvrage": "BERTOUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRE_BERTOUA_TRANSFO  90/30kV_BER.D12VILLE",
+            "region": "DRE",
+            "depart": "BER.D12VILLE",
+            "segment": "DISTRIBUTION-DRE",
+            "ouvrage": "BERTOUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRE_BERTOUA_TRANSFO  90/30kV_BER.D31 BATOURI",
+            "region": "DRE",
+            "depart": "BER.D31 BATOURI",
+            "segment": "DISTRIBUTION-DRE",
+            "ouvrage": "BERTOUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRE_BERTOUA_TRANSFO  90/30kV_BER.D32 BELABO",
+            "region": "DRE",
+            "depart": "BER.D32 BELABO",
+            "segment": "DISTRIBUTION-DRE",
+            "ouvrage": "BERTOUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRE_BERTOUA_TRANSFO  90/30kV_BER.D33 ABG",
+            "region": "DRE",
+            "depart": "BER.D33 ABG",
+            "segment": "DISTRIBUTION-DRE",
+            "ouvrage": "BERTOUA"
+          },
+          {
+            "reference": "DISTRIBUTION-DRE_BERTOUA_TRANSFO  90/30kV_BETARE.D CENTRALE",
+            "region": "DRE",
+            "depart": "BETARE.D CENTRALE",
+            "segment": "DISTRIBUTION-DRE",
+            "ouvrage": "BERTOUA"
+          }
+        ],
+        "region": "DRE",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "BERTOUA_POSTE SOURCE_HTA"
+      }
+    ]
+  },
+  "MPOLONGWE_POSTE SOURCE_HTA": {
+    "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRANSFO  90/30kV",
+        "reference": "DISTRIBUTION-MAINTENANCE POSTES_MPOLONGWE_POSTE SOURCE_HTA_TRANSFO  90/30kV _RAME 30kV",
+        "lignes": [
+          {
+            "reference": "DISTRIBUTION-DRSANO_MPOLONGWE_TRANSFO  90/30kV_MPOL.D31 EDEA",
+            "region": "DRSANO",
+            "depart": "MPOL.D31 EDEA",
+            "segment": "DISTRIBUTION-DRSANO",
+            "ouvrage": "MPOLONGWE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSANO_MPOLONGWE_TRANSFO  90/30kV_MPOL.D32 KRIBI",
+            "region": "DRSANO",
+            "depart": "MPOL.D32 KRIBI",
+            "segment": "DISTRIBUTION-DRSANO",
+            "ouvrage": "MPOLONGWE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSANO_MPOLONGWE_TRANSFO  90/30kV_MPOL.D33 PAK",
+            "region": "DRSANO",
+            "depart": "MPOL.D33 PAK",
+            "segment": "DISTRIBUTION-DRSANO",
+            "ouvrage": "MPOLONGWE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSANO_MPOLONGWE_TRANSFO  90/30kV_MPOL.D35 SNH",
+            "region": "DRSANO",
+            "depart": "MPOL.D35 SNH",
+            "segment": "DISTRIBUTION-DRSANO",
+            "ouvrage": "MPOLONGWE"
+          },
+          {
+            "reference": "DISTRIBUTION-DRSANO_MPOLONGWE_TRANSFO  90/30kV_MPOL.D36 KRIBI",
+            "region": "DRSANO",
+            "depart": "MPOL.D36 KRIBI",
+            "segment": "DISTRIBUTION-DRSANO",
+            "ouvrage": "MPOLONGWE"
+          }
+        ],
+        "region": "DRSANO",
+        "depart": "RAME 30kV",
+        "segment": "DISTRIBUTION-MAINTENANCE POSTES",
+        "ouvrage": "MPOLONGWE_POSTE SOURCE_HTA"
+      }
+    ]
+  }
+}

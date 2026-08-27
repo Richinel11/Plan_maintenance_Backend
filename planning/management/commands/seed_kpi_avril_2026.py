@@ -33,7 +33,7 @@ class Command(BaseCommand):
         prod  = EntiteMetier.objects.get(name="Production")
 
         workflow  = Workflow.objects.get(code="TRAVAUX_PROGRAMMES")
-        step_init = WorkflowStep.objects.get(workflow=workflow, code="CREER")
+        step_init = WorkflowStep.objects.get(workflow=workflow, code="EN_ATTENTE")
 
         unite_dist  = UniteDemanderesse.objects.filter(entite_metier=dist).first()
         unite_trans = UniteDemanderesse.objects.filter(entite_metier=trans).first()

@@ -891,7 +891,7 @@ class Command(BaseCommand):
         charge = User.objects.get(username='charge1')
         charge_pivot = User.objects.get(username='charge2')
         workflow = Workflow.objects.get(code="TRAVAUX_PROGRAMMES")
-        step_initial = WorkflowStep.objects.get(workflow=workflow, code="CREER")
+        step_initial = WorkflowStep.objects.get(workflow=workflow, code="EN_ATTENTE")
         unite = UniteDemanderesse.objects.filter(entite_metier=distribution).first()
         maintenance = TypeActivite.objects.filter(
             libelle="MAINTENANCE", entite_metier=distribution

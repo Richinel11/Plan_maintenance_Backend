@@ -547,7 +547,26 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
     alignements_proposes = []
 
     for groupe, reference in groupes_avec_pivot:
-        autres = [t for t in groupe if t.id != reference.id]
+        autres_tous = [t for t in groupe if t.id != reference.id]
+
+        # Un travail déplaçable déjà exactement calé sur la fenêtre du pivot
+        # est un conflit résolu — typiquement parce qu'une proposition
+        # précédente a déjà été appliquée. Les deux travaux restent en
+        # "chevauchement" par construction (l'alignement est volontaire),
+        # donc _detecter_groupes continue de les regrouper indéfiniment :
+        # sans ce filtre, chaque nouvelle analyse régénérerait une
+        # proposition EN_ATTENTE no-op pour ce couple, à l'infini.
+        autres = []
+        for t in autres_tous:
+            if _peut_bouger(t):
+                nd, nf = _calculer_nouvel_horaire(t, reference)
+                if t.heure_debut_planifie == nd and t.heure_fin_planifie == nf:
+                    continue
+            autres.append(t)
+
+        if not autres:
+            continue
+
         type_ref = reference.type_travaux.libelle if reference.type_travaux else "Non défini"
 
         chevauchements_detectes.append({
@@ -559,8 +578,15 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 "segment": reference.segment,
                 "priorite": reference.priorite,
                 "type_travaux": type_ref,
-                "debut": reference.heure_debut_planifie.strftime('%d/%m/%Y %H:%M') if reference.heure_debut_planifie else None,
-                "fin": reference.heure_fin_planifie.strftime('%d/%m/%Y %H:%M') if reference.heure_fin_planifie else None,
+                # ISO 8601 (pas de strftime) : ce sont de vraies dates
+                # consommées par le frontend (calendrier, réajustement
+                # manuel), pas seulement du texte à afficher. Un format
+                # JJ/MM/AAAA y était auparavant renvoyé et cassait tout
+                # `new Date(...)` côté client (jour > 12 → Invalid Date,
+                # jour ≤ 12 → date silencieusement fausse, JS lisant
+                # MM/DD/AAAA).
+                "debut": reference.heure_debut_planifie,
+                "fin": reference.heure_fin_planifie,
                 "peut_bouger": _peut_bouger(reference),
                 "alignement_verrouille": reference.alignement_verrouille,
             },
@@ -571,8 +597,8 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
                 "ressource": _nom_ressource(t),
                 "segment": t.segment,
                 "priorite": t.priorite,
-                "debut": t.heure_debut_planifie.strftime('%d/%m/%Y %H:%M'),
-                "fin": t.heure_fin_planifie.strftime('%d/%m/%Y %H:%M'),
+                "debut": t.heure_debut_planifie,
+                "fin": t.heure_fin_planifie,
                 "peut_bouger": _peut_bouger(t),
                 "alignement_verrouille": t.alignement_verrouille,
             } for t in autres]
@@ -699,7 +725,7 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
     return {
         "message": (
             f"{nb_travaux} travaux analysés sur {periode}. "
-            f"{len(groupes)} chevauchement(s) détecté(s). "
+            f"{len(chevauchements_detectes)} chevauchement(s) détecté(s). "
             f"{len(propositions_creees)} proposition(s) : "
             f"{nb_libres} libre(s), {nb_bloquees} bloquée(s)."
         ),
@@ -709,7 +735,7 @@ def analyser_mois(user, annee: int = None, mois: int = None) -> dict:
         "resume": {
             "periode": periode,
             "total_travaux_analyses": nb_travaux,
-            "total_chevauchements": len(groupes),
+            "total_chevauchements": len(chevauchements_detectes),
             "total_propositions": len(propositions_creees),
             "propositions_bloquees": nb_bloquees,
             "propositions_libres": nb_libres,

@@ -1,0 +1,904 @@
+{
+  "BRGM_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-CSE_BRGM_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-CSE_BRGM_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_BRGM_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_BRGM_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "BRGM_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV OYOMABANG_BRGM",
+        "reference": "TRANSPORT-CSE_BRGM_LIGNE_HTB_D.Ligne 90kV OYOMABANG_BRGM"
+      }
+    ]
+  },
+  "NGOUSSO_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/30kV",
+        "reference": "TRANSPORT-CSE_NGOUSSO_POSTE SOURCE_HTB_AT N°1  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-CSE_NGOUSSO_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°3  90/15kV",
+        "reference": "TRANSPORT-CSE_NGOUSSO_POSTE SOURCE_HTB_AT N°3  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_NGOUSSO_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_NGOUSSO_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      }
+    ]
+  },
+  "NGOUSSO_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV OYOMABANG_NGOUSSO",
+        "reference": "TRANSPORT-CSE_NGOUSSO_LIGNE_HTB_D.Ligne 90kV OYOMABANG_NGOUSSO"
+      },
+      {
+        "gr_tfo_postes": "D.Ligne 90kV NGOUSSO_KONDENGUI",
+        "reference": "TRANSPORT-CSE_NGOUSSO_LIGNE_HTB_D.Ligne 90kV NGOUSSO_KONDENGUI"
+      }
+    ]
+  },
+  "KONDENGUI_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/15kV",
+        "reference": "TRANSPORT-CSE_KONDENGUI_POSTE SOURCE_HTB_AT  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_KONDENGUI_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_KONDENGUI_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "AHALA_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/15kV",
+        "reference": "TRANSPORT-CSE_AHALA_POSTE SOURCE_HTB_AT  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_AHALA_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_AHALA_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "AHALA_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV OYOMABANG_AHALA",
+        "reference": "TRANSPORT-CSE_AHALA_LIGNE_HTB_D.Ligne 90kV OYOMABANG_AHALA"
+      }
+    ]
+  },
+  "NSIMALEN_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/15kV",
+        "reference": "TRANSPORT-CSE_NSIMALEN_POSTE SOURCE_HTB_AT  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_NSIMALEN_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_NSIMALEN_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "NSIMALEN_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV AHALA_NSIMALEN",
+        "reference": "TRANSPORT-CSE_NSIMALEN_LIGNE_HTB_D.Ligne 90kV AHALA_NSIMALEN"
+      }
+    ]
+  },
+  "NOMAYOS_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/30kV",
+        "reference": "TRANSPORT-CSE_NOMAYOS_POSTE SOURCE_HTB_AT  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_NOMAYOS_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_NOMAYOS_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "NOMAYOS_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV OYOMABANG-NOMAYOS",
+        "reference": "TRANSPORT-CSE_NOMAYOS_LIGNE_HTB_D.Ligne 90kV OYOMABANG-NOMAYOS"
+      }
+    ]
+  },
+  "OYOMABANG_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  225/90kV",
+        "reference": "TRANSPORT-CSE_OYOMABANG_POSTE SOURCE_HTB_AT N°1  225/90kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  225/90kV",
+        "reference": "TRANSPORT-CSE_OYOMABANG_POSTE SOURCE_HTB_AT N°2  225/90kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 225 kV",
+        "reference": "TRANSPORT-CSE_OYOMABANG_POSTE SOURCE_HTB_Jeu de barres 225 kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_OYOMABANG_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_OYOMABANG_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 225kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_OYOMABANG_POSTE SOURCE_HTB_Appareillages Protection 225kV et Auxiliaires"
+      }
+    ]
+  },
+  "OYOMABANG_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 225kV MANGOMBE-OYOMABANG",
+        "reference": "TRANSPORT-CSE_OYOMABANG_LIGNE_HTB_D.Ligne 225kV MANGOMBE-OYOMABANG"
+      }
+    ]
+  },
+  "NYOM II_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  225/15kV",
+        "reference": "TRANSPORT-CSE_NYOM II_POSTE SOURCE_HTB_AT N°1  225/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 225kV",
+        "reference": "TRANSPORT-CSE_NYOM II_POSTE SOURCE_HTB_Jeu de barres 225kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 225kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_NYOM II_POSTE SOURCE_HTB_Appareillages Protection 225kV et Auxiliaires"
+      }
+    ]
+  },
+  "NYOM II_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 225 kV  NATCHIGAL-NYOM II",
+        "reference": "TRANSPORT-CSE_NYOM II_LIGNE_HTB_D.Ligne 225 kV  NATCHIGAL-NYOM II"
+      },
+      {
+        "gr_tfo_postes": "D.Ligne 225 kV  NYOM II-OYOMABANG",
+        "reference": "TRANSPORT-CSE_NYOM II_LIGNE_HTB_D.Ligne 225 kV  NYOM II-OYOMABANG"
+      }
+    ]
+  },
+  "KOUMASSI_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-LSO_KOUMASSI_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-LSO_KOUMASSI_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_KOUMASSI_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_KOUMASSI_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "KOUMASSI_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV LOGBABA-KOUMASSI",
+        "reference": "TRANSPORT-LSO_KOUMASSI_LIGNE_HTB_D.Ligne 90kV LOGBABA-KOUMASSI"
+      }
+    ]
+  },
+  "BEKOKO_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-LSO_BEKOKO_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-LSO_BEKOKO_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_BEKOKO_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_BEKOKO_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "BEKOKO_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV BONABERI-BEKOKO",
+        "reference": "TRANSPORT-LSO_BEKOKO_LIGNE_HTB_D.Ligne 90kV BONABERI-BEKOKO"
+      }
+    ]
+  },
+  "BONABERI_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-LSO_BONABERI_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-LSO_BONABERI_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_BONABERI_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_BONABERI_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "BONABERI_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV DEIDO-BONABERI",
+        "reference": "TRANSPORT-LSO_BONABERI_LIGNE_HTB_D.Ligne 90kV DEIDO-BONABERI"
+      }
+    ]
+  },
+  "DEIDO_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-LSO_DEIDO_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-LSO_DEIDO_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_DEIDO_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_DEIDO_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "DEIDO_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV BASSA-DEIDO",
+        "reference": "TRANSPORT-LSO_DEIDO_LIGNE_HTB_D.Ligne 90kV BASSA-DEIDO"
+      }
+    ]
+  },
+  "MAKEPE_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-LSO_MAKEPE_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-LSO_MAKEPE_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_MAKEPE_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_MAKEPE_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "MAKEPE_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV BASSA-MAKEPE",
+        "reference": "TRANSPORT-LSO_MAKEPE_LIGNE_HTB_D.Ligne 90kV BASSA-MAKEPE"
+      }
+    ]
+  },
+  "NGODI BAKOKO_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-LSO_NGODI BAKOKO_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-LSO_NGODI BAKOKO_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_NGODI BAKOKO_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_NGODI BAKOKO_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "NGODI BAKOKO_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV LOGBABA-NGODI BAKOKO",
+        "reference": "TRANSPORT-LSO_NGODI BAKOKO_LIGNE_HTB_D.Ligne 90kV LOGBABA-NGODI BAKOKO"
+      }
+    ]
+  },
+  "LOGBABA_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  225/90kV",
+        "reference": "TRANSPORT-LSO_LOGBABA_POSTE SOURCE_HTB_AT N°1  225/90kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  225/90kV",
+        "reference": "TRANSPORT-LSO_LOGBABA_POSTE SOURCE_HTB_AT N°2  225/90kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°3  90/15kV",
+        "reference": "TRANSPORT-LSO_LOGBABA_POSTE SOURCE_HTB_AT N°3  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_LOGBABA_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 225kV",
+        "reference": "TRANSPORT-LSO_LOGBABA_POSTE SOURCE_HTB_Jeu de barres 225kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 225kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_LOGBABA_POSTE SOURCE_HTB_Appareillages Protection 225kV et Auxiliaires"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_LOGBABA_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "LOGBABA_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 225kV MANGOMBE-LOGBABA",
+        "reference": "TRANSPORT-LSO_LOGBABA_LIGNE_HTB_D.Ligne 225kV MANGOMBE-LOGBABA"
+      },
+      {
+        "gr_tfo_postes": "D.Ligne 225kV SOGLOULOU-LOGBABA",
+        "reference": "TRANSPORT-LSO_LOGBABA_LIGNE_HTB_D.Ligne 225kV SOGLOULOU-LOGBABA"
+      }
+    ]
+  },
+  "BASSA_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-LSO_BASSA_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-LSO_BASSA_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°3  90/15kV",
+        "reference": "TRANSPORT-LSO_BASSA_POSTE SOURCE_HTB_AT N°3  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_BASSA_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_BASSA_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "BASSA_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV LOGBABA-BASSA",
+        "reference": "TRANSPORT-LSO_BASSA_LIGNE_HTB_D.Ligne 90kV LOGBABA-BASSA"
+      }
+    ]
+  },
+  "MAROUA_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-NEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-NEA_MAROUA_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/30kV",
+        "reference": "TRANSPORT-NEA_MAROUA_POSTE SOURCE_HTB_AT N°2  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-NEA_MAROUA_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-NEA_MAROUA_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "MAROUA_LIGNE_HTB": {
+    "segment": "TRANSPORT-NEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 110kV GUIDER-MAROUA",
+        "reference": "TRANSPORT-NEA_MAROUA_LIGNE_HTB_D.Ligne 110kV GUIDER-MAROUA"
+      }
+    ]
+  },
+  "DJAMBOUTOU_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-NEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT N°1  90/15kV",
+        "reference": "TRANSPORT-NEA_DJAMBOUTOU_POSTE SOURCE_HTB_AT N°1  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "AT N°2  90/15kV",
+        "reference": "TRANSPORT-NEA_DJAMBOUTOU_POSTE SOURCE_HTB_AT N°2  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-NEA_DJAMBOUTOU_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-NEA_DJAMBOUTOU_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "DJAMBOUTOU_LIGNE_HTB": {
+    "segment": "TRANSPORT-NEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 110kV LAGDO-DJAMBOUTOU",
+        "reference": "TRANSPORT-NEA_DJAMBOUTOU_LIGNE_HTB_D.Ligne 110kV LAGDO-DJAMBOUTOU"
+      }
+    ]
+  },
+  "GUIDER_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-NEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT   90/15kV",
+        "reference": "TRANSPORT-NEA_GUIDER_POSTE SOURCE_HTB_AT   90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-NEA_GUIDER_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-NEA_GUIDER_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "GUIDER_LIGNE_HTB": {
+    "segment": "TRANSPORT-NEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 110kV DJAMBOUTOU-GUIDER",
+        "reference": "TRANSPORT-NEA_GUIDER_LIGNE_HTB_D.Ligne 110kV DJAMBOUTOU-GUIDER"
+      }
+    ]
+  },
+  "LAGDO_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-NEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "Jeu de barres 110kV",
+        "reference": "TRANSPORT-NEA_LAGDO_POSTE SOURCE_HTB_Jeu de barres 110kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 110kV et Auxiliaires",
+        "reference": "TRANSPORT-NEA_LAGDO_POSTE SOURCE_HTB_Appareillages Protection 110kV et Auxiliaires"
+      }
+    ]
+  },
+  "NGAOUNDERE_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-NEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  110/15kV",
+        "reference": "TRANSPORT-NEA_NGAOUNDERE_POSTE SOURCE_HTB_AT  110/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 110kV",
+        "reference": "TRANSPORT-NEA_NGAOUNDERE_POSTE SOURCE_HTB_Jeu de barres 110kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 110kV et Auxiliaires",
+        "reference": "TRANSPORT-NEA_NGAOUNDERE_POSTE SOURCE_HTB_Appareillages Protection 110kV et Auxiliaires"
+      }
+    ]
+  },
+  "NGAOUNDERE_LIGNE_HTB": {
+    "segment": "TRANSPORT-NEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 110kV LAGDO-NGAOUNDERE",
+        "reference": "TRANSPORT-NEA_NGAOUNDERE_LIGNE_HTB_D.Ligne 110kV LAGDO-NGAOUNDERE"
+      }
+    ]
+  },
+  "DJOB_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/30kV",
+        "reference": "TRANSPORT-CSE_DJOB_POSTE SOURCE_HTB_AT  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_DJOB_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_DJOB_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "DJOB_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV MEMVELE-DJOB",
+        "reference": "TRANSPORT-CSE_DJOB_LIGNE_HTB_D.Ligne 90kV MEMVELE-DJOB"
+      }
+    ]
+  },
+  "EKOMBITIE_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/15kV",
+        "reference": "TRANSPORT-CSE_EKOMBITIE_POSTE SOURCE_HTB_AT  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_EKOMBITIE_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_EKOMBITIE_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "EKOMBITIE_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV AHALA-EKOMBITIE",
+        "reference": "TRANSPORT-CSE_EKOMBITIE_LIGNE_HTB_D.Ligne 90kV AHALA-EKOMBITIE"
+      }
+    ]
+  },
+  "NDJOCK NKONG_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/30kV",
+        "reference": "TRANSPORT_NDJOCK NKONG_POSTE SOURCE_HTB_AT  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT_NDJOCK NKONG_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT_NDJOCK NKONG_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "NDJOCK NKONG_LIGNE_HTB": {
+    "segment": "TRANSPORT",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV C_EDEA-NDJOCK NKONG",
+        "reference": "TRANSPORT_NDJOCK NKONG_LIGNE_HTB_D.Ligne 90kV C_EDEA-NDJOCK NKONG"
+      },
+      {
+        "gr_tfo_postes": "D.Ligne 90kV NDJOCK NKONG-OYOMABANG",
+        "reference": "TRANSPORT_NDJOCK NKONG_LIGNE_HTB_D.Ligne 90kV NDJOCK NKONG-OYOMABANG"
+      }
+    ]
+  },
+  "NJOMBE_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/30kV",
+        "reference": "TRANSPORT-LSO_NJOMBE_POSTE SOURCE_HTB_AT  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_NJOMBE_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_NJOMBE_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "NJOMBE_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV BEKOKO-NJOMBE",
+        "reference": "TRANSPORT-LSO_NJOMBE_LIGNE_HTB_D.Ligne 90kV BEKOKO-NJOMBE"
+      }
+    ]
+  },
+  "NKONGSAMBA_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/30kV",
+        "reference": "TRANSPORT-LSO_NKONGSAMBA_POSTE SOURCE_HTB_AT  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_NKONGSAMBA_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_NKONGSAMBA_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "NKONGSAMBA_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV NJOMBE-NKONGSAMBA",
+        "reference": "TRANSPORT-LSO_NKONGSAMBA_LIGNE_HTB_D.Ligne 90kV NJOMBE-NKONGSAMBA"
+      }
+    ]
+  },
+  "MILE 2 LIMBE_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/30kV",
+        "reference": "TRANSPORT-LSO_MILE 2 LIMBE_POSTE SOURCE_HTB_AT  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-LSO_MILE 2 LIMBE_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-LSO_MILE 2 LIMBE_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "MILE 2 LIMBE_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV BEKOKO-MILE2 LIMBE",
+        "reference": "TRANSPORT-LSO_MILE 2 LIMBE_LIGNE_HTB_D.Ligne 90kV BEKOKO-MILE2 LIMBE"
+      }
+    ]
+  },
+  "BAFOUSSAM_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-ONO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/30kV",
+        "reference": "TRANSPORT-ONO_BAFOUSSAM_POSTE SOURCE_HTB_AT  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-ONO_BAFOUSSAM_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-ONO_BAFOUSSAM_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "BAFOUSSAM_LIGNE_HTB": {
+    "segment": "TRANSPORT-ONO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV NKONGSAMBA-BAFOUSSAM",
+        "reference": "TRANSPORT-ONO_BAFOUSSAM_LIGNE_HTB_D.Ligne 90kV NKONGSAMBA-BAFOUSSAM"
+      }
+    ]
+  },
+  "BAMENDA_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-ONO",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/30kV",
+        "reference": "TRANSPORT-ONO_BAMENDA_POSTE SOURCE_HTB_AT  90/30kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-ONO_BAMENDA_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-ONO_BAMENDA_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "BAMENDA_LIGNE_HTB": {
+    "segment": "TRANSPORT-ONO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV BAFOUSSAM-BAMENDA",
+        "reference": "TRANSPORT-ONO_BAMENDA_LIGNE_HTB_D.Ligne 90kV BAFOUSSAM-BAMENDA"
+      }
+    ]
+  },
+  "BERTOUA_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/15kV",
+        "reference": "TRANSPORT-CSE_BERTOUA_POSTE SOURCE_HTB_AT  90/15kV"
+      },
+      {
+        "gr_tfo_postes": "Jeu de barres 90kV",
+        "reference": "TRANSPORT-CSE_BERTOUA_POSTE SOURCE_HTB_Jeu de barres 90kV"
+      },
+      {
+        "gr_tfo_postes": "Appareillages Protection 90kV et Auxiliaires",
+        "reference": "TRANSPORT-CSE_BERTOUA_POSTE SOURCE_HTB_Appareillages Protection 90kV et Auxiliaires"
+      }
+    ]
+  },
+  "BERTOUA_LIGNE_HTB": {
+    "segment": "TRANSPORT-CSE",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90kV LOM PANGAR-BERTOUA",
+        "reference": "TRANSPORT-CSE_BERTOUA_LIGNE_HTB_D.Ligne 90kV LOM PANGAR-BERTOUA"
+      }
+    ]
+  },
+  "MPOLONGWE_POSTE SOURCE_HTB": {
+    "segment": "TRANSPORT",
+    "posts": [
+      {
+        "gr_tfo_postes": "AT  90/30kV",
+        "reference": "TRANSPORT_MPOLONGWE_POSTE SOURCE_HTB_AT  90/30kV"
+      }
+    ]
+  },
+  "MANGOMBE_POSTE DE MANGOMBE": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "TRAVEE 225 kV TFO",
+        "reference": "TRANSPORT-LSO_MANGOMBE_POSTE DE MANGOMBE _TRAVEE 225 kV TFO"
+      },
+      {
+        "gr_tfo_postes": "TRAVEE 90 kV TFO",
+        "reference": "TRANSPORT-LSO_MANGOMBE_POSTE DE MANGOMBE _TRAVEE 90 kV TFO"
+      },
+      {
+        "gr_tfo_postes": "TFO 225/90 kV 105 MVA",
+        "reference": "TRANSPORT-LSO_MANGOMBE_POSTE DE MANGOMBE _TFO 225/90 kV 105 MVA"
+      }
+    ]
+  },
+  "MANGOMBE_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 225 kV  SONGLOULOU- MANGOMBE 1",
+        "reference": "TRANSPORT-LSO_MANGOMBE_LIGNE_HTB_D.Ligne 225 kV  SONGLOULOU- MANGOMBE 1"
+      },
+      {
+        "gr_tfo_postes": "D.Ligne 225 kV  SONGLOULOU- MANGOMBE 2",
+        "reference": "TRANSPORT-LSO_MANGOMBE_LIGNE_HTB_D.Ligne 225 kV  SONGLOULOU- MANGOMBE 2"
+      }
+    ]
+  },
+  "DIBAMBA_LIGNE_HTB": {
+    "segment": "TRANSPORT-LSO",
+    "posts": [
+      {
+        "gr_tfo_postes": "D.Ligne 90 kV DIBAMBA – NGODI BAKOKO",
+        "reference": "TRANSPORT-LSO_DIBAMBA_LIGNE_HTB_D.Ligne 90 kV DIBAMBA – NGODI BAKOKO"
+      }
+    ]
+  }
+}

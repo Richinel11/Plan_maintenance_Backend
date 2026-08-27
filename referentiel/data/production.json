@@ -1,0 +1,228 @@
+{
+  "DCP": {
+    "segment": "PRODUCTION - EDEA",
+    "posts": [
+      {
+        "gr_tfo_postes": "Groupe 01 - TR01",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 01 - TR01"
+      },
+      {
+        "gr_tfo_postes": "Groupe 02 - TR02",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 02 - TR02"
+      },
+      {
+        "gr_tfo_postes": "Groupe 03 - TR03",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 03 - TR03"
+      },
+      {
+        "gr_tfo_postes": "Groupe 04 - ALUCAM",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 04 - ALUCAM"
+      },
+      {
+        "gr_tfo_postes": "Groupe 05 - ALUCAM",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 05 - ALUCAM"
+      },
+      {
+        "gr_tfo_postes": "Groupe 06 - ALUCAM",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 06 - ALUCAM"
+      },
+      {
+        "gr_tfo_postes": "EDEA_Groupe 07 - ALUCAM",
+        "reference": "PRODUCTION - EDEA_DCP_EDEA_Groupe 07 - ALUCAM"
+      },
+      {
+        "gr_tfo_postes": "Groupe 08 - ALUCAM",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 08 - ALUCAM"
+      },
+      {
+        "gr_tfo_postes": "Groupe 09 - ALUCAM",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 09 - ALUCAM"
+      },
+      {
+        "gr_tfo_postes": "Groupe 10 - TR10",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 10 - TR10"
+      },
+      {
+        "gr_tfo_postes": "Groupe 11 - TR11",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 11 - TR11"
+      },
+      {
+        "gr_tfo_postes": "Groupe 12 -TR12",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 12 -TR12"
+      },
+      {
+        "gr_tfo_postes": "Groupe 13 - TR13",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 13 - TR13"
+      },
+      {
+        "gr_tfo_postes": "Groupe 14 - TR14",
+        "reference": "PRODUCTION - EDEA_DCP_Groupe 14 - TR14"
+      },
+      {
+        "gr_tfo_postes": "Groupe 1-  TR01",
+        "reference": "PRODUCTION - LAGDO_DCP_Groupe 1-  TR01"
+      },
+      {
+        "gr_tfo_postes": "Groupe 2 - TR02",
+        "reference": "PRODUCTION - LAGDO_DCP_Groupe 2 - TR02"
+      },
+      {
+        "gr_tfo_postes": "Groupe 3 - TR03",
+        "reference": "PRODUCTION - LAGDO_DCP_Groupe 3 - TR03"
+      },
+      {
+        "gr_tfo_postes": "Groupe 4 - TR04",
+        "reference": "PRODUCTION - LAGDO_DCP_Groupe 4 - TR04"
+      },
+      {
+        "gr_tfo_postes": "Groupe 1 - TR01",
+        "reference": "PRODUCTION - SLL_DCP_Groupe 1 - TR01"
+      },
+      {
+        "gr_tfo_postes": "Groupe 2 - TR01",
+        "reference": "PRODUCTION - SLL_DCP_Groupe 2 - TR01"
+      },
+      {
+        "gr_tfo_postes": "Groupe 3 - TR02",
+        "reference": "PRODUCTION - SLL_DCP_Groupe 3 - TR02"
+      },
+      {
+        "gr_tfo_postes": "Groupe 4 - TR02",
+        "reference": "PRODUCTION - SLL_DCP_Groupe 4 - TR02"
+      },
+      {
+        "gr_tfo_postes": "Groupe 5 - TR03",
+        "reference": "PRODUCTION - SLL_DCP_Groupe 5 - TR03"
+      },
+      {
+        "gr_tfo_postes": "Groupe 6 - TR03",
+        "reference": "PRODUCTION - SLL_DCP_Groupe 6 - TR03"
+      },
+      {
+        "gr_tfo_postes": "Groupe 7 - TR04",
+        "reference": "PRODUCTION - SLL_DCP_Groupe 7 - TR04"
+      },
+      {
+        "gr_tfo_postes": "Groupe 8 - TR04",
+        "reference": "PRODUCTION - SLL_DCP_Groupe 8 - TR04"
+      }
+    ]
+  },
+  "IPP": {
+    "segment": "PRODUCTION - NHPC",
+    "posts": [
+      {
+        "gr_tfo_postes": "Groupe 1 - TR01",
+        "reference": "PRODUCTION - NHPC_IPP_Groupe 1 - TR01"
+      },
+      {
+        "gr_tfo_postes": "Groupe 2 - TR02",
+        "reference": "PRODUCTION - NHPC_IPP_Groupe 2 - TR02"
+      },
+      {
+        "gr_tfo_postes": "Groupe 3 - TR03",
+        "reference": "PRODUCTION - NHPC_IPP_Groupe 3 - TR03"
+      },
+      {
+        "gr_tfo_postes": "Groupe 4 - TR04",
+        "reference": "PRODUCTION - NHPC_IPP_Groupe 4 - TR04"
+      },
+      {
+        "gr_tfo_postes": "Groupe 5 - TR05",
+        "reference": "PRODUCTION - NHPC_IPP_Groupe 5 - TR05"
+      },
+      {
+        "gr_tfo_postes": "Groupe 6 - TR06",
+        "reference": "PRODUCTION - NHPC_IPP_Groupe 6 - TR06"
+      },
+      {
+        "gr_tfo_postes": "Groupe 7 - TR07",
+        "reference": "PRODUCTION - NHPC_IPP_Groupe 7 - TR07"
+      },
+      {
+        "gr_tfo_postes": "Groupe 01",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 01"
+      },
+      {
+        "gr_tfo_postes": "Groupe 02",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 02"
+      },
+      {
+        "gr_tfo_postes": "Groupe 03",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 03"
+      },
+      {
+        "gr_tfo_postes": "Groupe 04",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 04"
+      },
+      {
+        "gr_tfo_postes": "Groupe 05",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 05"
+      },
+      {
+        "gr_tfo_postes": "Groupe 06",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 06"
+      },
+      {
+        "gr_tfo_postes": "Groupe 07",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 07"
+      },
+      {
+        "gr_tfo_postes": "Groupe 08",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 08"
+      },
+      {
+        "gr_tfo_postes": "Groupe 09",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 09"
+      },
+      {
+        "gr_tfo_postes": "Groupe 10",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 10"
+      },
+      {
+        "gr_tfo_postes": "Groupe 11",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 11"
+      },
+      {
+        "gr_tfo_postes": "Groupe 12",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 12"
+      },
+      {
+        "gr_tfo_postes": "Groupe 13",
+        "reference": "PRODUCTION - KPDC_IPP_Groupe 13"
+      },
+      {
+        "gr_tfo_postes": "Groupe 1",
+        "reference": "PRODUCTION - DPDC_IPP_Groupe 1"
+      },
+      {
+        "gr_tfo_postes": "Groupe 2",
+        "reference": "PRODUCTION - DPDC_IPP_Groupe 2"
+      },
+      {
+        "gr_tfo_postes": "Groupe 3",
+        "reference": "PRODUCTION - DPDC_IPP_Groupe 3"
+      },
+      {
+        "gr_tfo_postes": "Groupe 4",
+        "reference": "PRODUCTION - DPDC_IPP_Groupe 4"
+      },
+      {
+        "gr_tfo_postes": "Groupe 5",
+        "reference": "PRODUCTION - DPDC_IPP_Groupe 5"
+      },
+      {
+        "gr_tfo_postes": "Groupe 6",
+        "reference": "PRODUCTION - DPDC_IPP_Groupe 6"
+      },
+      {
+        "gr_tfo_postes": "Groupe 7",
+        "reference": "PRODUCTION - DPDC_IPP_Groupe 7"
+      },
+      {
+        "gr_tfo_postes": "Groupe 8",
+        "reference": "PRODUCTION - DPDC_IPP_Groupe 8"
+      }
+    ]
+  }
+}

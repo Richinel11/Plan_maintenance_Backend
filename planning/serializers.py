@@ -249,6 +249,9 @@ class PropositionAlignementSerializer(serializers.ModelSerializer):
 
     travail_a_modifier_ref = serializers.SerializerMethodField()
     travail_reference_ref = serializers.SerializerMethodField()
+    travail_a_modifier_verrouille = serializers.BooleanField(
+        source='travail_a_modifier.alignement_verrouille', read_only=True
+    )
     cree_par_nom = serializers.CharField(source='cree_par.get_full_name', read_only=True)
     planning = serializers.SerializerMethodField()
 
@@ -263,12 +266,13 @@ class PropositionAlignementSerializer(serializers.ModelSerializer):
             'ancienne_fin','nouveau_debut', 'nouvelle_fin',
             'raison','conflit_charge_consignation',
             'detail_conflit','travail_a_modifier',
-            'travail_a_modifier_ref','travail_reference',
+            'travail_a_modifier_ref','travail_a_modifier_verrouille',
+            'travail_reference',
             'travail_reference_ref','cree_par_nom', 'created_at',
             'planning',
         ]
-        
-        
+
+
     def get_travail_a_modifier_ref(self, obj):
         if obj.travail_a_modifier and obj.travail_a_modifier.reference:
             return obj.travail_a_modifier.reference.valeur
