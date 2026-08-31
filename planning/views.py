@@ -585,7 +585,7 @@ class TravailViewSet(ModelViewSet):
     @extend_schema(
         request=inline_serializer('ChangerStatutSerializer', fields={
             'statut_travaux': drf_serializers.ChoiceField(choices=[
-                'BROUILLON', 'SOUMIS', 'VALIDE', 'REPORTE', 'EN_COURS', 'TERMINE'
+                'BROUILLON', 'SOUMIS', 'VALIDE', 'REPORTE', 'EN_COURS', 'TERMINE', 'ANNULE'
             ])
         }),
         responses={200: TravailSerializer, 400: {"type": "object"}},
@@ -879,3 +879,41 @@ class TravailViewSet(ModelViewSet):
             "interne": interne,
             "non_renseigne": non_renseigne,
         })
+
+    @extend_schema(
+        tags=["KPI - Rapport suivi"],
+        description=(
+            "Rapport consolidé « Suivi des travaux prévisionnels » (tuiles de synthèse "
+            "+ 5 tableaux : par région/mois, évolution mois M vs M-1 par segment, "
+            "nombre de TP par segment/mois, durée des interruptions par segment, "
+            "travaux exécutés en alignement). "
+            "Paramètres optionnels : ?annee=2026&mois=5 (Mois M de référence pour les "
+            "comparaisons M vs M-1 ; par défaut le mois courant). "
+            "Les tableaux couvrent la période cumulée du 1er janvier de `annee` "
+            "jusqu'à la fin de `mois` (year-to-date). "
+            "Voir planning/rapport_suivi_service.py pour le détail des conventions "
+            "de calcul (gain END alignée, taux de conformité, résolution de région)."
+        )
+    )
+    @action(detail=False, methods=['GET'], url_path='rapport-suivi')
+    def rapport_suivi(self, request):
+        from .rapport_suivi_service import generer_rapport_suivi
+
+        aujourdhui = timezone.localdate()
+        try:
+            annee = int(request.query_params.get('annee', aujourdhui.year))
+            mois = int(request.query_params.get('mois', aujourdhui.month))
+        except (TypeError, ValueError):
+            return Response(
+                {"error": "annee et mois doivent être des entiers."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not (1 <= mois <= 12):
+            return Response(
+                {"error": "mois doit être compris entre 1 et 12."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        rapport = generer_rapport_suivi(annee, mois, queryset=self.get_queryset())
+        return Response(rapport)

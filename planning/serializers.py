@@ -136,6 +136,9 @@ class TravailSerializer(serializers.ModelSerializer):
             'statut_probleme', 'probleme_rencontre', 'travail_en_alignement',
             'alignement_verrouille', 'date_report_travaux',
 
+            # Réalisation (saisis une fois le travail exécuté)
+            'heure_debut_reel', 'heure_fin_reel', 'duree_reelle_heures', 'end_realise_mwh',
+
             # Audit
             'date_creation', 'date_modification',
 
@@ -153,7 +156,8 @@ class TravailSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'heure_fin_planifie', 'nombre_jours_avant_travaux',
             'prevision_enf_mwh', 'date_creation', 'date_modification',
-            'type_alignement'   #  calculé automatiquement
+            'type_alignement',   #  calculé automatiquement
+            'duree_reelle_heures',   #  calculé automatiquement depuis heure_debut_reel/heure_fin_reel
             ]
 
     def get_demande_retrait(self, obj):

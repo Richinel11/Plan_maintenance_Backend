@@ -11,6 +11,17 @@ REGION_CODES = [
     'DRE',
     'DRS',
     'DRSO',
+    # Codes du rapport "Suivi des travaux prévisionnels" (KPI direction)
+    'CSE',
+    'DRNEA',
+    'DRSANO',
+    'DRSOM',
+    'EDEA',
+    'LAGDO',
+    'LSO',
+    'ONO',
+    'POSTE SOURCE',
+    'SLL',
 ]
 
 

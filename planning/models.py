@@ -72,6 +72,7 @@ class Travail(models.Model):
         DISTRIBUTION = "DISTRIBUTION", _("Distribution")
         TRANSPORT    = "TRANSPORT",    _("Transport")
         PRODUCTION   = "PRODUCTION",   _("Production")
+        DACOR        = "DACOR",        _("Dacor")
         
     class Priorite(models.TextChoices):
         P1 = "P1", _("P1 - Urgent")
@@ -105,8 +106,17 @@ class Travail(models.Model):
         ('VALIDE', 'Validé'),
         ('EN_COURS', 'En cours'),
         ('TERMINE', 'Terminé'),
-        ('REPORTE', 'Reporté')
+        ('REPORTE', 'Reporté'),
+        ('ANNULE', 'Annulé'),
     ]
+
+    # Facteurs de conversion vers l'heure, utilisés pour agréger les durées
+    # (prévues et réalisées) sur des travaux exprimés dans des unités différentes.
+    HEURES_PAR_UNITE_DUREE = {
+        'HEURES': 1,
+        'JOURS': 24,
+        'SEMAINES': 168,
+    }
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     planning = models.ForeignKey(Planning, on_delete=models.CASCADE, related_name='travaux')
@@ -179,6 +189,14 @@ class Travail(models.Model):
     alignement_verrouille = models.BooleanField(default=False)
     date_report_travaux = models.DateField(null=True, blank=True)
 
+    #  Réalisation (valeurs constatées après exécution effective du travail,
+    #  saisies une fois le travail TERMINE — distinctes des champs "planifié"
+    #  ci-dessus, utilisées par les KPI de suivi Prévu vs Réalisé)
+    heure_debut_reel = models.DateTimeField(null=True, blank=True)
+    heure_fin_reel = models.DateTimeField(null=True, blank=True)
+    duree_reelle_heures = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    end_realise_mwh = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
     #  Audit
     cree_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name='travaux_crees')
     modifie_par = models.ForeignKey(Utilisateur, on_delete=models.PROTECT, related_name='travaux_modifies', null=True, blank=True)
@@ -202,8 +220,20 @@ class Travail(models.Model):
                 self.heure_debut_planifie.date() - self.date_programmee
             ).days
 
+        if self.heure_debut_reel and self.heure_fin_reel and not self.duree_reelle_heures:
+            delta = self.heure_fin_reel - self.heure_debut_reel
+            self.duree_reelle_heures = round(delta.total_seconds() / 3600, 2)
+
         super().save(*args, **kwargs)
-        
+
+    @property
+    def duree_planifiee_heures(self):
+        """Durée planifiée convertie en heures, quelle que soit unite_duree."""
+        if not self.duree:
+            return None
+        facteur = self.HEURES_PAR_UNITE_DUREE.get(self.unite_duree, 1)
+        return float(self.duree) * facteur
+
     def _determiner_type_alignement(self):
         if self.segment == 'TRANSPORT':
          return self.TypeAlignement.TRANSPORT
