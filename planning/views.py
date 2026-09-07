@@ -630,30 +630,93 @@ class TravailViewSet(ModelViewSet):
         travail.save()
         return Response({"status": "Travail validé."})
 
+    @staticmethod
+    def _verifier_charge_consignation(request, travail):
+        """
+        Seul le chargé de consignation désigné sur le travail constate le réel
+        (il est le seul présent sur le terrain). Renvoie une Response d'erreur,
+        ou None si l'appelant est légitime.
+        """
+        if request.user.is_superuser:
+            return None
+        if travail.charge_consignation_id != request.user.id:
+            return Response(
+                {"error": "Seul le chargé de consignation désigné sur ce travail "
+                          "peut effectuer cette action."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return None
+
     @action(detail=True, methods=['POST'])
     def demarrer(self, request, pk=None):
+        """
+        Démarrage du travail par le chargé de consignation (bouton ▶).
+
+        L'heure de début réelle n'est pas saisie mais horodatée par le serveur
+        au moment du clic : la donnée est mesurée et non déclarée, ce qui la
+        rend exploitable par les KPI de suivi (cf. rapport_suivi_service).
+        """
         travail = self.get_object()
         if travail.statut_travaux != 'VALIDE':
             return Response(
                 {"error": "Le travail doit être VALIDE pour pouvoir démarrer."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        napt = getattr(travail, 'note_arret', None)
+        if napt is None or napt.statut != 'DIFFUSEE':
+            return Response(
+                {"error": "La NAPT du travail doit être diffusée pour pouvoir le démarrer."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        erreur = self._verifier_charge_consignation(request, travail)
+        if erreur:
+            return erreur
+
         travail.statut_travaux = 'EN_COURS'
+        travail.heure_debut_reel = timezone.now()
+        travail.modifie_par = request.user
         travail.save()
-        return Response({"status": "Travail en cours."})
+        return Response({
+            "status": "Travail en cours.",
+            "heure_debut_reel": travail.heure_debut_reel,
+        })
 
     @action(detail=True, methods=['POST'])
     def terminer(self, request, pk=None):
+        """
+        Clôture du travail par le chargé de consignation (bouton ⏹).
+
+        Exige que le travail ait été démarré : un travail ne peut donc plus
+        passer en TERMINE sans porter ses heures réelles.
+        """
         travail = self.get_object()
+        if travail.statut_travaux != 'EN_COURS':
+            return Response(
+                {"error": "Le travail doit avoir été démarré (EN_COURS) pour "
+                          "pouvoir être terminé."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         napt = getattr(travail, 'note_arret', None)
         if napt is None or napt.statut != 'DIFFUSEE':
             return Response(
                 {"error": "La NAPT du travail doit être diffusée pour pouvoir le terminer."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        erreur = self._verifier_charge_consignation(request, travail)
+        if erreur:
+            return erreur
+
         travail.statut_travaux = 'TERMINE'
+        travail.heure_fin_reel = timezone.now()
+        travail.modifie_par = request.user
+        # duree_reelle_heures est déduite du couple début/fin dans Travail.save()
         travail.save()
-        return Response({"status": "Travail terminé."})
+        return Response({
+            "status": "Travail terminé.",
+            "heure_debut_reel": travail.heure_debut_reel,
+            "heure_fin_reel": travail.heure_fin_reel,
+            "duree_reelle_heures": travail.duree_reelle_heures,
+        })
 
     # ── FILTRES ──
 
